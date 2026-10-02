@@ -1,0 +1,45 @@
+# OpenMetadata가 카탈로그화할 "소스" 데이터베이스.
+# OpenMetadata 자체 스택(docker-compose.yml, 공식 배포본)과는 별개의 compose 프로젝트로 띄운다.
+# 5432 포트를 호스트에 공개해서, OpenMetadata 컨테이너에서는 host.docker.internal:5432 로 접속한다.
+services:
+  sourcedb:
+    image: postgres:16
+    container_name: openmetadata_demo_sourcedb
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: demo
+      POSTGRES_PASSWORD: demo
+      POSTGRES_DB: retaildb
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./sourcedb-init:/docker-entrypoint-initdb.d:ro
+      - sourcedb-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U demo -d retaildb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  sourcedb2:
+    image: postgres:16
+    container_name: openmetadata_demo_sourcedb2
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: demo2
+      POSTGRES_PASSWORD: demo2
+      POSTGRES_DB: manufacturingdb
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./sourcedb-init2:/docker-entrypoint-initdb.d:ro
+      - sourcedb2-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U demo2 -d manufacturingdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  sourcedb-data:
+  sourcedb2-data:

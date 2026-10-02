@@ -1,0 +1,4 @@
+# Generated Airflow submissions may contain DB credentials.
+/jobs/airflow_*.conf
+/output/airflow_batch/
+__pycache__/

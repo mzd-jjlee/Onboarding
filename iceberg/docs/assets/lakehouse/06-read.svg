@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="645" viewBox="0 0 1200 645" role="img" aria-label="06  ·  읽기: 실제 파일을 여는 주체가 다르다">
+<title>06  ·  읽기: 실제 파일을 여는 주체가 다르다</title><desc>공통: HMS는 테이블 위치를 알려준다. 데이터 행이 HMS를 통과할 필요는 없다.</desc>
+<defs><marker id="arrow-06-read" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#68798a"/></marker></defs>
+<rect width="1200" height="100%" rx="18" fill="#ffffff"/>
+<style>text{font-family:"Apple SD Gothic Neo","Malgun Gothic",sans-serif;fill:#203349} .title{font-size:27px;font-weight:700} .sub{font-size:18px;fill:#53677b} .node{font-size:21px;font-weight:700} .body{font-size:17px} .label{font-size:16px;fill:#53677b}</style>
+<text x="35" y="44" class="title" text-anchor="start">06  ·  읽기: 실제 파일을 여는 주체가 다르다</text>
+<text x="35" y="76" class="sub" text-anchor="start">공통: HMS는 테이블 위치를 알려준다. 데이터 행이 HMS를 통과할 필요는 없다.</text>
+<text x="35" y="120" class="node" text-anchor="start">A  ·  PyIceberg가 읽고 DuckDB에 결과 전달</text>
+<rect x="35" y="145" width="250" height="88" rx="12" fill="#f1edff" stroke="#7354ac" stroke-width="1.5"/>
+<text x="53" y="176" class="node" text-anchor="start">HMS</text>
+<text x="53" y="205" class="body" text-anchor="start">테이블 위치 응답</text>
+<rect x="365" y="145" width="400" height="106" rx="12" fill="#fff2df" stroke="#986014" stroke-width="1.5"/>
+<text x="383" y="176" class="node" text-anchor="start">PyIceberg + Arrow</text>
+<text x="383" y="205" class="body" text-anchor="start">메타데이터·Parquet 읽기</text>
+<text x="383" y="229" class="body" text-anchor="start">필터 / 컬럼 선택 후 메모리 결과</text>
+<rect x="845" y="145" width="320" height="106" rx="12" fill="#eaf2ff" stroke="#2963ba" stroke-width="1.5"/>
+<text x="863" y="176" class="node" text-anchor="start">DuckDB</text>
+<text x="863" y="205" class="body" text-anchor="start">Arrow 결과로 SQL 실행</text>
+<text x="863" y="229" class="body" text-anchor="start">집계 / 조인</text>
+<polyline points="285,190 365,190" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-06-read)"/>
+<polyline points="765,190 845,190" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-06-read)"/>
+<text x="805" y="176" class="label" text-anchor="middle">Arrow</text>
+<rect x="365" y="295" width="400" height="88" rx="12" fill="#e8f6ee" stroke="#26784c" stroke-width="1.5"/>
+<text x="383" y="326" class="node" text-anchor="start">공유 파일 저장소 /lake</text>
+<text x="383" y="355" class="body" text-anchor="start">Iceberg metadata + Parquet</text>
+<polyline points="565,295 565,251" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-06-read)"/>
+<text x="35" y="436" class="node" text-anchor="start">B  ·  PyIceberg는 위치만 찾고 DuckDB가 직접 읽음</text>
+<rect x="35" y="460" width="250" height="88" rx="12" fill="#f1edff" stroke="#7354ac" stroke-width="1.5"/>
+<text x="53" y="491" class="node" text-anchor="start">HMS</text>
+<text x="53" y="520" class="body" text-anchor="start">현재 metadata 위치</text>
+<rect x="345" y="460" width="310" height="88" rx="12" fill="#fff2df" stroke="#986014" stroke-width="1.5"/>
+<text x="363" y="491" class="node" text-anchor="start">PyIceberg</text>
+<text x="363" y="520" class="body" text-anchor="start">metadata_location 전달</text>
+<rect x="715" y="460" width="450" height="106" rx="12" fill="#eaf2ff" stroke="#2963ba" stroke-width="1.5"/>
+<text x="733" y="491" class="node" text-anchor="start">DuckDB + iceberg 확장</text>
+<text x="733" y="520" class="body" text-anchor="start">iceberg_scan(정확한 metadata 경로)</text>
+<text x="733" y="544" class="body" text-anchor="start">공유 저장소의 메타데이터·Parquet 읽기</text>
+<polyline points="285,504 345,504" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-06-read)"/>
+<polyline points="655,504 715,504" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-06-read)"/>
+<polyline points="765,340 940,340 940,460" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-06-read)"/>
+<text x="1040" y="396" class="label" text-anchor="middle">공유 파일 읽기</text>
+<text x="35" y="611" class="sub" text-anchor="start">A는 메모리 결과를 조회 · B는 지정한 테이블 버전을 직접 조회 · 둘 다 새 상태 확인 시 재로드 필요</text>
+</svg>

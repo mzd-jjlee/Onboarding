@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="510" viewBox="0 0 1200 510" role="img" aria-label="05  ·  쓰기: 파일 완성 → 테이블 등록 → 커밋">
+<title>05  ·  쓰기: 파일 완성 → 테이블 등록 → 커밋</title><desc>SeaTunnel LocalFile sink와 PyIceberg add_files()를 나눈 첫 학습 경로</desc>
+<defs><marker id="arrow-05-write" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#68798a"/></marker></defs>
+<rect width="1200" height="100%" rx="18" fill="#ffffff"/>
+<style>text{font-family:"Apple SD Gothic Neo","Malgun Gothic",sans-serif;fill:#203349} .title{font-size:27px;font-weight:700} .sub{font-size:18px;fill:#53677b} .node{font-size:21px;font-weight:700} .body{font-size:17px} .label{font-size:16px;fill:#53677b}</style>
+<text x="35" y="44" class="title" text-anchor="start">05  ·  쓰기: 파일 완성 → 테이블 등록 → 커밋</text>
+<text x="35" y="76" class="sub" text-anchor="start">SeaTunnel LocalFile sink와 PyIceberg add_files()를 나눈 첫 학습 경로</text>
+<rect x="35" y="125" width="330" height="106" rx="12" fill="#eaf2ff" stroke="#2963ba" stroke-width="1.5"/>
+<text x="53" y="156" class="node" text-anchor="start">① SeaTunnel</text>
+<text x="53" y="185" class="body" text-anchor="start">원본 DB 읽기</text>
+<text x="53" y="209" class="body" text-anchor="start">Parquet 파일 완성</text>
+<rect x="435" y="125" width="330" height="106" rx="12" fill="#fff2df" stroke="#986014" stroke-width="1.5"/>
+<text x="453" y="156" class="node" text-anchor="start">② PyIceberg</text>
+<text x="453" y="185" class="body" text-anchor="start">HMS에서 테이블 로드</text>
+<text x="453" y="209" class="body" text-anchor="start">완성된 파일을 add_files</text>
+<rect x="835" y="125" width="330" height="106" rx="12" fill="#e8f6ee" stroke="#26784c" stroke-width="1.5"/>
+<text x="853" y="156" class="node" text-anchor="start">③ 새 메타데이터</text>
+<text x="853" y="185" class="body" text-anchor="start">새 파일 목록 / 스냅샷</text>
+<text x="853" y="209" class="body" text-anchor="start">metadata JSON 작성</text>
+<polyline points="365,178 435,178" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-05-write)"/>
+<polyline points="765,178 835,178" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-05-write)"/>
+<rect x="835" y="325" width="330" height="106" rx="12" fill="#f1edff" stroke="#7354ac" stroke-width="1.5"/>
+<text x="853" y="356" class="node" text-anchor="start">④ HMS 카탈로그 커밋</text>
+<text x="853" y="385" class="body" text-anchor="start">현재 메타데이터 위치 변경</text>
+<text x="853" y="409" class="body" text-anchor="start">충돌 시 검증 / 재시도·실패</text>
+<rect x="35" y="325" width="730" height="106" rx="12" fill="#eaf2ff" stroke="#2963ba" stroke-width="1.5"/>
+<text x="53" y="356" class="node" text-anchor="start">⑤ 새 reader가 새 스냅샷을 읽음</text>
+<text x="53" y="385" class="body" text-anchor="start">디스크에 파일만 생겼을 때는 테이블 결과가 바뀌지 않는다.</text>
+<text x="53" y="409" class="body" text-anchor="start">커밋에 성공해야 테이블의 새 상태로 공개된다.</text>
+<polyline points="1000,231 1000,325" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-05-write)"/>
+<polyline points="835,378 765,378" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-05-write)"/>
+</svg>

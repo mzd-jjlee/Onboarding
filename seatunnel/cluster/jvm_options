@@ -1,0 +1,13 @@
+# JVM Heap - 로컬 cluster 노드용, VM 메모리 9.7GB 기준 노드당 3g 할당
+-Xms1g
+-Xmx3g
+
+# JVM Dump
+-XX:+HeapDumpOnOutOfMemoryError
+-XX:HeapDumpPath=/tmp/seatunnel/dump/zeta-server
+
+# Metaspace
+-XX:MaxMetaspaceSize=2g
+
+# G1GC
+-XX:+UseG1GC

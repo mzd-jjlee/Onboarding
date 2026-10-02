@@ -1,0 +1,450 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>그림으로 이해하는 로컬 레이크하우스</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f6fa;color:#23354a;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;line-height:1.8}main{max-width:1280px;margin:auto;background:white;padding:48px 40px 90px}h1{font-size:38px;line-height:1.3;letter-spacing:-1px}h2{font-size:28px;margin-top:64px;padding-top:22px;border-top:2px solid #dce5ef;line-height:1.45}h3{font-size:22px;margin-top:36px}p{font-size:17px;margin:18px 0}a{color:#205fab;text-underline-offset:3px}aside{color:#53677b;padding:6px 16px;border-left:4px solid #8aa9d1;background:#f5f8fc}figure{margin:28px 0;padding:8px;border:1px solid #dce5ef;border-radius:16px;overflow:auto}figure svg{display:block;width:100%;min-width:760px;height:auto}figcaption{color:#596b7d;font-size:14px;padding:8px 16px}pre{background:#17283d;color:#e2edf9;border-radius:10px;padding:22px;overflow:auto;line-height:1.6;font-size:14px}code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}p code,td code{font-size:.88em;background:#eef3f9;padding:2px 4px;border-radius:4px}table{border-collapse:collapse;width:100%;font-size:15px;min-width:700px}th,td{text-align:left;vertical-align:top;border-bottom:1px solid #dce5ef;padding:12px 14px}th{background:#edf3fb}.table-wrap{overflow:auto;margin:24px 0}.step{padding-left:16px;border-left:3px solid #c4d8f2}strong{color:#173f6a}@media(max-width:700px){main{padding:24px 18px}h1{font-size:29px}h2{font-size:24px}p{font-size:16px}}@media print{body{background:white}main{padding:0;max-width:none}figure{break-inside:avoid}figure svg{min-width:0}h2,h3{break-after:avoid}pre{white-space:pre-wrap}table{min-width:0;font-size:11px}a{color:inherit}}
+</style></head><body><main><h1>그림으로 이해하는 로컬 레이크하우스</h1>
+<aside>SeaTunnel로 DB → Parquet을 만들어본 사람을 위한 Iceberg · Hive Metastore · DuckDB 안내서</aside>
+<aside>검토일: 2026-10-02. 기존 조사 문서 2개와 공식 문서를 대조한 <strong>개념·설계 검증</strong>이다. 컨테이너 실행 및 조합별 통합 테스트를 완료했다는 뜻은 아니다. 예제 경로와 파일명은 설명용이다.</aside>
+<h2>1. 질문에 먼저 답하면</h2>
+<p><strong>맞다. Iceberg 자체를 DB 서버처럼 Docker로 띄우는 것은 아니다.</strong> Iceberg는 데이터를 테이블로 관리하는 <strong>오픈 테이블 포맷</strong>이며, 이를 읽고 쓰는 라이브러리와 엔진 연동 구현이 있다. Compose에 <code>iceberg</code>라는 이름의 서비스가 보이면, 실제 이미지가 실행하는 것은 Spark, REST 카탈로그 같은 주변 구성일 수 있다.</p>
+<p>“Iceberg로 조회한다”는 말은 <strong>DuckDB 같은 엔진이 Iceberg 형식의 테이블을 해석해서 SQL을 실행한다</strong>는 뜻으로 이해하면 된다. Iceberg에 SQL을 보내고, Iceberg가 Hive를 거쳐 DuckDB에 일을 시키는 구조는 아니다. <a href="https://iceberg.apache.org/docs/latest/">Iceberg 소개</a>, <a href="https://duckdb.org/docs/current/core_extensions/iceberg/overview">DuckDB Iceberg 확장</a></p>
+<figure><svg xmlns="http://www.w3.org/2000/svg" width="1200" height="540" viewBox="0 0 1200 540" role="img" aria-label="01  ·  역할을 먼저 나누기">
+<title>01  ·  역할을 먼저 나누기</title><desc>SQL은 DuckDB가 실행하고, Iceberg는 테이블을 구성하는 규칙을 제공한다.</desc>
+<defs><marker id="arrow-01-roles" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#68798a"/></marker></defs>
+<rect width="1200" height="100%" rx="18" fill="#ffffff"/>
+<style>text{font-family:"Apple SD Gothic Neo","Malgun Gothic",sans-serif;fill:#203349} .title{font-size:27px;font-weight:700} .sub{font-size:18px;fill:#53677b} .node{font-size:21px;font-weight:700} .body{font-size:17px} .label{font-size:16px;fill:#53677b}</style>
+<text x="35" y="44" class="title" text-anchor="start">01  ·  역할을 먼저 나누기</text>
+<text x="35" y="76" class="sub" text-anchor="start">SQL은 DuckDB가 실행하고, Iceberg는 테이블을 구성하는 규칙을 제공한다.</text>
+<rect x="35" y="125" width="235" height="106" rx="12" fill="#eaf2ff" stroke="#2963ba" stroke-width="1.5"/>
+<text x="53" y="156" class="node" text-anchor="start">원본 DB</text>
+<text x="53" y="185" class="body" text-anchor="start">업무 데이터</text>
+<text x="53" y="209" class="body" text-anchor="start">PostgreSQL / MySQL</text>
+<rect x="330" y="125" width="235" height="106" rx="12" fill="#eaf2ff" stroke="#2963ba" stroke-width="1.5"/>
+<text x="348" y="156" class="node" text-anchor="start">SeaTunnel Zeta</text>
+<text x="348" y="185" class="body" text-anchor="start">읽고 적재하는 엔진</text>
+<text x="348" y="209" class="body" text-anchor="start">LocalFile / Iceberg sink</text>
+<rect x="635" y="125" width="235" height="106" rx="12" fill="#e8f6ee" stroke="#26784c" stroke-width="1.5"/>
+<text x="653" y="156" class="node" text-anchor="start">로컬 디스크</text>
+<text x="653" y="185" class="body" text-anchor="start">실제 데이터: Parquet</text>
+<text x="653" y="209" class="body" text-anchor="start">테이블 정보: JSON / Avro</text>
+<rect x="930" y="125" width="235" height="106" rx="12" fill="#eaf2ff" stroke="#2963ba" stroke-width="1.5"/>
+<text x="948" y="156" class="node" text-anchor="start">DuckDB</text>
+<text x="948" y="185" class="body" text-anchor="start">SQL · 집계 · 조인</text>
+<text x="948" y="209" class="body" text-anchor="start">파일을 읽어 결과 생성</text>
+<polyline points="270,178 330,178" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-01-roles)"/>
+<polyline points="565,178 635,178" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-01-roles)"/>
+<polyline points="870,178 930,178" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-01-roles)"/>
+<text x="900" y="164" class="label" text-anchor="middle">읽기</text>
+<rect x="635" y="310" width="235" height="106" rx="12" fill="#f1edff" stroke="#7354ac" stroke-width="1.5"/>
+<text x="653" y="341" class="node" text-anchor="start">Hive Metastore</text>
+<text x="653" y="370" class="body" text-anchor="start">이름 → 현재 메타 위치</text>
+<text x="653" y="394" class="body" text-anchor="start">카탈로그 서비스</text>
+<rect x="35" y="310" width="530" height="106" rx="12" fill="#fff2df" stroke="#986014" stroke-width="1.5"/>
+<text x="53" y="341" class="node" text-anchor="start">Iceberg = 테이블 포맷 + 구현</text>
+<text x="53" y="370" class="body" text-anchor="start">별도 SQL 서버가 아니라, 파일 집합과 버전을 관리하는 규약</text>
+<text x="53" y="394" class="body" text-anchor="start">writer와 reader 안의 라이브러리 / 확장이 처리한다</text>
+<polyline points="1048,231 1048,365 870,365" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-01-roles)" stroke-dasharray="7 5"/>
+<text x="1000" y="345" class="label" text-anchor="middle">테이블 찾기</text>
+<text x="35" y="493" class="sub" text-anchor="start">※ 조회 경로에 따라 PyIceberg가 파일을 읽어 DuckDB에 넘길 수도 있다. 그림 06에서 구분한다.</text>
+</svg>
+<figcaption>구성요소의 역할: 원본 DB, SeaTunnel, 파일, 카탈로그, 조회 엔진</figcaption></figure>
+<div class="table-wrap"><table><thead><tr><th>구성요소</th><th>이 실습에서 맡는 일</th><th>어디에 존재하나?</th></tr></thead><tbody>
+<tr><td>원본 PostgreSQL/MySQL</td><td>업무 데이터의 출발점</td><td>기존 DB 서비스</td></tr>
+<tr><td>SeaTunnel Zeta</td><td>DB에서 읽고 파일로 적재</td><td>작업을 실행하는 엔진 프로세스</td></tr>
+<tr><td>Parquet</td><td>실제 행과 컬럼을 저장하는 파일 형식</td><td>로컬 디스크의 파일</td></tr>
+<tr><td>Iceberg</td><td>어떤 파일들이 한 테이블의 어떤 버전인지 정의</td><td>메타데이터 파일 + 이를 처리하는 구현</td></tr>
+<tr><td>Hive Metastore, HMS</td><td>테이블 이름을 등록하고 현재 메타데이터 위치를 관리</td><td>Java 서비스 + 백엔드 DB</td></tr>
+<tr><td>DuckDB</td><td>SQL 필터·집계·조인</td><td>Python, CLI 등에서 실행되는 임베디드 DB 엔진</td></tr>
+<tr><td>OpenMetadata</td><td>사람이 데이터를 검색하고 설명·소유자·계보를 이해</td><td>별도 메타데이터 관리 서비스</td></tr>
+</tbody></table></div>
+<p>DuckDB는 자체 DB 파일에 데이터를 저장할 수도 있다. <strong>이번 구성에서는 외부 레이크를 조회하는 역할로 쓴다.</strong> Python 전용도 아니다. CLI나 다른 언어에서도 사용할 수 있다. <a href="https://duckdb.org/docs/">DuckDB 개요</a></p>
+<h2>2. 이미 해본 작업에서 무엇이 추가될까?</h2>
+<p>지금까지는 <code>orders</code> 데이터를 Parquet 파일로 내보냈다. DuckDB는 이 파일을 바로 조회할 수 있으므로 <strong>SQL 한 번 실행하는 데 Iceberg와 Hive가 반드시 필요한 것은 아니다.</strong></p>
+<pre><code>-- 일반 Parquet 파일 조회: 이 자체로 Iceberg 조회가 되지는 않는다.
+SELECT status, count(*)
+FROM read_parquet(&#x27;/lake/landing/orders/*.parquet&#x27;)
+GROUP BY status;</code></pre>
+<p>일반 Parquet 조회도 컬럼 선택과 필터 푸시다운, 파일 내부 통계를 활용할 수 있다. Iceberg의 추가 가치는 <strong>테이블 전체에 대한 일관된 파일 집합과 변경 이력</strong>이다. <a href="https://duckdb.org/docs/current/data/parquet/overview">DuckDB Parquet 읽기</a></p>
+<figure><svg xmlns="http://www.w3.org/2000/svg" width="1200" height="480" viewBox="0 0 1200 480" role="img" aria-label="02  ·  파일 적재에 테이블 관리를 더하기">
+<title>02  ·  파일 적재에 테이블 관리를 더하기</title><desc>같은 Parquet 파일이어도, 등록과 커밋 여부에 따라 Iceberg 테이블 포함 여부가 달라진다.</desc>
+<defs><marker id="arrow-02-before-after" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#68798a"/></marker></defs>
+<rect width="1200" height="100%" rx="18" fill="#ffffff"/>
+<style>text{font-family:"Apple SD Gothic Neo","Malgun Gothic",sans-serif;fill:#203349} .title{font-size:27px;font-weight:700} .sub{font-size:18px;fill:#53677b} .node{font-size:21px;font-weight:700} .body{font-size:17px} .label{font-size:16px;fill:#53677b}</style>
+<text x="35" y="44" class="title" text-anchor="start">02  ·  파일 적재에 테이블 관리를 더하기</text>
+<text x="35" y="76" class="sub" text-anchor="start">같은 Parquet 파일이어도, 등록과 커밋 여부에 따라 Iceberg 테이블 포함 여부가 달라진다.</text>
+<rect x="35" y="125" width="230" height="106" rx="12" fill="#f0f3f6" stroke="#566779" stroke-width="1.5"/>
+<text x="53" y="156" class="node" text-anchor="start">지금까지</text>
+<text x="53" y="185" class="body" text-anchor="start">DB → SeaTunnel</text>
+<text x="53" y="209" class="body" text-anchor="start">파일을 완성한다</text>
+<rect x="330" y="125" width="350" height="106" rx="12" fill="#e8f6ee" stroke="#26784c" stroke-width="1.5"/>
+<text x="348" y="156" class="node" text-anchor="start">Parquet 파일들</text>
+<text x="348" y="185" class="body" text-anchor="start">a.parquet / b.parquet</text>
+<text x="348" y="209" class="body" text-anchor="start">폴더의 파일을 직접 조회</text>
+<rect x="765" y="125" width="395" height="106" rx="12" fill="#eaf2ff" stroke="#2963ba" stroke-width="1.5"/>
+<text x="783" y="156" class="node" text-anchor="start">DuckDB read_parquet()</text>
+<text x="783" y="185" class="body" text-anchor="start">파일 경로로 SQL 실행</text>
+<text x="783" y="209" class="body" text-anchor="start">Iceberg가 없어도 가능</text>
+<polyline points="265,178 330,178" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-02-before-after)"/>
+<polyline points="680,178 765,178" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-02-before-after)"/>
+<rect x="35" y="310" width="230" height="106" rx="12" fill="#fff2df" stroke="#986014" stroke-width="1.5"/>
+<text x="53" y="341" class="node" text-anchor="start">이번에 추가</text>
+<text x="53" y="370" class="body" text-anchor="start">PyIceberg 등록</text>
+<text x="53" y="394" class="body" text-anchor="start">새 상태를 커밋</text>
+<rect x="330" y="310" width="350" height="106" rx="12" fill="#e8f6ee" stroke="#26784c" stroke-width="1.5"/>
+<text x="348" y="341" class="node" text-anchor="start">Iceberg 스냅샷</text>
+<text x="348" y="370" class="body" text-anchor="start">이 버전의 파일은 a + b</text>
+<text x="348" y="394" class="body" text-anchor="start">파일 목록 · 스키마 · 이력</text>
+<rect x="765" y="310" width="395" height="106" rx="12" fill="#f1edff" stroke="#7354ac" stroke-width="1.5"/>
+<text x="783" y="341" class="node" text-anchor="start">카탈로그를 통한 테이블 탐색</text>
+<text x="783" y="370" class="body" text-anchor="start">retail.orders → 현재 metadata</text>
+<text x="783" y="394" class="body" text-anchor="start">선택된 스냅샷의 파일만 조회</text>
+<polyline points="265,363 330,363" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-02-before-after)"/>
+<polyline points="765,363 680,363" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-02-before-after)"/>
+</svg>
+<figcaption>기존 파일 적재와 Iceberg 테이블 등록의 차이</figcaption></figure>
+<p>예를 들어 디렉터리에 <code>a.parquet</code>, <code>b.parquet</code>, 실패한 작업의 <code>temp.parquet</code>이 함께 있어도, Iceberg의 현재 스냅샷이 <code>a</code>, <code>b</code>만 가리키면 테이블 조회에는 둘만 들어간다. <strong>파일의 존재와 테이블에 포함되는 것은 다르다.</strong></p>
+<p>“레이크”는 파일을 쌓는 저장 기반에 가깝고, “레이크하우스”는 그 위에 테이블 관리와 SQL 분석 기능을 더한 아키텍처다. 이번 실습은 그 구조를 노트북 한 대에서 축소해서 배우는 것이다.</p>
+<h2>3. ‘메타데이터’는 세 종류로 나눠보자</h2>
+<p>가장 헷갈리는 문장이 “Hive에 메타데이터를 저장한다”다. 일부는 맞지만 <strong>Iceberg의 메타데이터 파일 전체가 HMS의 PostgreSQL 안으로 들어가는 것은 아니다.</strong></p>
+<figure><svg xmlns="http://www.w3.org/2000/svg" width="1200" height="550" viewBox="0 0 1200 550" role="img" aria-label="03  ·  메타데이터는 어디에 저장될까?">
+<title>03  ·  메타데이터는 어디에 저장될까?</title><desc>카탈로그 DB와 Iceberg 메타데이터 파일, 실제 행 데이터는 서로 다른 층이다.</desc>
+<defs><marker id="arrow-03-metadata" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#68798a"/></marker></defs>
+<rect width="1200" height="100%" rx="18" fill="#ffffff"/>
+<style>text{font-family:"Apple SD Gothic Neo","Malgun Gothic",sans-serif;fill:#203349} .title{font-size:27px;font-weight:700} .sub{font-size:18px;fill:#53677b} .node{font-size:21px;font-weight:700} .body{font-size:17px} .label{font-size:16px;fill:#53677b}</style>
+<text x="35" y="44" class="title" text-anchor="start">03  ·  메타데이터는 어디에 저장될까?</text>
+<text x="35" y="76" class="sub" text-anchor="start">카탈로그 DB와 Iceberg 메타데이터 파일, 실제 행 데이터는 서로 다른 층이다.</text>
+<rect x="35" y="120" width="1130" height="87" rx="12" fill="#f1edff" stroke="#7354ac" stroke-width="1.5"/>
+<text x="53" y="151" class="node" text-anchor="start">HMS 백엔드 DB: 이름과 현재 위치</text>
+<text x="53" y="180" class="body" text-anchor="start">retail.orders → metadata_location = file:///lake/.../00002-uuid.metadata.json</text>
+<polyline points="200,207 200,254" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-03-metadata)"/>
+<text x="375" y="239" class="label" text-anchor="middle">위치를 따라 파일 읽기</text>
+<rect x="35" y="254" width="330" height="106" rx="12" fill="#fff2df" stroke="#986014" stroke-width="1.5"/>
+<text x="53" y="285" class="node" text-anchor="start">metadata JSON</text>
+<text x="53" y="314" class="body" text-anchor="start">테이블 스키마 · 파티션 정의</text>
+<text x="53" y="338" class="body" text-anchor="start">현재 스냅샷 → S2</text>
+<rect x="435" y="254" width="330" height="106" rx="12" fill="#fff2df" stroke="#986014" stroke-width="1.5"/>
+<text x="453" y="285" class="node" text-anchor="start">manifest list</text>
+<text x="453" y="314" class="body" text-anchor="start">S2에 포함되는</text>
+<text x="453" y="338" class="body" text-anchor="start">manifest들의 목록</text>
+<rect x="835" y="254" width="330" height="106" rx="12" fill="#fff2df" stroke="#986014" stroke-width="1.5"/>
+<text x="853" y="285" class="node" text-anchor="start">manifest</text>
+<text x="853" y="314" class="body" text-anchor="start">데이터 파일 경로</text>
+<text x="853" y="338" class="body" text-anchor="start">파티션 값 · 통계</text>
+<polyline points="365,307 435,307" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-03-metadata)"/>
+<polyline points="765,307 835,307" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-03-metadata)"/>
+<rect x="835" y="415" width="330" height="88" rx="12" fill="#e8f6ee" stroke="#26784c" stroke-width="1.5"/>
+<text x="853" y="446" class="node" text-anchor="start">Parquet</text>
+<text x="853" y="475" class="body" text-anchor="start">실제 행: 1001, DONE, ...</text>
+<polyline points="1000,360 1000,415" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-03-metadata)"/>
+<text x="35" y="440" class="sub" text-anchor="start">JSON과 Avro는 warehouse 등의 파일 저장소에 있다.</text>
+<text x="35" y="474" class="sub" text-anchor="start">HMS의 PostgreSQL에 Parquet 행을 적재하는 것이 아니다.</text>
+</svg>
+<figcaption>HMS DB, Iceberg 메타데이터 파일, 실제 데이터의 분리</figcaption></figure>
+<div class="table-wrap"><table><thead><tr><th>위치</th><th>예시</th><th>답하는 질문</th></tr></thead><tbody>
+<tr><td>HMS 백엔드 DB</td><td><code>retail.orders</code>, 테이블 속성, <code>metadata_location</code></td><td>이 이름의 테이블은 어디에서 시작해서 읽나?</td></tr>
+<tr><td>Iceberg metadata JSON</td><td>스키마, 파티션 정의, 스냅샷 정보</td><td>어떤 구조와 버전을 읽나?</td></tr>
+<tr><td>Manifest list / manifest</td><td>파일 목록, 파티션 값, 통계</td><td>어떤 데이터 파일을 읽나?</td></tr>
+<tr><td>Parquet 파일</td><td><code>order_id=1001, status=&#x27;DONE&#x27;</code></td><td>실제 값은 무엇인가?</td></tr>
+</tbody></table></div>
+<p>HMS에는 포인터 외에도 namespace, 테이블 속성 등의 정보가 있다. “문자열 하나만 저장한다”는 표현은 핵심 역할을 설명하는 비유일 뿐 실제 저장 구조는 아니다. <a href="https://iceberg.apache.org/docs/latest/hive/">Iceberg Hive 연동</a></p>
+<p>스냅샷은 데이터 전체를 매번 복사한 백업본이 아니다. 어느 파일 집합을 테이블의 한 시점으로 볼지 나타내며, 이전 스냅샷과 파일을 공유할 수 있다. 파일명과 디렉터리 배치는 구현에 따라 달라진다. <a href="https://iceberg.apache.org/spec/">Iceberg 스펙</a></p>
+<pre><code>/lake/
+├── landing/orders/batch-001.parquet    ← 기존 SeaTunnel 산출물
+└── warehouse/retail/orders/
+    ├── data/                          ← 새로 쓰는 데이터 파일의 예시 위치
+    └── metadata/
+        ├── 00001-&lt;uuid&gt;.metadata.json
+        ├── snap-&lt;id&gt;-&lt;uuid&gt;.avro       ← manifest list
+        └── &lt;uuid&gt;-m0.avro              ← manifest
+
+HMS의 PostgreSQL 볼륨                  ← 위 파일들과 별도의 영속 데이터
+└── 테이블 등록 정보와 현재 metadata_location</code></pre>
+<p><code>add_files()</code>로 등록하면 manifest가 <code>landing</code>의 기존 파일을 가리킬 수 있다. 모든 데이터가 반드시 <code>warehouse/.../data</code>에 있어야 하는 것은 아니다.</p>
+<h2>4. 추천 학습 구성: 무엇을 Docker로 띄우나?</h2>
+<p><strong>HMS + 전용 PostgreSQL을 서비스로 실행하고, PyIceberg + DuckDB는 하나의 학습용 Python 컨테이너에서 실행하는 구성을 제안한다.</strong> Python을 호스트에서 실행해도 되지만, 첫 실습에서는 컨테이너끼리 <code>/lake</code> 경로를 통일하면 이해하기 쉽다. 아래 그림은 구현 완료 상태가 아니라 설계안이다.</p>
+<figure><svg xmlns="http://www.w3.org/2000/svg" width="1200" height="665" viewBox="0 0 1200 665" role="img" aria-label="04  ·  노트북 한 대의 배치 구조">
+<title>04  ·  노트북 한 대의 배치 구조</title><desc>설계안 · 같은 Docker 네트워크에서 서비스 이름을 사용하고, 파일 경로는 /lake로 통일한다.</desc>
+<defs><marker id="arrow-04-deployment" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#68798a"/></marker></defs>
+<rect width="1200" height="100%" rx="18" fill="#ffffff"/>
+<style>text{font-family:"Apple SD Gothic Neo","Malgun Gothic",sans-serif;fill:#203349} .title{font-size:27px;font-weight:700} .sub{font-size:18px;fill:#53677b} .node{font-size:21px;font-weight:700} .body{font-size:17px} .label{font-size:16px;fill:#53677b}</style>
+<text x="35" y="44" class="title" text-anchor="start">04  ·  노트북 한 대의 배치 구조</text>
+<text x="35" y="76" class="sub" text-anchor="start">설계안 · 같은 Docker 네트워크에서 서비스 이름을 사용하고, 파일 경로는 /lake로 통일한다.</text>
+<rect x="35" y="125" width="325" height="106" rx="12" fill="#eaf2ff" stroke="#2963ba" stroke-width="1.5"/>
+<text x="53" y="156" class="node" text-anchor="start">SeaTunnel 컨테이너</text>
+<text x="53" y="185" class="body" text-anchor="start">기존 Zeta 환경 활용</text>
+<text x="53" y="209" class="body" text-anchor="start">파일 생성 / 테이블 쓰기</text>
+<rect x="435" y="125" width="325" height="106" rx="12" fill="#eaf2ff" stroke="#2963ba" stroke-width="1.5"/>
+<text x="453" y="156" class="node" text-anchor="start">lab 컨테이너</text>
+<text x="453" y="185" class="body" text-anchor="start">Python + PyIceberg + DuckDB</text>
+<text x="453" y="209" class="body" text-anchor="start">등록 스크립트 / SQL 조회</text>
+<rect x="835" y="125" width="330" height="106" rx="12" fill="#f1edff" stroke="#7354ac" stroke-width="1.5"/>
+<text x="853" y="156" class="node" text-anchor="start">hms 컨테이너</text>
+<text x="853" y="185" class="body" text-anchor="start">Thrift: hms:9083</text>
+<text x="853" y="209" class="body" text-anchor="start">테이블 등록 / 현재 위치</text>
+<polyline points="760,178 835,178" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-04-deployment)" stroke-dasharray="7 5"/>
+<text x="798" y="162" class="label" text-anchor="middle">RPC</text>
+<rect x="835" y="310" width="330" height="106" rx="12" fill="#f1edff" stroke="#7354ac" stroke-width="1.5"/>
+<text x="853" y="341" class="node" text-anchor="start">catalog-db</text>
+<text x="853" y="370" class="body" text-anchor="start">HMS용 PostgreSQL</text>
+<text x="853" y="394" class="body" text-anchor="start">별도 DB 데이터 볼륨</text>
+<polyline points="1000,231 1000,310" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-04-deployment)" stroke-dasharray="7 5"/>
+<text x="1040" y="278" class="label" text-anchor="middle">JDBC</text>
+<rect x="35" y="480" width="1130" height="106" rx="12" fill="#e8f6ee" stroke="#26784c" stroke-width="1.5"/>
+<text x="53" y="511" class="node" text-anchor="start">호스트의 ./lake → 각 컨테이너의 /lake</text>
+<text x="53" y="540" class="body" text-anchor="start">landing: SeaTunnel 산출물     |     warehouse: Iceberg 메타데이터와 데이터 파일</text>
+<text x="53" y="564" class="body" text-anchor="start">동일한 파일을 동일한 경로로 공유 · 컨테이너 삭제 후에도 호스트 파일은 보존</text>
+<polyline points="198,231 198,480" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-04-deployment)"/>
+<text x="255" y="370" class="label" text-anchor="middle">파일 접근</text>
+<polyline points="598,231 598,480" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-04-deployment)"/>
+<text x="655" y="370" class="label" text-anchor="middle">파일 접근</text>
+<polyline points="1135,231 1190,231 1190,451 1090,451 1090,480" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-04-deployment)" stroke-dasharray="7 5"/>
+<text x="35" y="632" class="sub" text-anchor="start">점선: 서비스 통신 / HMS의 필요 시 파일 접근. 실선: SeaTunnel·lab의 파일 접근.</text>
+</svg>
+<figcaption>로컬 Docker 구성과 공유 디스크 경계</figcaption></figure>
+<div class="table-wrap"><table><thead><tr><th>Compose에서 관리할 대상</th><th>실행 형태</th><th>영속화할 것</th></tr></thead><tbody>
+<tr><td><code>hms</code></td><td>상주 서비스, Thrift 9083</td><td>설정; 실제 카탈로그 DB는 아래 PostgreSQL</td></tr>
+<tr><td><code>catalog-db</code></td><td>HMS용 PostgreSQL 서비스</td><td>DB 데이터 볼륨</td></tr>
+<tr><td><code>lab</code></td><td>PyIceberg + DuckDB가 설치된 Python 실행 환경</td><td><code>/lake</code> 공유 마운트</td></tr>
+<tr><td>SeaTunnel Zeta</td><td>기존 환경 활용 또는 같은 네트워크의 별도 서비스</td><td>작업 설정·상태, <code>/lake</code> 공유 마운트</td></tr>
+</tbody></table></div>
+<p><code>iceberg-server</code>라는 프로세스는 필요 없다. HiveServer2, HDFS, Spark도 이 제안의 필수 요소가 아니다. HMS용 PostgreSQL과 업무 원본 PostgreSQL은 <strong>역할과 데이터가 다르다</strong>. 실습에서 같은 서버를 쓸 수는 있지만 DB와 계정을 분리하는 편이 구분하기 좋다.</p>
+<p>연결에는 두 주소 체계가 있다.</p>
+<pre><code>컨테이너 간 네트워크:   lab → thrift://hms:9083
+호스트에서 네트워크:    Python → thrift://localhost:9083  (포트 공개 시)
+파일 위치:             file:///lake/landing/orders/batch-001.parquet</code></pre>
+<p>컨테이너 안의 <code>localhost</code>는 그 컨테이너 자신이다. 기존 SeaTunnel이 별도 Compose 프로젝트에 있다면 공유 Docker 네트워크나 별도의 도달 가능한 주소를 설정해야 한다.</p>
+<p><strong>같은 파일을 같은 절대 경로로 볼 수 있어야 한다.</strong> 호스트의 <code>./lake</code>를 SeaTunnel과 <code>lab</code>에서 모두 <code>/lake</code>로 마운트한다. 파일 접근이 필요한 HMS 작업도 고려해 HMS에 같은 마운트를 둔다. 호스트 Python에서는 <code>/lake</code>가 저절로 생기지 않는다. 포트 연결이 성공해도 파일 경로가 다르면 읽기는 실패한다. S3/MinIO를 도입하면 공유 URI를 사용할 수 있지만, 첫 학습 단계에서는 서비스 수가 늘어난다.</p>
+<h2>5. 쓰기 흐름: Parquet이 테이블이 되는 순간</h2>
+<figure><svg xmlns="http://www.w3.org/2000/svg" width="1200" height="510" viewBox="0 0 1200 510" role="img" aria-label="05  ·  쓰기: 파일 완성 → 테이블 등록 → 커밋">
+<title>05  ·  쓰기: 파일 완성 → 테이블 등록 → 커밋</title><desc>SeaTunnel LocalFile sink와 PyIceberg add_files()를 나눈 첫 학습 경로</desc>
+<defs><marker id="arrow-05-write" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#68798a"/></marker></defs>
+<rect width="1200" height="100%" rx="18" fill="#ffffff"/>
+<style>text{font-family:"Apple SD Gothic Neo","Malgun Gothic",sans-serif;fill:#203349} .title{font-size:27px;font-weight:700} .sub{font-size:18px;fill:#53677b} .node{font-size:21px;font-weight:700} .body{font-size:17px} .label{font-size:16px;fill:#53677b}</style>
+<text x="35" y="44" class="title" text-anchor="start">05  ·  쓰기: 파일 완성 → 테이블 등록 → 커밋</text>
+<text x="35" y="76" class="sub" text-anchor="start">SeaTunnel LocalFile sink와 PyIceberg add_files()를 나눈 첫 학습 경로</text>
+<rect x="35" y="125" width="330" height="106" rx="12" fill="#eaf2ff" stroke="#2963ba" stroke-width="1.5"/>
+<text x="53" y="156" class="node" text-anchor="start">① SeaTunnel</text>
+<text x="53" y="185" class="body" text-anchor="start">원본 DB 읽기</text>
+<text x="53" y="209" class="body" text-anchor="start">Parquet 파일 완성</text>
+<rect x="435" y="125" width="330" height="106" rx="12" fill="#fff2df" stroke="#986014" stroke-width="1.5"/>
+<text x="453" y="156" class="node" text-anchor="start">② PyIceberg</text>
+<text x="453" y="185" class="body" text-anchor="start">HMS에서 테이블 로드</text>
+<text x="453" y="209" class="body" text-anchor="start">완성된 파일을 add_files</text>
+<rect x="835" y="125" width="330" height="106" rx="12" fill="#e8f6ee" stroke="#26784c" stroke-width="1.5"/>
+<text x="853" y="156" class="node" text-anchor="start">③ 새 메타데이터</text>
+<text x="853" y="185" class="body" text-anchor="start">새 파일 목록 / 스냅샷</text>
+<text x="853" y="209" class="body" text-anchor="start">metadata JSON 작성</text>
+<polyline points="365,178 435,178" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-05-write)"/>
+<polyline points="765,178 835,178" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-05-write)"/>
+<rect x="835" y="325" width="330" height="106" rx="12" fill="#f1edff" stroke="#7354ac" stroke-width="1.5"/>
+<text x="853" y="356" class="node" text-anchor="start">④ HMS 카탈로그 커밋</text>
+<text x="853" y="385" class="body" text-anchor="start">현재 메타데이터 위치 변경</text>
+<text x="853" y="409" class="body" text-anchor="start">충돌 시 검증 / 재시도·실패</text>
+<rect x="35" y="325" width="730" height="106" rx="12" fill="#eaf2ff" stroke="#2963ba" stroke-width="1.5"/>
+<text x="53" y="356" class="node" text-anchor="start">⑤ 새 reader가 새 스냅샷을 읽음</text>
+<text x="53" y="385" class="body" text-anchor="start">디스크에 파일만 생겼을 때는 테이블 결과가 바뀌지 않는다.</text>
+<text x="53" y="409" class="body" text-anchor="start">커밋에 성공해야 테이블의 새 상태로 공개된다.</text>
+<polyline points="1000,231 1000,325" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-05-write)"/>
+<polyline points="835,378 765,378" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-05-write)"/>
+</svg>
+<figcaption>파일 생성, 등록, 커밋의 순서</figcaption></figure>
+<p class="step">1. SeaTunnel이 원본 DB에서 데이터를 읽고 <code>batch-001.parquet</code>을 완성한다.</p>
+<p class="step">2. PyIceberg가 HMS에서 대상 테이블 정보를 읽는다. 최초 1회는 namespace와 테이블을 생성한다.</p>
+<p class="step">3. <code>add_files()</code>로 기존 Parquet을 등록한다. 데이터 파일을 다시 쓰지 않고 메타데이터를 만든다.</p>
+<p class="step">4. 새 metadata JSON이 준비되면 카탈로그 커밋을 수행한다.</p>
+<p class="step">5. 성공한 커밋을 통해 새 상태가 공개된다. 이후 새로 로드한 reader는 새 파일 집합을 본다.</p>
+<p>PyIceberg의 <code>add_files()</code>는 스키마·필드 ID·이름 매핑 및 파티션 조건을 만족해야 한다. 처음에는 <strong>파티션 없는 작은 append-only 데이터</strong>를 권한다. 등록 후에는 원본 파일을 수정·이동·삭제하지 않는다. Iceberg 유지보수에 의해 삭제 대상이 될 수 있으므로 임시 출력 폴더나 다른 작업이 덮어쓰는 폴더를 그대로 사용하지 않는다. <a href="https://py.iceberg.apache.org/api/#add-files">PyIceberg 파일 등록</a></p>
+<p>기존 조사에 있는 <code>add_files()</code> 예제는 “폴더 감시”가 아니다. 새 파일마다 등록 작업이 필요하며, 재실행 시 같은 배치를 다시 넣지 않도록 배치 추적도 필요하다. 같은 행을 다른 파일명으로 재적재하면 파일 중복 검사만으로 행 중복이 사라지지는 않는다.</p>
+<p>후속 단계에서는 SeaTunnel <strong>Iceberg sink</strong>가 데이터 파일 생성과 메타데이터 커밋을 맡게 할 수 있다. LocalFile sink는 파일을 쓰고, Iceberg sink는 테이블에 커밋한다는 차이다. 2.3.13 공식 문서에 Hive/Hadoop/REST 관련 예제와 upsert 옵션이 있으나, Zeta의 실제 의존성 및 로컬 공유 경로 조합은 별도 실행 검증이 필요하다. <a href="https://seatunnel.apache.org/docs/2.3.13/connectors/sink/Iceberg/">SeaTunnel 2.3.13 Iceberg sink</a></p>
+<h2>6. 조회 흐름: 실제 Parquet은 누가 읽나?</h2>
+<p><strong>HMS는 일반적인 조회에서 Parquet 행을 전달하는 중계 서버가 아니다.</strong> 테이블을 찾은 뒤 파일에 접근하는 것은 reader 쪽이다. 여기서 reader 구현을 두 가지로 나눌 수 있다.</p>
+<figure><svg xmlns="http://www.w3.org/2000/svg" width="1200" height="645" viewBox="0 0 1200 645" role="img" aria-label="06  ·  읽기: 실제 파일을 여는 주체가 다르다">
+<title>06  ·  읽기: 실제 파일을 여는 주체가 다르다</title><desc>공통: HMS는 테이블 위치를 알려준다. 데이터 행이 HMS를 통과할 필요는 없다.</desc>
+<defs><marker id="arrow-06-read" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#68798a"/></marker></defs>
+<rect width="1200" height="100%" rx="18" fill="#ffffff"/>
+<style>text{font-family:"Apple SD Gothic Neo","Malgun Gothic",sans-serif;fill:#203349} .title{font-size:27px;font-weight:700} .sub{font-size:18px;fill:#53677b} .node{font-size:21px;font-weight:700} .body{font-size:17px} .label{font-size:16px;fill:#53677b}</style>
+<text x="35" y="44" class="title" text-anchor="start">06  ·  읽기: 실제 파일을 여는 주체가 다르다</text>
+<text x="35" y="76" class="sub" text-anchor="start">공통: HMS는 테이블 위치를 알려준다. 데이터 행이 HMS를 통과할 필요는 없다.</text>
+<text x="35" y="120" class="node" text-anchor="start">A  ·  PyIceberg가 읽고 DuckDB에 결과 전달</text>
+<rect x="35" y="145" width="250" height="88" rx="12" fill="#f1edff" stroke="#7354ac" stroke-width="1.5"/>
+<text x="53" y="176" class="node" text-anchor="start">HMS</text>
+<text x="53" y="205" class="body" text-anchor="start">테이블 위치 응답</text>
+<rect x="365" y="145" width="400" height="106" rx="12" fill="#fff2df" stroke="#986014" stroke-width="1.5"/>
+<text x="383" y="176" class="node" text-anchor="start">PyIceberg + Arrow</text>
+<text x="383" y="205" class="body" text-anchor="start">메타데이터·Parquet 읽기</text>
+<text x="383" y="229" class="body" text-anchor="start">필터 / 컬럼 선택 후 메모리 결과</text>
+<rect x="845" y="145" width="320" height="106" rx="12" fill="#eaf2ff" stroke="#2963ba" stroke-width="1.5"/>
+<text x="863" y="176" class="node" text-anchor="start">DuckDB</text>
+<text x="863" y="205" class="body" text-anchor="start">Arrow 결과로 SQL 실행</text>
+<text x="863" y="229" class="body" text-anchor="start">집계 / 조인</text>
+<polyline points="285,190 365,190" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-06-read)"/>
+<polyline points="765,190 845,190" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-06-read)"/>
+<text x="805" y="176" class="label" text-anchor="middle">Arrow</text>
+<rect x="365" y="295" width="400" height="88" rx="12" fill="#e8f6ee" stroke="#26784c" stroke-width="1.5"/>
+<text x="383" y="326" class="node" text-anchor="start">공유 파일 저장소 /lake</text>
+<text x="383" y="355" class="body" text-anchor="start">Iceberg metadata + Parquet</text>
+<polyline points="565,295 565,251" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-06-read)"/>
+<text x="35" y="436" class="node" text-anchor="start">B  ·  PyIceberg는 위치만 찾고 DuckDB가 직접 읽음</text>
+<rect x="35" y="460" width="250" height="88" rx="12" fill="#f1edff" stroke="#7354ac" stroke-width="1.5"/>
+<text x="53" y="491" class="node" text-anchor="start">HMS</text>
+<text x="53" y="520" class="body" text-anchor="start">현재 metadata 위치</text>
+<rect x="345" y="460" width="310" height="88" rx="12" fill="#fff2df" stroke="#986014" stroke-width="1.5"/>
+<text x="363" y="491" class="node" text-anchor="start">PyIceberg</text>
+<text x="363" y="520" class="body" text-anchor="start">metadata_location 전달</text>
+<rect x="715" y="460" width="450" height="106" rx="12" fill="#eaf2ff" stroke="#2963ba" stroke-width="1.5"/>
+<text x="733" y="491" class="node" text-anchor="start">DuckDB + iceberg 확장</text>
+<text x="733" y="520" class="body" text-anchor="start">iceberg_scan(정확한 metadata 경로)</text>
+<text x="733" y="544" class="body" text-anchor="start">공유 저장소의 메타데이터·Parquet 읽기</text>
+<polyline points="285,504 345,504" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-06-read)"/>
+<polyline points="655,504 715,504" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-06-read)"/>
+<polyline points="765,340 940,340 940,460" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-06-read)"/>
+<text x="1040" y="396" class="label" text-anchor="middle">공유 파일 읽기</text>
+<text x="35" y="611" class="sub" text-anchor="start">A는 메모리 결과를 조회 · B는 지정한 테이블 버전을 직접 조회 · 둘 다 새 상태 확인 시 재로드 필요</text>
+</svg>
+<figcaption>PyIceberg 경유 조회와 DuckDB 직접 조회의 비교</figcaption></figure>
+<h3>A. 이해하기 쉬운 첫 경로: PyIceberg → Arrow → DuckDB</h3>
+<p>PyIceberg가 HMS와 대화하고 Iceberg 테이블을 읽는다. 그 결과를 메모리의 Arrow 데이터로 DuckDB에 넘기고, DuckDB가 SQL을 실행한다. <strong>이 경로에서는 실제 파일 읽기를 PyIceberg 쪽이 담당한다.</strong> <a href="https://py.iceberg.apache.org/api/#duckdb">PyIceberg DuckDB 연동</a></p>
+<pre><code># 개념 예제: hms 연결, 공유 경로, 테이블, Python 패키지가 준비되어야 한다.
+from pyiceberg.catalog import load_catalog
+
+catalog = load_catalog(
+    &quot;local_hive&quot;,
+    type=&quot;hive&quot;,
+    uri=&quot;thrift://hms:9083&quot;,  # lab 컨테이너에서 실행할 때
+)
+table = catalog.load_table(&quot;retail.orders&quot;)
+con = table.scan(
+    row_filter=&quot;status = &#x27;DONE&#x27;&quot;,
+    selected_fields=(&quot;order_id&quot;, &quot;status&quot;),
+).to_duckdb(table_name=&quot;orders&quot;)
+print(con.sql(&quot;SELECT status, count(*) FROM orders GROUP BY status&quot;).fetchall())</code></pre>
+<p>이 방식은 DuckDB가 HMS 테이블을 영구적으로 <code>ATTACH</code>한 것이 아니다. 새 커밋을 보고 싶으면 테이블을 다시 로드하거나 refresh하고 scan을 다시 수행한다. 큰 데이터에서는 Arrow 결과의 메모리 사용량에 주의하고, 읽기 조건과 선택 컬럼을 PyIceberg scan에 미리 준다.</p>
+<h3>B. DuckDB가 직접 읽기: 현재 메타데이터 위치만 PyIceberg로 찾기</h3>
+<p>PyIceberg를 <strong>이름 → 현재 metadata 경로 조회</strong>에만 쓰고, DuckDB의 <code>iceberg</code> 확장에 정확한 경로를 넘길 수 있다. 이때 Iceberg 메타데이터와 실제 Parquet을 읽는 주체는 DuckDB다. <a href="https://duckdb.org/docs/current/core_extensions/iceberg/overview">DuckDB 직접 읽기</a></p>
+<pre><code># 위 catalog와 테이블이 준비된 경우의 별도 조회 경로
+import duckdb
+
+table = catalog.load_table(&quot;retail.orders&quot;)
+con = duckdb.connect()
+con.execute(&quot;INSTALL iceberg&quot;)  # 최초 설치는 다운로드가 필요할 수 있음
+con.execute(&quot;LOAD iceberg&quot;)
+rows = con.execute(
+    &quot;SELECT status, count(*) FROM iceberg_scan(?) GROUP BY status&quot;,
+    [table.metadata_location],
+).fetchall()
+print(rows)</code></pre>
+<p>이 예제는 실행 검증 전이며, 확장 버전과 파일 I/O 지원을 확인해야 한다. <strong>파일명으로 최신 버전을 추측할 필요가 없고</strong>, 불변인 metadata 경로 하나를 기준으로 읽는다. 이후 커밋까지 자동 추적하는 연결은 아니므로 다음 조회 때 카탈로그를 다시 로드한다. 이 경로로 쓰기 커밋을 수행하지는 않는다.</p>
+<h3>다른 연결 방법은 언제 보나?</h3>
+<div class="table-wrap"><table><thead><tr><th>연결 방식</th><th>Iceberg 읽기 주체</th><th>HMS와의 관계</th><th>학습 순서</th></tr></thead><tbody>
+<tr><td>A. <code>to_duckdb()</code></td><td>PyIceberg → Arrow</td><td>PyIceberg가 Thrift 사용</td><td>먼저</td></tr>
+<tr><td>B. <code>metadata_location</code> → <code>iceberg_scan()</code></td><td>DuckDB 확장</td><td>PyIceberg가 현재 경로만 조회</td><td>다음</td></tr>
+<tr><td>REST 카탈로그 <code>ATTACH</code></td><td>DuckDB 확장</td><td>REST를 제공하는 HMS 배포가 필요</td><td>버전 고정 후 검증</td></tr>
+<tr><td><code>hive_metastore</code> 커뮤니티 확장</td><td>확장과 DuckDB reader</td><td>Thrift 연결; Iceberg 읽기 지원</td><td>대안으로 검토</td></tr>
+</tbody></table></div>
+<p>DuckDB의 공식 <code>iceberg</code> 확장이 일반 HMS Thrift URI에 바로 연결하는 것과, 별도 커뮤니티 확장의 Thrift 연결은 구분해야 한다. REST <code>ATTACH</code> 경로의 쓰기는 현재 공식 문서에 지원되지만, 선택한 Hive 이미지와 DuckDB 확장의 조합은 테스트해야 한다. <a href="https://duckdb.org/docs/current/core_extensions/iceberg/catalogs">DuckDB 카탈로그</a>, <a href="https://duckdb.org/docs/current/core_extensions/iceberg/writing_to_iceberg">Iceberg 쓰기</a>, <a href="https://duckdb.org/community_extensions/extensions/hive_metastore">커뮤니티 확장</a></p>
+<h2>7. 커밋과 스냅샷을 그림으로 이해하기</h2>
+<figure><svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520" role="img" aria-label="07  ·  커밋이 바꾸는 것은 “현재 상태”">
+<title>07  ·  커밋이 바꾸는 것은 “현재 상태”</title><desc>append 예시 · 스냅샷은 데이터 전체를 복제한 백업이 아니라 파일 집합을 가리키는 상태다.</desc>
+<defs><marker id="arrow-07-snapshot" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#68798a"/></marker></defs>
+<rect width="1200" height="100%" rx="18" fill="#ffffff"/>
+<style>text{font-family:"Apple SD Gothic Neo","Malgun Gothic",sans-serif;fill:#203349} .title{font-size:27px;font-weight:700} .sub{font-size:18px;fill:#53677b} .node{font-size:21px;font-weight:700} .body{font-size:17px} .label{font-size:16px;fill:#53677b}</style>
+<text x="35" y="44" class="title" text-anchor="start">07  ·  커밋이 바꾸는 것은 “현재 상태”</text>
+<text x="35" y="76" class="sub" text-anchor="start">append 예시 · 스냅샷은 데이터 전체를 복제한 백업이 아니라 파일 집합을 가리키는 상태다.</text>
+<rect x="35" y="130" width="330" height="106" rx="12" fill="#f1edff" stroke="#7354ac" stroke-width="1.5"/>
+<text x="53" y="161" class="node" text-anchor="start">커밋 전</text>
+<text x="53" y="190" class="body" text-anchor="start">카탈로그 → S1의 metadata</text>
+<text x="53" y="214" class="body" text-anchor="start">reader 결과 = a.parquet</text>
+<rect x="435" y="130" width="330" height="106" rx="12" fill="#fff2df" stroke="#986014" stroke-width="1.5"/>
+<text x="453" y="161" class="node" text-anchor="start">writer 준비 중</text>
+<text x="453" y="190" class="body" text-anchor="start">b.parquet + 새 metadata</text>
+<text x="453" y="214" class="body" text-anchor="start">아직 새 상태로 공개되지 않음</text>
+<rect x="835" y="130" width="330" height="106" rx="12" fill="#f1edff" stroke="#7354ac" stroke-width="1.5"/>
+<text x="853" y="161" class="node" text-anchor="start">커밋 후</text>
+<text x="853" y="190" class="body" text-anchor="start">카탈로그 → S2의 metadata</text>
+<text x="853" y="214" class="body" text-anchor="start">새 reader 결과 = a + b</text>
+<polyline points="365,183 435,183" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-07-snapshot)"/>
+<polyline points="765,183 835,183" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-07-snapshot)"/>
+<rect x="35" y="330" width="530" height="106" rx="12" fill="#e8f6ee" stroke="#26784c" stroke-width="1.5"/>
+<text x="53" y="361" class="node" text-anchor="start">S1 · 이전 상태</text>
+<text x="53" y="390" class="body" text-anchor="start">a.parquet</text>
+<text x="53" y="414" class="body" text-anchor="start">보존된 스냅샷으로 과거 조회 가능</text>
+<rect x="635" y="330" width="530" height="106" rx="12" fill="#e8f6ee" stroke="#26784c" stroke-width="1.5"/>
+<text x="653" y="361" class="node" text-anchor="start">S2 · 새 상태</text>
+<text x="653" y="390" class="body" text-anchor="start">a.parquet + b.parquet</text>
+<text x="653" y="414" class="body" text-anchor="start">a는 공유한다. 모든 데이터를 복사하지 않는다.</text>
+<polyline points="200,236 200,330" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-07-snapshot)"/>
+<polyline points="1000,236 1000,330" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-07-snapshot)"/>
+<text x="35" y="482" class="sub" text-anchor="start">스냅샷을 만료하고 관련 파일을 삭제하면 그 시점의 과거 조회는 더 이상 보장되지 않는다.</text>
+</svg>
+<figcaption>커밋 전후에 reader가 보는 파일 집합</figcaption></figure>
+<p>S1이 <code>a.parquet</code>을 가리키고 있다고 하자. writer가 <code>b.parquet</code>과 S2 메타데이터를 만들고 있어도 아직 공개 전이면 새 reader는 S1을 읽는다. 커밋 후 새로 테이블을 로드하면 S2의 <code>a+b</code>를 읽는다. 기존 S1을 읽던 작업은 해당 파일이 유지되는 동안 일관된 이전 상태로 읽을 수 있다.</p>
+<p>이 일관성은 <strong>불변 파일, 커밋 검증, 카탈로그의 원자적 상태 변경, reader의 스냅샷 사용이 함께</strong> 만든다. “HMS의 DB 트랜잭션 하나가 Iceberg의 모든 ACID를 만든다”라고 이해하면 부족하다. 동시 writer 충돌 시 재시도 또는 실패 처리가 필요하며, 항상 자동 성공하는 것은 아니다. <a href="https://iceberg.apache.org/docs/latest/reliability/">Iceberg 신뢰성 설계</a></p>
+<p>과거 조회는 스냅샷과 관련 파일을 보존한 범위에서 가능하다. overwrite 후 현재 스냅샷에서 빠진 파일도 과거 스냅샷이 참조하면 아직 orphan이 아니다. 스냅샷 만료와 orphan 정리는 구분되는 유지보수 작업이다. <a href="https://iceberg.apache.org/docs/latest/maintenance/">Iceberg 유지보수</a></p>
+<p><strong>CDC도 별도 문제다.</strong> 원본에서 <code>order_id=1001</code>이 수정되었다고 해서 새 Parquet을 append하는 것만으로 옛 행이 교체되지는 않는다. 변경 이벤트를 UPDATE/DELETE/upsert 의미로 적용할 writer와 설정이 필요하다. Iceberg의 식별 필드나 sink의 primary key 설정을 RDB의 자동 유일성 제약과 동일시하지 않는다. 초기에는 INSERT만 검증하고, 이후 수정·삭제 결과와 재시작 중복을 확인한다. <a href="https://iceberg.apache.org/spec/#identifier-field-ids">Iceberg 스펙의 identifier fields</a>, <a href="https://seatunnel.apache.org/docs/2.3.13/connectors/sink/Iceberg/">SeaTunnel sink 옵션</a></p>
+<h2>8. OpenMetadata와 Hive Metastore는 무엇이 다를까?</h2>
+<figure><svg xmlns="http://www.w3.org/2000/svg" width="1200" height="500" viewBox="0 0 1200 500" role="img" aria-label="08  ·  OpenMetadata는 사람이 이해하는 계층">
+<title>08  ·  OpenMetadata는 사람이 이해하는 계층</title><desc>HMS는 실행을 위한 카탈로그이고, OpenMetadata는 검색·설명·소유자·계보를 위한 서비스다.</desc>
+<defs><marker id="arrow-08-openmetadata" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#68798a"/></marker></defs>
+<rect width="1200" height="100%" rx="18" fill="#ffffff"/>
+<style>text{font-family:"Apple SD Gothic Neo","Malgun Gothic",sans-serif;fill:#203349} .title{font-size:27px;font-weight:700} .sub{font-size:18px;fill:#53677b} .node{font-size:21px;font-weight:700} .body{font-size:17px} .label{font-size:16px;fill:#53677b}</style>
+<text x="35" y="44" class="title" text-anchor="start">08  ·  OpenMetadata는 사람이 이해하는 계층</text>
+<text x="35" y="76" class="sub" text-anchor="start">HMS는 실행을 위한 카탈로그이고, OpenMetadata는 검색·설명·소유자·계보를 위한 서비스다.</text>
+<rect x="35" y="130" width="340" height="106" rx="12" fill="#eaf2ff" stroke="#2963ba" stroke-width="1.5"/>
+<text x="53" y="161" class="node" text-anchor="start">사람 / 데이터 사용자</text>
+<text x="53" y="190" class="body" text-anchor="start">어떤 테이블인가?</text>
+<text x="53" y="214" class="body" text-anchor="start">누가 관리하고 어디서 왔나?</text>
+<rect x="465" y="130" width="700" height="106" rx="12" fill="#fff2df" stroke="#986014" stroke-width="1.5"/>
+<text x="483" y="161" class="node" text-anchor="start">OpenMetadata</text>
+<text x="483" y="190" class="body" text-anchor="start">메타데이터 수집 → 검색 / 설명 / 계보</text>
+<text x="483" y="214" class="body" text-anchor="start">커넥터 설정과 수집 작업이 별도로 필요</text>
+<polyline points="375,183 465,183" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-08-openmetadata)"/>
+<rect x="35" y="325" width="340" height="106" rx="12" fill="#eaf2ff" stroke="#2963ba" stroke-width="1.5"/>
+<text x="53" y="356" class="node" text-anchor="start">writer / reader</text>
+<text x="53" y="385" class="body" text-anchor="start">테이블 로드와 커밋</text>
+<text x="53" y="409" class="body" text-anchor="start">파일 읽기·쓰기</text>
+<rect x="465" y="325" width="310" height="106" rx="12" fill="#f1edff" stroke="#7354ac" stroke-width="1.5"/>
+<text x="483" y="356" class="node" text-anchor="start">Hive Metastore</text>
+<text x="483" y="385" class="body" text-anchor="start">현재 테이블 위치</text>
+<text x="483" y="409" class="body" text-anchor="start">커밋 상태 관리</text>
+<rect x="855" y="325" width="310" height="106" rx="12" fill="#e8f6ee" stroke="#26784c" stroke-width="1.5"/>
+<text x="873" y="356" class="node" text-anchor="start">파일 저장소</text>
+<text x="873" y="385" class="body" text-anchor="start">metadata / manifest</text>
+<text x="873" y="409" class="body" text-anchor="start">Parquet 데이터</text>
+<polyline points="375,378 465,378" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-08-openmetadata)" stroke-dasharray="7 5"/>
+<polyline points="205,431 205,463 1010,463 1010,431" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-08-openmetadata)"/>
+<polyline points="620,325 620,236" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-08-openmetadata)" stroke-dasharray="7 5"/>
+<text x="730" y="285" class="label" text-anchor="middle">별도 수집 구성</text>
+</svg>
+<figcaption>데이터 실행 경로와 사람을 위한 메타데이터 탐색의 차이</figcaption></figure>
+<p>HMS는 엔진이 테이블을 찾고 커밋하는 실행 경로에 들어간다. OpenMetadata는 사람이 “이 테이블은 무엇이고 누가 관리하며 어디서 왔나”를 찾아보는 데 쓰인다. OpenMetadata를 띄웠다고 Iceberg 테이블의 현재 버전을 커밋하는 HMS 역할이 자동으로 생기지는 않는다.</p>
+<p>OpenMetadata 연동은 기본 적재·조회가 된 다음에 추가한다. 수집 가능한 스키마·프로파일·계보는 커넥터와 설정에 따라 다르며, 그림은 자동 연동이 이미 되어 있다는 뜻이 아니다. 특히 Hive 커넥터 설정을 HMS의 Thrift 포트 연결과 동일시하면 안 된다. <a href="https://docs.open-metadata.org/v1.12.x/connectors/database/hive">OpenMetadata Hive 커넥터</a></p>
+<h2>9. 기존 조사에서 확인한 내용과 정정할 내용</h2>
+<p>대상: <a href="iceberg-hive-duckdb-roles.md">역할 조사</a>, <a href="local-lakehouse-build-options.md">구축 옵션 조사</a>. 방향은 유용하지만 아래 문장은 수정해서 이해해야 한다. 이 절은 <strong>문헌 검증 결과</strong>이며 실행 성공 판정이 아니다.</p>
+<div class="table-wrap"><table><thead><tr><th>기존 설명</th><th>판정</th><th>더 정확한 설명과 근거</th></tr></thead><tbody>
+<tr><td>Iceberg는 별도 서버가 아니다</td><td>맞음</td><td>테이블 포맷과 구현 라이브러리. 주변 카탈로그/엔진은 서비스일 수 있다. <a href="https://iceberg.apache.org/docs/latest/">공식 소개</a></td></tr>
+<tr><td>DuckDB는 저장소가 아니며 Python 안에서만 실행</td><td>지나친 단정</td><td>자체 영속 저장을 지원하는 임베디드 DB이며 CLI 등에서도 사용. 여기서는 외부 조회 역할. <a href="https://duckdb.org/docs/">공식 문서</a></td></tr>
+<tr><td>Derby는 동시 접속 1개여서 두 HMS 클라이언트가 동시 사용 불가</td><td>오류</td><td>embedded DB를 여는 JVM 제한과 접속 수는 다르다. 같은 HMS JVM을 통한 여러 클라이언트 접속을 그 이유만으로 금지할 수 없다. <a href="https://db.apache.org/derby/papers/DerbyTut/embedded_intro.html">Derby 공식 설명</a></td></tr>
+<tr><td>Hive 4.x면 REST 9001이 기본 제공</td><td>버전 일반화</td><td>최신 문서에는 기능이 있다. 설정 기본값은 <code>-1</code>; 공식 standalone 이미지 예제는 9001을 사용. 모든 4.x 태그에 동일 적용을 보장하지 않는다. <a href="https://hive.apache.org/docs/latest/admin/iceberg-rest-catalog/">Hive REST 문서</a></td></tr>
+<tr><td>압축 메타데이터는 gzip만 지원</td><td>문맥 보완</td><td>비압축 JSON도 읽는다. 지원하는 <strong>압축 코덱</strong>이 gzip이라는 의미. <a href="https://duckdb.org/docs/current/core_extensions/iceberg/overview">DuckDB 직접 읽기</a></td></tr>
+<tr><td>HMS 테이블에 version-hint가 없으면 unsafe guessing 필요</td><td>부정확</td><td>카탈로그에서 정확한 <code>metadata_location</code>을 얻어 읽으면 된다. <a href="https://duckdb.org/docs/current/core_extensions/iceberg/overview">DuckDB 직접 읽기</a></td></tr>
+<tr><td>HadoopCatalog는 카탈로그가 없는 방식</td><td>용어 오류</td><td>별도 카탈로그 서버가 없을 뿐 파일시스템 기반 카탈로그다. atomic rename 지원이 요구된다. 모든 운영 환경에 대한 일괄 비권장으로 확대하면 안 된다. <a href="https://iceberg.apache.org/javadoc/latest/org/apache/iceberg/hadoop/HadoopCatalog.html">HadoopCatalog API</a></td></tr>
+<tr><td>metadata 디렉터리의 모든 파일은 불변</td><td>예외 누락</td><td>커밋된 metadata JSON과 manifest는 불변. <code>version-hint.text</code> 같은 보조 포인터는 갱신된다. <a href="https://github.com/apache/iceberg/blob/main/core/src/main/java/org/apache/iceberg/hadoop/HadoopTableOperations.java">HadoopTableOperations 구현</a></td></tr>
+<tr><td>일반 Parquet은 항상 전체 스캔, 과거 조회 불가능</td><td>과장</td><td>필터·통계 활용 가능. 별도 버전 관리도 가능하지만 Iceberg처럼 테이블 스냅샷이 표준화되어 있지는 않다. <a href="https://duckdb.org/docs/current/data/parquet/overview">DuckDB Parquet</a></td></tr>
+<tr><td><code>add_files</code> 파일은 Iceberg가 관리하지 않으며 overwrite 즉시 orphan</td><td>오류</td><td>등록된 데이터 파일이다. 과거 스냅샷 참조가 남을 수 있고 유지보수 삭제 대상이 될 수 있다. <a href="https://py.iceberg.apache.org/api/#add-files">PyIceberg API</a>, <a href="https://iceberg.apache.org/docs/latest/maintenance/">유지보수</a></td></tr>
+<tr><td>PyIceberg는 무조건 마이크로초까지만 지원</td><td>버전 조건 필요</td><td>테이블 format version, timestamp 타입, PyIceberg/Arrow 버전을 함께 확인해야 한다. 최신 Iceberg 스펙에는 나노초 타입도 있다. <a href="https://iceberg.apache.org/spec/#primitive-types">스펙</a></td></tr>
+<tr><td>기존 저장소에 Postgres Compose가 있다</td><td>현 디렉터리에서는 확인 안 됨</td><td>검토 당시 이 프로젝트에는 README와 조사 문서만 있다. 다른 프로젝트 환경을 쓰려면 경로·네트워크·DB를 명시해야 한다.</td></tr>
+</tbody></table></div>
+<p>기존 문서의 DuckLake 출시 시점·운영 적합성 비교 및 제3자 Docker 이미지의 동작은 이번 범위에서 재검증하지 않았다. 현재 과제의 구조를 이해하거나 구성을 선택하는 근거로 사용하지 않는다.</p>
+<h2>10. 실제 구현은 이 순서로 진행하면 된다</h2>
+<div class="table-wrap"><table><thead><tr><th>단계</th><th>할 일</th><th>성공을 눈으로 확인하는 기준</th></tr></thead><tbody>
+<tr><td>1</td><td>기존 Parquet을 DuckDB로 직접 조회</td><td>원본 샘플과 행 수·값 일치</td></tr>
+<tr><td>2</td><td>HMS + catalog DB + lab 준비</td><td>namespace 생성, 서비스 재시작 후 등록 정보 유지</td></tr>
+<tr><td>3</td><td>작은 비파티션 테이블 생성 후 <code>add_files</code></td><td>metadata JSON/manifest 생성, HMS 포인터 확인</td></tr>
+<tr><td>4</td><td>PyIceberg → Arrow → DuckDB 조회</td><td>1단계의 행 수·집계와 일치</td></tr>
+<tr><td>5</td><td>현재 metadata 경로를 DuckDB에 전달</td><td>직접 Iceberg 조회도 같은 결과</td></tr>
+<tr><td>6</td><td>파일 하나 추가 후 커밋 전후 비교</td><td>파일 생성만으로는 결과 불변, 커밋 후 증가</td></tr>
+<tr><td>7</td><td>이전 스냅샷 조회</td><td>새 파일 추가 전 결과 재현</td></tr>
+<tr><td>8</td><td>SeaTunnel Iceberg sink 전환</td><td>별도 등록 스크립트 없이 커밋 생성</td></tr>
+<tr><td>9</td><td>CDC 수정·삭제, 이후 OpenMetadata</td><td>중복·삭제 결과 검증 후 탐색 기능 추가</td></tr>
+</tbody></table></div>
+<p>Hive 이전에 Iceberg 파일 구조만 먼저 보고 싶다면 PyIceberg의 <strong>SQLite SQL catalog</strong>를 사용할 수 있다. 이것도 카탈로그가 있는 구성이다. PyIceberg SQL catalog 예제를 HadoopCatalog 예제로 오해하지 않는다. <a href="https://py.iceberg.apache.org/configuration/">PyIceberg 카탈로그 설정</a></p>
+<p>구현 시에는 Hive 이미지 태그, DuckDB와 확장, PyIceberg, SeaTunnel 및 Iceberg 테이블 format version을 기록하고 고정한다. REST/커뮤니티 확장, CDC, 스키마 진화는 기본 append/read가 된 뒤 하나씩 확인한다. 이 문서는 그 구현을 선택하고 이해하기 위한 안내서이며 실행 가능한 Compose 배포물을 포함하지 않는다.</p></main></body></html>

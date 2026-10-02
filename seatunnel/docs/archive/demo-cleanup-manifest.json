@@ -1,0 +1,35 @@
+{
+  "deleted": [
+    "jobs/07_postgres_cdc_with_op_to_parquet.conf",
+    "jobs/04_postgres_100m_to_parquet_partitioned.conf",
+    "jobs/06_postgres_cdc_to_parquet.conf",
+    "jobs/03_postgres_100m_to_parquet.conf",
+    "jobs/10_production_orders_10m_cdc_to_jdbc_sink.conf",
+    "jobs/14_postgres_cdc_insert_update_to_parquet.conf",
+    "jobs/13_cluster_shared_staging_check.conf",
+    "jobs/08_postgres_cdc_20min_demo.conf",
+    "jobs/05_mysql_to_parquet.conf",
+    "jobs/02_postgres_10m_to_parquet.conf",
+    "jobs/11_production_orders_10m_cdc_retest.conf",
+    "output/production_orders_mysql",
+    "output/.DS_Store",
+    "output/production_orders_10m",
+    "output/cluster_shared_staging_check",
+    "output/cdc_demo_orders_with_op.run.log",
+    "output/cdc_demo_orders_with_op",
+    "output/cdc_demo_orders",
+    "output/cdc_20min_demo_launcher.log",
+    "output/cdc_20min_demo",
+    "output/cdc_insert_update",
+    "scripts/cdc-timed-demo.py"
+  ],
+  "moved": {
+    "jobs/examples": "docs/sink-examples"
+  },
+  "kept_configs": [
+    "01_postgres_to_parquet.conf",
+    "09_postgres_cdc_to_jdbc_sink.conf",
+    "12_postgres_200m_to_parquet_cluster.conf",
+    "15_postgres_10m_cdc_insert_update.conf"
+  ]
+}

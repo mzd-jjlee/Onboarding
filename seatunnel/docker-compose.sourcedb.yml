@@ -1,0 +1,71 @@
+# SeaTunnel 실습용 소스 DB 두 개 (Postgres + MySQL).
+# openmetadata/docker-compose.sourcedb.yml과 동일한 역할이지만 완전히 독립된 compose 프로젝트다.
+# 포트가 겹치지 않게 Postgres는 5440(openmetadata가 5432/5433을 이미 씀), MySQL은 기본 3306을 쓴다.
+#
+# 두 DB 모두 CDC(logical replication / binlog)까지 나중에 바로 쓸 수 있게 처음부터 설정해뒀다
+# (wal_level=logical, binlog_format=ROW 등) — 배치 실습만 할 거면 몰라도 되는 옵션이지만 미리 켜둬도
+# 배치 성능에 영향 없다.
+#
+# 최초 기동 시 sourcedb-init/*/01_init.sql이 실행되면서 customers(5만 행) + sales(200만 행)를
+# 생성한다 — 첫 기동은 데이터 생성 때문에 수 분 걸릴 수 있다 (healthcheck retries를 넉넉히 잡아둠).
+services:
+  postgres:
+    image: postgres:16
+    container_name: seatunnel_practice_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: demo
+      POSTGRES_PASSWORD: demo
+      POSTGRES_DB: srcdb
+    command:
+      [
+        "postgres",
+        "-c", "wal_level=logical",                    # 로그에서 행 단위 변경을 읽을 수 있도록 설정
+        "-c", "max_replication_slots=10",             # 변경 로그를 읽는 소비자의 진행 위치를 관리할 슬롯 확보
+        "-c", "max_wal_senders=10",                   # 변경 로그 전송 연결 허용
+        "-c", "shared_buffers=256MB"
+      ]
+    ports:
+      - "5440:5432"
+    volumes:
+      - ./sourcedb-init/postgres:/docker-entrypoint-initdb.d:ro
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U demo -d srcdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 60   # 초기 데이터 생성(200만 행) 시간을 감안해 넉넉히
+
+  mysql:
+    image: mysql:8.0
+    container_name: seatunnel_practice_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: demo
+      MYSQL_DATABASE: srcdb
+      MYSQL_USER: demo
+      MYSQL_PASSWORD: demo
+    command:
+      - --server-id=223344
+      - --log-bin=mysql-bin
+      - --binlog-format=ROW
+      - --binlog-row-image=FULL
+      - --gtid-mode=ON
+      - --enforce-gtid-consistency=ON
+      - --innodb-buffer-pool-size=512M
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./sourcedb-init/mysql:/docker-entrypoint-initdb.d:ro
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -pdemo --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+
+volumes:
+  postgres-data:
+  mysql-data:
+
+

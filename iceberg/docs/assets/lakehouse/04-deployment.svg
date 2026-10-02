@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="665" viewBox="0 0 1200 665" role="img" aria-label="04  ·  노트북 한 대의 배치 구조">
+<title>04  ·  노트북 한 대의 배치 구조</title><desc>설계안 · 같은 Docker 네트워크에서 서비스 이름을 사용하고, 파일 경로는 /lake로 통일한다.</desc>
+<defs><marker id="arrow-04-deployment" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#68798a"/></marker></defs>
+<rect width="1200" height="100%" rx="18" fill="#ffffff"/>
+<style>text{font-family:"Apple SD Gothic Neo","Malgun Gothic",sans-serif;fill:#203349} .title{font-size:27px;font-weight:700} .sub{font-size:18px;fill:#53677b} .node{font-size:21px;font-weight:700} .body{font-size:17px} .label{font-size:16px;fill:#53677b}</style>
+<text x="35" y="44" class="title" text-anchor="start">04  ·  노트북 한 대의 배치 구조</text>
+<text x="35" y="76" class="sub" text-anchor="start">설계안 · 같은 Docker 네트워크에서 서비스 이름을 사용하고, 파일 경로는 /lake로 통일한다.</text>
+<rect x="35" y="125" width="325" height="106" rx="12" fill="#eaf2ff" stroke="#2963ba" stroke-width="1.5"/>
+<text x="53" y="156" class="node" text-anchor="start">SeaTunnel 컨테이너</text>
+<text x="53" y="185" class="body" text-anchor="start">기존 Zeta 환경 활용</text>
+<text x="53" y="209" class="body" text-anchor="start">파일 생성 / 테이블 쓰기</text>
+<rect x="435" y="125" width="325" height="106" rx="12" fill="#eaf2ff" stroke="#2963ba" stroke-width="1.5"/>
+<text x="453" y="156" class="node" text-anchor="start">lab 컨테이너</text>
+<text x="453" y="185" class="body" text-anchor="start">Python + PyIceberg + DuckDB</text>
+<text x="453" y="209" class="body" text-anchor="start">등록 스크립트 / SQL 조회</text>
+<rect x="835" y="125" width="330" height="106" rx="12" fill="#f1edff" stroke="#7354ac" stroke-width="1.5"/>
+<text x="853" y="156" class="node" text-anchor="start">hms 컨테이너</text>
+<text x="853" y="185" class="body" text-anchor="start">Thrift: hms:9083</text>
+<text x="853" y="209" class="body" text-anchor="start">테이블 등록 / 현재 위치</text>
+<polyline points="760,178 835,178" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-04-deployment)" stroke-dasharray="7 5"/>
+<text x="798" y="162" class="label" text-anchor="middle">RPC</text>
+<rect x="835" y="310" width="330" height="106" rx="12" fill="#f1edff" stroke="#7354ac" stroke-width="1.5"/>
+<text x="853" y="341" class="node" text-anchor="start">catalog-db</text>
+<text x="853" y="370" class="body" text-anchor="start">HMS용 PostgreSQL</text>
+<text x="853" y="394" class="body" text-anchor="start">별도 DB 데이터 볼륨</text>
+<polyline points="1000,231 1000,310" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-04-deployment)" stroke-dasharray="7 5"/>
+<text x="1040" y="278" class="label" text-anchor="middle">JDBC</text>
+<rect x="35" y="480" width="1130" height="106" rx="12" fill="#e8f6ee" stroke="#26784c" stroke-width="1.5"/>
+<text x="53" y="511" class="node" text-anchor="start">호스트의 ./lake → 각 컨테이너의 /lake</text>
+<text x="53" y="540" class="body" text-anchor="start">landing: SeaTunnel 산출물     |     warehouse: Iceberg 메타데이터와 데이터 파일</text>
+<text x="53" y="564" class="body" text-anchor="start">동일한 파일을 동일한 경로로 공유 · 컨테이너 삭제 후에도 호스트 파일은 보존</text>
+<polyline points="198,231 198,480" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-04-deployment)"/>
+<text x="255" y="370" class="label" text-anchor="middle">파일 접근</text>
+<polyline points="598,231 598,480" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-04-deployment)"/>
+<text x="655" y="370" class="label" text-anchor="middle">파일 접근</text>
+<polyline points="1135,231 1190,231 1190,451 1090,451 1090,480" fill="none" stroke="#68798a" stroke-width="2.2" marker-end="url(#arrow-04-deployment)" stroke-dasharray="7 5"/>
+<text x="35" y="632" class="sub" text-anchor="start">점선: 서비스 통신 / HMS의 필요 시 파일 접근. 실선: SeaTunnel·lab의 파일 접근.</text>
+</svg>

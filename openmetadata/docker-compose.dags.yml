@@ -1,0 +1,25 @@
+# docker-compose.yml(공식 배포본)에 얹는 오버레이. 공식 파일은 손대지 않고,
+# ingestion(Airflow) 컨테이너에 우리 로컬 DAG 폴더를 bind-mount로 추가한다.
+#
+# 마운트 문법: ./dags:/opt/airflow/dags/custom:ro  (HOST_경로:컨테이너_경로:모드)
+#   - ./dags            — compose 파일 기준 상대경로. 실제로는 ~/projects/cluade-test/openmetadata/dags (호스트/맥 디스크의 진짜 폴더)
+#   - /opt/airflow/dags/custom — 컨테이너 안에서 이 경로로 보이게 함
+#   - :ro               — read-only. 컨테이너에서 이 경로에 쓰기는 불가 (DAG는 호스트에서만 수정하라는 의도)
+#
+# custom 폴더는 어떻게 생기나: 원본 이미지엔 이 폴더가 없다 (docker run으로 이미지만 띄워서 확인함).
+# bind mount 대상 경로가 컨테이너 안에 없으면 Docker가 컨테이너를 만들 때 그 자리에 빈 디렉터리를
+# 자동으로 만들어준다 — 위 volumes 한 줄이 "컨테이너를 만들 때 /opt/airflow/dags/custom 경로에
+# 호스트의 ./dags를 마운트하라"는 지시이고, Docker가 없는 경로를 만들어서 마운트를 수행하는 것뿐이다.
+#
+# 왜 Airflow가 이 파일들을 인식하나: airflow.cfg의 dags_folder(/opt/airflow/dags) 아래를
+# 재귀적으로 스캔해서 .py 파일을 전부 읽기 때문. 그래서 "custom"이라는 폴더 이름 자체엔 의미가
+# 없고(다른 이름이어도 동일하게 동작함 — 실제로 zzz_random_folder_name 같은 임의 이름으로도
+# 인식되는 걸 확인함), dags_folder 하위 어디에 있든 상관없이 읽힌다. 기존 /opt/airflow/dags
+# (named volume, OpenMetadata가 자동 생성하는 ingestion pipeline DAG용)와도 서로 다른
+# 서브디렉터리라 충돌하지 않는다.
+
+
+services:
+  ingestion:
+    volumes:
+      - ./dags:/opt/airflow/dags/custom:ro

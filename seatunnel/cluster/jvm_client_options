@@ -1,0 +1,4 @@
+# scripts/run-job.sh에서 사용하는 Local JVM 힙 설정
+-Xms1g
+-Xmx3g
+-XX:+UseG1GC
