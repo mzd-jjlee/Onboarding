@@ -1,0 +1,9 @@
+# 기존 두 Compose 파일과 함께 사용. 1억 행 적재 작업에만 적용한다.
+services:
+  seatunnel:
+    mem_limit: 4g
+    environment:
+      SOURCE_USER: ${SOURCE_USER:?SOURCE_USER is required}
+      SOURCE_PASSWORD: ${SOURCE_PASSWORD:?SOURCE_PASSWORD is required}
+    volumes:
+      - ./config/jvm_100m_options:/opt/seatunnel/config/jvm_client_options:ro

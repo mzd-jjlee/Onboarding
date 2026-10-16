@@ -1,0 +1,755 @@
+ Container iceberg-learning-catalog-db-1 Running 
+ Container iceberg-learning-hms-1 Running 
+ Container iceberg-learning-source-db-1 Running 
+ Container iceberg-learning-catalog-db-1 Waiting 
+ Container iceberg-learning-catalog-db-1 Healthy 
+ Container iceberg-learning-source-db-1 Waiting 
+ Container iceberg-learning-source-db-1 Healthy 
+ Container iceberg-learning-batch-1 Creating 
+ Container iceberg-learning-batch-1 Created 
+2026-10-02 06:26:30,019 INFO  [c.h.i.c.AbstractConfigLocator ] [main] - Loading configuration '/opt/seatunnel/config/seatunnel.yaml' from System property 'seatunnel.config'
+2026-10-02 06:26:30,021 INFO  [c.h.i.c.AbstractConfigLocator ] [main] - Using configuration file at /opt/seatunnel/config/seatunnel.yaml
+2026-10-02 06:26:30,024 INFO  [o.a.s.e.c.c.SeaTunnelConfig   ] [main] - seatunnel.home is /opt/seatunnel
+2026-10-02 06:26:30,082 INFO  [amlSeaTunnelDomConfigProcessor] [main] - Dynamic slot is enabled, the schedule strategy is set to REJECT
+2026-10-02 06:26:30,083 INFO  [c.h.i.c.AbstractConfigLocator ] [main] - Loading configuration '/opt/seatunnel/config/hazelcast.yaml' from System property 'hazelcast.config'
+2026-10-02 06:26:30,083 INFO  [c.h.i.c.AbstractConfigLocator ] [main] - Using configuration file at /opt/seatunnel/config/hazelcast.yaml
+2026-10-02 06:26:30,235 INFO  [c.h.i.c.AbstractConfigLocator ] [main] - Loading configuration '/opt/seatunnel/config/hazelcast-client.yaml' from System property 'hazelcast.client.config'
+2026-10-02 06:26:30,235 INFO  [c.h.i.c.AbstractConfigLocator ] [main] - Using configuration file at /opt/seatunnel/config/hazelcast-client.yaml
+2026-10-02 06:26:30,265 WARN  [c.h.i.AddressPicker           ] [main] - [LOCAL] [seatunnel-198220] [5.1] You configured your member address as host name. Please be aware of that your dns can be spoofed. Make sure that your dns configurations are correct.
+2026-10-02 06:26:30,265 INFO  [c.h.i.AddressPicker           ] [main] - [LOCAL] [seatunnel-198220] [5.1] Resolving domain name 'localhost' to address(es): [127.0.0.1, 0:0:0:0:0:0:0:1]
+2026-10-02 06:26:30,265 INFO  [c.h.i.AddressPicker           ] [main] - [LOCAL] [seatunnel-198220] [5.1] Interfaces is disabled, trying to pick one address from TCP-IP config addresses: [localhost/127.0.0.1, localhost/0:0:0:0:0:0:0:1]
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+2026-10-02 06:26:30,546 INFO  [o.a.s.e.s.SeaTunnelServer     ] [main] - SeaTunnel server start...
+2026-10-02 06:26:30,548 INFO  [c.h.system                    ] [main] - [localhost]:5801 [seatunnel-198220] [5.1] Based on Hazelcast IMDG version: 5.1.0 (20220228 - 21f20e7)
+2026-10-02 06:26:30,548 INFO  [c.h.system                    ] [main] - [localhost]:5801 [seatunnel-198220] [5.1] Cluster name: seatunnel-198220
+2026-10-02 06:26:30,549 INFO  [c.h.system                    ] [main] - [localhost]:5801 [seatunnel-198220] [5.1] 
+                                                         
+ _____               _____                             _ 
+/  ___|             |_   _|                           | |
+\ `--.   ___   __ _   | |   _   _  _ __   _ __    ___ | |
+ `--. \ / _ \ / _` |  | |  | | | || '_ \ | '_ \  / _ \| |
+/\__/ /|  __/| (_| |  | |  | |_| || | | || | | ||  __/| |
+\____/  \___| \__,_|  \_/   \__,_||_| |_||_| |_| \___||_|
+                                                         
+
+2026-10-02 06:26:30,549 INFO  [c.h.system                    ] [main] - [localhost]:5801 [seatunnel-198220] [5.1] Copyright © 2021-2024 The Apache Software Foundation. Apache SeaTunnel, SeaTunnel, and its feather logo are trademarks of The Apache Software Foundation.
+2026-10-02 06:26:30,549 INFO  [c.h.system                    ] [main] - [localhost]:5801 [seatunnel-198220] [5.1] Integrity Checker is disabled. Fail-fast on corrupted executables will not be performed.
+To enable integrity checker do one of the following: 
+  - Change member config using Java API: config.setIntegrityCheckerEnabled(true);
+  - Change XML/YAML configuration property: Set hazelcast.integrity-checker.enabled to true
+  - Add system property: -Dhz.integritychecker.enabled=true (for Hazelcast embedded, works only when loading config via Config.load)
+  - Add environment variable: HZ_INTEGRITYCHECKER_ENABLED=true (recommended when running container image. For Hazelcast embedded, works only when loading config via Config.load)
+2026-10-02 06:26:30,550 INFO  [c.h.system                    ] [main] - [localhost]:5801 [seatunnel-198220] [5.1] The Jet engine is disabled.
+To enable the Jet engine on the members, do one of the following:
+  - Change member config using Java API: config.getJetConfig().setEnabled(true)
+  - Change XML/YAML configuration property: Set hazelcast.jet.enabled to true
+  - Add system property: -Dhz.jet.enabled=true (for Hazelcast embedded, works only when loading config via Config.load)
+  - Add environment variable: HZ_JET_ENABLED=true (recommended when running container image. For Hazelcast embedded, works only when loading config via Config.load)
+2026-10-02 06:26:30,761 INFO  [c.h.s.security                ] [main] - [localhost]:5801 [seatunnel-198220] [5.1] Enable DEBUG/FINE log level for log category com.hazelcast.system.security  or use -Dhazelcast.security.recommendations system property to see 🔒 security recommendations and the status of current config.
+2026-10-02 06:26:30,837 INFO  [o.a.s.e.s.SeaTunnelNodeContext] [main] - Using LiteNodeDropOutTcpIpJoiner TCP/IP discovery
+2026-10-02 06:26:30,839 WARN  [c.h.c.CPSubsystem             ] [main] - [localhost]:5801 [seatunnel-198220] [5.1] CP Subsystem is not enabled. CP data structures will operate in UNSAFE mode! Please note that UNSAFE mode will not provide strong consistency guarantees.
+2026-10-02 06:26:30,928 INFO  [.c.c.DefaultClassLoaderService] [main] - start classloader service with cache mode
+2026-10-02 06:26:30,931 INFO  [c.h.i.c.AbstractConfigLocator ] [main] - Loading configuration '/opt/seatunnel/config/seatunnel.yaml' from System property 'seatunnel.config'
+2026-10-02 06:26:30,932 INFO  [c.h.i.c.AbstractConfigLocator ] [main] - Using configuration file at /opt/seatunnel/config/seatunnel.yaml
+2026-10-02 06:26:30,934 INFO  [amlSeaTunnelDomConfigProcessor] [main] - Dynamic slot is enabled, the schedule strategy is set to REJECT
+2026-10-02 06:26:30,934 INFO  [c.h.i.c.AbstractConfigLocator ] [main] - Loading configuration '/opt/seatunnel/config/hazelcast.yaml' from System property 'hazelcast.config'
+2026-10-02 06:26:30,934 INFO  [c.h.i.c.AbstractConfigLocator ] [main] - Using configuration file at /opt/seatunnel/config/hazelcast.yaml
+2026-10-02 06:26:30,941 WARN  [o.a.s.e.s.TaskExecutionService] [pool-3-thread-1] - [localhost]:5801 [seatunnel-198220] [5.1] The Node is not ready yet, Node state STARTING,looking forward to the next scheduling
+2026-10-02 06:26:30,941 INFO  [o.a.s.e.s.TaskExecutionService] [main] - [localhost]:5801 [seatunnel-198220] [5.1] Created new BusWork : 927369095
+2026-10-02 06:26:30,944 WARN  [a.s.e.s.s.s.DefaultSlotService] [hz.main.seaTunnel.slotService.thread] - failed send heartbeat to resource manager, will retry later. this address: [localhost]:5801
+2026-10-02 06:26:30,946 INFO  [o.a.s.e.s.CoordinatorService  ] [main] - [localhost]:5801 [seatunnel-198220] [5.1] Start pending job schedule thread
+2026-10-02 06:26:31,055 WARN  [o.a.h.u.NativeCodeLoader      ] [main] - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2026-10-02 06:26:31,147 INFO  [o.a.s.e.s.CoordinatorService  ] [pool-7-thread-1] - [localhost]:5801 [seatunnel-198220] [5.1] 
+***********************************************
+     CoordinatorService Thread Pool Status
+***********************************************
+activeCount               :                   1
+corePoolSize              :                  10
+maximumPoolSize           :          2147483647
+poolSize                  :                   1
+completedTaskCount        :                   0
+taskCount                 :                   1
+***********************************************
+
+2026-10-02 06:26:31,152 INFO  [o.a.s.e.s.JettyService        ] [main] - SeaTunnel REST service will start on port 8080
+2026-10-02 06:26:31,157 INFO  [o.a.s.s.o.e.j.u.log           ] [main] - Logging initialized @1566ms to org.apache.seatunnel.shade.org.eclipse.jetty.util.log.Slf4jLog
+2026-10-02 06:26:31,189 WARN  [a.s.s.o.e.j.s.h.ContextHandler] [main] - Empty contextPath
+2026-10-02 06:26:31,209 INFO  [o.a.s.s.o.e.j.s.Server        ] [main] - jetty-9.4.56.v20240826; built: 2024-08-26T17:15:05.868Z; git: ec6782ff5ead824dabdcf47fa98f90a4aedff401; jvm 1.8.0_342-b07
+2026-10-02 06:26:31,224 INFO  [o.a.s.s.o.e.j.s.session       ] [main] - DefaultSessionIdManager workerName=node0
+2026-10-02 06:26:31,224 INFO  [o.a.s.s.o.e.j.s.session       ] [main] - No SessionScavenger set, using defaults
+2026-10-02 06:26:31,225 INFO  [o.a.s.s.o.e.j.s.session       ] [main] - node0 Scavenging every 660000ms
+2026-10-02 06:26:31,333 INFO  [a.s.s.o.e.j.s.h.ContextHandler] [main] - Started o.a.s.s.o.e.j.s.ServletContextHandler@1cbc1dde{/,null,AVAILABLE}
+2026-10-02 06:26:31,338 INFO  [.s.s.o.e.j.s.AbstractConnector] [main] - Started ServerConnector@7a6ea47d{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-10-02 06:26:31,338 INFO  [o.a.s.s.o.e.j.s.Server        ] [main] - Started @1748ms
+2026-10-02 06:26:31,356 INFO  [c.h.i.d.Diagnostics           ] [main] - [localhost]:5801 [seatunnel-198220] [5.1] Diagnostics disabled. To enable add -Dhazelcast.diagnostics.enabled=true to the JVM arguments.
+2026-10-02 06:26:31,359 INFO  [c.h.c.LifecycleService        ] [main] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5801 is STARTING
+2026-10-02 06:26:31,380 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-8] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5817 is added to the blacklist.
+2026-10-02 06:26:31,380 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-13] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5829 is added to the blacklist.
+2026-10-02 06:26:31,380 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-9] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5806 is added to the blacklist.
+2026-10-02 06:26:31,380 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-4] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5825 is added to the blacklist.
+2026-10-02 06:26:31,381 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-4] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5814 is added to the blacklist.
+2026-10-02 06:26:31,381 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-12] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5808 is added to the blacklist.
+2026-10-02 06:26:31,381 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-13] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5826 is added to the blacklist.
+2026-10-02 06:26:31,381 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-12] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5816 is added to the blacklist.
+2026-10-02 06:26:31,382 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-12] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5805 is added to the blacklist.
+2026-10-02 06:26:31,382 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-12] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5811 is added to the blacklist.
+2026-10-02 06:26:31,382 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-12] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5809 is added to the blacklist.
+2026-10-02 06:26:31,383 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-12] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5830 is added to the blacklist.
+2026-10-02 06:26:31,383 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-12] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5828 is added to the blacklist.
+2026-10-02 06:26:31,383 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-12] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5803 is added to the blacklist.
+2026-10-02 06:26:31,380 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-5] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5815 is added to the blacklist.
+2026-10-02 06:26:31,380 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-14] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5802 is added to the blacklist.
+2026-10-02 06:26:31,380 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-15] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5822 is added to the blacklist.
+2026-10-02 06:26:31,380 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-1] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5827 is added to the blacklist.
+2026-10-02 06:26:31,382 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-6] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5813 is added to the blacklist.
+2026-10-02 06:26:31,382 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-2] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5821 is added to the blacklist.
+2026-10-02 06:26:31,382 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-16] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5820 is added to the blacklist.
+2026-10-02 06:26:31,382 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-4] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5812 is added to the blacklist.
+2026-10-02 06:26:31,382 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-11] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5810 is added to the blacklist.
+2026-10-02 06:26:31,381 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-13] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5807 is added to the blacklist.
+2026-10-02 06:26:31,381 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-10] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5804 is added to the blacklist.
+2026-10-02 06:26:31,381 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-8] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5818 is added to the blacklist.
+2026-10-02 06:26:31,381 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-9] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5824 is added to the blacklist.
+2026-10-02 06:26:31,381 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-3] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5823 is added to the blacklist.
+2026-10-02 06:26:31,381 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-7] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5819 is added to the blacklist.
+2026-10-02 06:26:32,380 INFO  [c.h.i.c.ClusterService        ] [main] - [localhost]:5801 [seatunnel-198220] [5.1] 
+
+Members {size:1, ver:1} [
+	Member [localhost]:5801 - 8cec52f1-509c-4758-800c-04dd536f97da [master node] [active master] this
+]
+
+2026-10-02 06:26:32,390 INFO  [c.h.i.d.HealthMonitor         ] [hz.main.HealthMonitor] - [localhost]:5801 [seatunnel-198220] [5.1] processors=6, physical.memory.total=9.7G, physical.memory.free=3.7G, swap.space.total=0, swap.space.free=0, heap.memory.used=61.0M, heap.memory.free=221.0M, heap.memory.total=282.0M, heap.memory.max=1.3G, heap.memory.used/total=21.64%, heap.memory.used/max=4.47%, minor.gc.count=5, minor.gc.time=24ms, major.gc.count=2, major.gc.time=45ms, load.process=0.00%, load.system=0.00%, load.systemAverage=0.44, thread.count=125, thread.peakCount=125, cluster.timeDiff=0, event.q.size=0, executor.q.async.size=0, executor.q.client.size=0, executor.q.client.query.size=0, executor.q.client.blocking.size=0, executor.q.query.size=0, executor.q.scheduled.size=0, executor.q.io.size=0, executor.q.system.size=0, executor.q.operations.size=0, executor.q.priorityOperation.size=0, operations.completed.count=0, executor.q.mapLoad.size=0, executor.q.mapLoadAllKeys.size=0, executor.q.cluster.size=0, executor.q.response.size=0, operations.running.count=0, operations.pending.invocations.percentage=0.00%, operations.pending.invocations.count=0, proxy.count=1, clientEndpoint.count=0, connection.active.count=0, client.connection.count=0, connection.count=0
+2026-10-02 06:26:32,390 INFO  [c.h.c.LifecycleService        ] [main] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5801 is STARTED
+2026-10-02 06:26:32,401 INFO  [.h.i.p.i.PartitionStateManager] [hz.main.cached.thread-14] - [localhost]:5801 [seatunnel-198220] [5.1] Initializing cluster partition table arrangement...
+2026-10-02 06:26:32,412 INFO  [.c.i.s.ClientInvocationService] [main] - hz.client_1 [seatunnel-198220] [5.1] Running with 2 response threads, dynamic=true
+2026-10-02 06:26:32,420 INFO  [c.h.c.LifecycleService        ] [main] - hz.client_1 [seatunnel-198220] [5.1] HazelcastClient 5.1 (20220228 - 21f20e7) is STARTING
+2026-10-02 06:26:32,420 INFO  [c.h.c.LifecycleService        ] [main] - hz.client_1 [seatunnel-198220] [5.1] HazelcastClient 5.1 (20220228 - 21f20e7) is STARTED
+2026-10-02 06:26:32,425 INFO  [.c.i.c.ClientConnectionManager] [main] - hz.client_1 [seatunnel-198220] [5.1] Trying to connect to cluster: seatunnel-198220
+2026-10-02 06:26:32,426 INFO  [.c.i.c.ClientConnectionManager] [main] - hz.client_1 [seatunnel-198220] [5.1] Trying to connect to [localhost]:5801
+2026-10-02 06:26:32,435 INFO  [.p.t.AuthenticationMessageTask] [hz.main.generic-operation.thread-0] - [localhost]:5801 [seatunnel-198220] [5.1] Received auth from Connection[id=1, /127.0.0.1:5801->/127.0.0.1:54923, qualifier=null, endpoint=[127.0.0.1]:54923, remoteUuid=d655d8c7-1b92-4003-ad87-f067dc6351f9, alive=true, connectionType=JVM, planeIndex=-1], successfully authenticated, clientUuid: d655d8c7-1b92-4003-ad87-f067dc6351f9, client name: hz.client_1, client version: 5.1
+2026-10-02 06:26:32,436 INFO  [c.h.c.LifecycleService        ] [main] - hz.client_1 [seatunnel-198220] [5.1] HazelcastClient 5.1 (20220228 - 21f20e7) is CLIENT_CONNECTED
+2026-10-02 06:26:32,436 INFO  [.c.i.c.ClientConnectionManager] [main] - hz.client_1 [seatunnel-198220] [5.1] Authenticated with server [localhost]:5801:8cec52f1-509c-4758-800c-04dd536f97da, server version: 5.1, local address: /127.0.0.1:54923
+2026-10-02 06:26:32,437 INFO  [c.h.i.d.Diagnostics           ] [main] - hz.client_1 [seatunnel-198220] [5.1] Diagnostics disabled. To enable add -Dhazelcast.diagnostics.enabled=true to the JVM arguments.
+2026-10-02 06:26:32,445 INFO  [c.h.c.i.s.ClientClusterService] [hz.client_1.event-8] - hz.client_1 [seatunnel-198220] [5.1] 
+
+Members [1] {
+	Member [localhost]:5801 - 8cec52f1-509c-4758-800c-04dd536f97da [master node]
+}
+
+2026-10-02 06:26:32,446 INFO  [o.a.s.e.s.CoordinatorService  ] [pool-5-thread-1] - [localhost]:5801 [seatunnel-198220] [5.1] This node become a new active master node, begin init coordinator service
+2026-10-02 06:26:32,469 INFO  [o.a.s.e.s.CoordinatorService  ] [pool-5-thread-1] - [localhost]:5801 [seatunnel-198220] [5.1] Loaded event handlers: [org.apache.seatunnel.api.event.LoggingEventHandler@652424f5]
+2026-10-02 06:26:32,471 INFO  [.c.i.s.ClientStatisticsService] [main] - Client statistics is enabled with period 5 seconds.
+2026-10-02 06:26:32,500 INFO  [o.a.s.c.s.u.ConfigBuilder     ] [main] - Loading config file from path: /jobs/01_orders_to_iceberg.conf
+2026-10-02 06:26:32,673 INFO  [o.a.s.c.s.u.ConfigShadeUtils  ] [main] - Load config shade spi: [base64]
+2026-10-02 06:26:32,703 INFO  [o.a.s.c.s.u.ConfigBuilder     ] [main] - Parsed config file: 
+{
+    "env" : {
+        "parallelism" : 1,
+        "job.mode" : "BATCH"
+    },
+    "source" : [
+        {
+            "url" : "jdbc:postgresql://source-db:5432/ordersdb",
+            "driver" : "org.postgresql.Driver",
+            "user" : "demo",
+            "password" : "******",
+            "query" : "select order_id, customer_name, amount, status from orders where batch_id = 1",
+            "plugin_name" : "Jdbc"
+        }
+    ],
+    "sink" : [
+        {
+            "catalog_name" : "local_hive",
+            "iceberg.catalog.config" : {
+                "type" : "hive",
+                "uri" : "thrift://hms:9083",
+                "warehouse" : "file:///lake/warehouse"
+            },
+            "namespace" : "retail",
+            "table" : "orders",
+            "iceberg.table.write-props" : {
+                "write.format.default" : "parquet"
+            },
+            "schema_save_mode" : "CREATE_SCHEMA_WHEN_NOT_EXIST",
+            "data_save_mode" : "APPEND_DATA",
+            "plugin_name" : "Iceberg"
+        }
+    ],
+    "transform" : []
+}
+
+2026-10-02 06:26:32,714 INFO  [p.MultipleTableJobConfigParser] [main] - add common jar in plugins :[]
+2026-10-02 06:26:32,726 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - Load SeaTunnelSink Plugin from /opt/seatunnel/connectors
+2026-10-02 06:26:32,729 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - Discovery plugin jar for: PluginIdentifier{engineType='seatunnel', pluginType='source', pluginName='Jdbc'} at: [file:/opt/seatunnel/connectors/connector-jdbc-2.3.13.jar]
+2026-10-02 06:26:32,729 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - find connector jar and dependency for PluginIdentifier{engineType='seatunnel', pluginType='source', pluginName='Jdbc'}: [file:/opt/seatunnel/connectors/connector-jdbc-2.3.13.jar]
+2026-10-02 06:26:32,734 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - Load SeaTunnelSink Plugin from /opt/seatunnel/connectors
+2026-10-02 06:26:32,737 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - Load SeaTunnelSink Plugin from /opt/seatunnel/connectors
+2026-10-02 06:26:32,738 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - Discovery plugin jar for: PluginIdentifier{engineType='seatunnel', pluginType='sink', pluginName='Iceberg'} at: [file:/opt/seatunnel/connectors/connector-iceberg-2.3.13.jar]
+2026-10-02 06:26:32,738 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - find connector jar and dependency for PluginIdentifier{engineType='seatunnel', pluginType='sink', pluginName='Iceberg'}: [file:/opt/seatunnel/connectors/connector-iceberg-2.3.13.jar]
+2026-10-02 06:26:32,740 INFO  [p.MultipleTableJobConfigParser] [main] - start generating all sources.
+2026-10-02 06:26:32,766 WARN  [o.a.s.a.c.ReadonlyConfig      ] [main] - Please use the new key 'username' instead of the deprecated key 'user'.
+2026-10-02 06:26:32,783 INFO  [o.a.s.c.s.j.u.JdbcCatalogUtils] [main] - Loading catalog tables for catalog : class org.apache.seatunnel.connectors.seatunnel.jdbc.catalog.psql.PostgresCatalog
+2026-10-02 06:26:32,891 INFO  [.s.c.s.j.c.AbstractJdbcCatalog] [main] - Catalog Postgres established connection to jdbc:postgresql://source-db:5432/ordersdb
+2026-10-02 06:26:32,925 INFO  [o.a.s.c.s.j.u.JdbcCatalogUtils] [main] - Loaded 1 catalog tables for catalog : class org.apache.seatunnel.connectors.seatunnel.jdbc.catalog.psql.PostgresCatalog
+2026-10-02 06:26:32,925 INFO  [.s.c.s.j.c.AbstractJdbcCatalog] [main] - Catalog Postgres closing
+2026-10-02 06:26:32,926 INFO  [o.a.s.a.t.f.FactoryUtil       ] [main] - get the CatalogTable from source Jdbc: jdbc_catalog.null.orders
+2026-10-02 06:26:32,933 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - Load SeaTunnelSource Plugin from /opt/seatunnel/connectors
+2026-10-02 06:26:32,938 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - Discovery plugin jar for: PluginIdentifier{engineType='seatunnel', pluginType='source', pluginName='Jdbc'} at: [file:/opt/seatunnel/connectors/connector-jdbc-2.3.13.jar]
+2026-10-02 06:26:32,938 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - find connector jar and dependency for PluginIdentifier{engineType='seatunnel', pluginType='source', pluginName='Jdbc'}: [file:/opt/seatunnel/connectors/connector-jdbc-2.3.13.jar]
+2026-10-02 06:26:32,939 INFO  [p.MultipleTableJobConfigParser] [main] - start generating all transforms.
+2026-10-02 06:26:32,939 INFO  [p.MultipleTableJobConfigParser] [main] - start generating all sinks.
+2026-10-02 06:26:32,941 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - Load SeaTunnelSink Plugin from /opt/seatunnel/connectors
+2026-10-02 06:26:32,942 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - Discovery plugin jar for: PluginIdentifier{engineType='seatunnel', pluginType='sink', pluginName='Iceberg'} at: [file:/opt/seatunnel/connectors/connector-iceberg-2.3.13.jar]
+2026-10-02 06:26:32,942 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - find connector jar and dependency for PluginIdentifier{engineType='seatunnel', pluginType='sink', pluginName='Iceberg'}: [file:/opt/seatunnel/connectors/connector-iceberg-2.3.13.jar]
+2026-10-02 06:26:32,957 INFO  [o.a.s.a.t.f.FactoryUtil       ] [main] - Create sink 'Iceberg' with upstream input catalog-table[database: null, schema: null, table: orders]
+2026-10-02 06:26:32,980 INFO  [o.a.s.e.c.j.ClientJobProxy    ] [main] - Start submit job, job id: 1158288894827954177, with plugin jar [file:/opt/seatunnel/connectors/connector-jdbc-2.3.13.jar, file:/opt/seatunnel/connectors/connector-iceberg-2.3.13.jar]
+2026-10-02 06:26:32,987 INFO  [.e.s.r.AbstractResourceManager] [hz.main.client.thread-4] - Init ResourceManager
+2026-10-02 06:26:32,987 INFO  [.e.s.r.AbstractResourceManager] [hz.main.client.thread-4] - initWorker... 
+2026-10-02 06:26:32,988 INFO  [.e.s.r.AbstractResourceManager] [hz.main.client.thread-4] - init live nodes: [[localhost]:5801]
+2026-10-02 06:26:32,988 INFO  [.e.s.r.AbstractResourceManager] [SeaTunnel-CompletableFuture-Thread-2] - received new worker register: [localhost]:5801
+2026-10-02 06:26:32,988 INFO  [.e.s.r.AbstractResourceManager] [hz.main.client.thread-4] - registerWorker: {[localhost]:5801=WorkerProfile(address=[localhost]:5801, profile=ResourceProfile{cpu=CPU{core=0}, heapMemory=Memory{bytes=1431830528}}, unassignedResource=ResourceProfile{cpu=CPU{core=0}, heapMemory=Memory{bytes=1431830528}}, dynamicSlot=true, assignedSlots=[], unassignedSlots=[], attributes={}, systemLoadInfo=null)}
+2026-10-02 06:26:33,000 INFO  [o.a.s.e.s.m.JobMaster         ] [seatunnel-coordinator-service-2] - in batch mode, the 'checkpoint.interval' configuration of env is missing, so checkpoint will be disabled
+2026-10-02 06:26:33,000 INFO  [o.a.s.e.s.m.JobMaster         ] [seatunnel-coordinator-service-2] - Init JobMaster for Job SeaTunnel_Job (1158288894827954177) 
+2026-10-02 06:26:33,000 INFO  [o.a.s.e.s.m.JobMaster         ] [seatunnel-coordinator-service-2] - Job SeaTunnel_Job (1158288894827954177) needed jar urls [file:/opt/seatunnel/connectors/connector-jdbc-2.3.13.jar, file:/opt/seatunnel/connectors/connector-iceberg-2.3.13.jar]
+2026-10-02 06:26:33,001 INFO  [.c.c.DefaultClassLoaderService] [seatunnel-coordinator-service-2] - Create classloader for job 1 with jars [file:/opt/seatunnel/connectors/connector-jdbc-2.3.13.jar]
+2026-10-02 06:26:33,001 INFO  [.c.c.DefaultClassLoaderService] [seatunnel-coordinator-service-2] - Create classloader for job 1 with jars [file:/opt/seatunnel/connectors/connector-iceberg-2.3.13.jar]
+2026-10-02 06:26:33,024 WARN  [a.s.c.s.i.IcebergCatalogLoader] [seatunnel-coordinator-service-2] - Kerberos authentication is not configured, it will skip kerberos authentication
+2026-10-02 06:26:33,025 INFO  [a.s.c.s.i.IcebergCatalogLoader] [seatunnel-coordinator-service-2] - Hadoop config initialized: org.apache.hadoop.hdfs.HdfsConfiguration
+2026-10-02 06:26:33,111 INFO  [a.s.a.s.SaveModeExecuteWrapper] [seatunnel-coordinator-service-2] - Executing save mode for table: retail.orders, with SchemaSaveMode: CREATE_SCHEMA_WHEN_NOT_EXIST, DataSaveMode: APPEND_DATA using Catalog: Iceberg
+2026-10-02 06:26:33,128 INFO  [o.a.h.h.c.HiveConf            ] [seatunnel-coordinator-service-2] - Found configuration file null
+2026-10-02 06:26:33,245 ERROR [o.a.h.h.m.u.MetaStoreUtils    ] [seatunnel-coordinator-service-2] - Got exception: java.net.URISyntaxException Illegal character in hostname at index 48: thrift://iceberg-learning-hms-1.iceberg-learning_default:9083
+java.net.URISyntaxException: Illegal character in hostname at index 48: thrift://iceberg-learning-hms-1.iceberg-learning_default:9083
+	at java.net.URI$Parser.fail(URI.java:2847) ~[?:1.8.0_342]
+	at java.net.URI$Parser.parseHostname(URI.java:3386) ~[?:1.8.0_342]
+	at java.net.URI$Parser.parseServer(URI.java:3235) ~[?:1.8.0_342]
+	at java.net.URI$Parser.parseAuthority(URI.java:3154) ~[?:1.8.0_342]
+	at java.net.URI$Parser.parseHierarchical(URI.java:3096) ~[?:1.8.0_342]
+	at java.net.URI$Parser.parse(URI.java:3052) ~[?:1.8.0_342]
+	at java.net.URI.<init>(URI.java:673) ~[?:1.8.0_342]
+	at org.apache.hadoop.hive.metastore.HiveMetaStoreClient.resolveUris(HiveMetaStoreClient.java:250) ~[hive-exec-3.1.3.jar:3.1.3]
+	at org.apache.hadoop.hive.metastore.HiveMetaStoreClient.<init>(HiveMetaStoreClient.java:182) ~[hive-exec-3.1.3.jar:3.1.3]
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method) ~[?:1.8.0_342]
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62) ~[?:1.8.0_342]
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45) ~[?:1.8.0_342]
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423) ~[?:1.8.0_342]
+	at org.apache.hadoop.hive.metastore.utils.JavaUtils.newInstance(JavaUtils.java:84) ~[hive-exec-3.1.3.jar:3.1.3]
+	at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.<init>(RetryingMetaStoreClient.java:95) ~[hive-exec-3.1.3.jar:3.1.3]
+	at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.getProxy(RetryingMetaStoreClient.java:148) ~[hive-exec-3.1.3.jar:3.1.3]
+	at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.getProxy(RetryingMetaStoreClient.java:119) ~[hive-exec-3.1.3.jar:3.1.3]
+	at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.getProxy(RetryingMetaStoreClient.java:112) ~[hive-exec-3.1.3.jar:3.1.3]
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:1.8.0_342]
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[?:1.8.0_342]
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:1.8.0_342]
+	at java.lang.reflect.Method.invoke(Method.java:498) ~[?:1.8.0_342]
+	at org.apache.iceberg.common.DynMethods$UnboundMethod.invokeChecked(DynMethods.java:62) ~[connector-iceberg-2.3.13.jar:2.3.13]
+	at org.apache.iceberg.common.DynMethods$UnboundMethod.invoke(DynMethods.java:74) ~[connector-iceberg-2.3.13.jar:2.3.13]
+	at org.apache.iceberg.common.DynMethods$StaticMethod.invoke(DynMethods.java:187) ~[connector-iceberg-2.3.13.jar:2.3.13]
+	at org.apache.iceberg.hive.HiveClientPool.newClient(HiveClientPool.java:63) ~[connector-iceberg-2.3.13.jar:2.3.13]
+	at org.apache.iceberg.hive.HiveClientPool.newClient(HiveClientPool.java:34) ~[connector-iceberg-2.3.13.jar:2.3.13]
+	at org.apache.iceberg.ClientPoolImpl.get(ClientPoolImpl.java:143) ~[connector-iceberg-2.3.13.jar:2.3.13]
+	at org.apache.iceberg.ClientPoolImpl.run(ClientPoolImpl.java:70) ~[connector-iceberg-2.3.13.jar:2.3.13]
+	at org.apache.iceberg.ClientPoolImpl.run(ClientPoolImpl.java:65) ~[connector-iceberg-2.3.13.jar:2.3.13]
+	at org.apache.iceberg.hive.CachedClientPool.run(CachedClientPool.java:122) ~[connector-iceberg-2.3.13.jar:2.3.13]
+	at org.apache.iceberg.hive.HiveTableOperations.doRefresh(HiveTableOperations.java:147) ~[connector-iceberg-2.3.13.jar:2.3.13]
+	at org.apache.iceberg.BaseMetastoreTableOperations.refresh(BaseMetastoreTableOperations.java:90) ~[connector-iceberg-2.3.13.jar:2.3.13]
+	at org.apache.iceberg.BaseMetastoreTableOperations.current(BaseMetastoreTableOperations.java:73) ~[connector-iceberg-2.3.13.jar:2.3.13]
+	at org.apache.iceberg.BaseMetastoreCatalog.loadTable(BaseMetastoreCatalog.java:49) ~[connector-iceberg-2.3.13.jar:2.3.13]
+	at org.apache.iceberg.catalog.Catalog.tableExists(Catalog.java:281) ~[connector-iceberg-2.3.13.jar:2.3.13]
+	at org.apache.seatunnel.connectors.seatunnel.iceberg.catalog.IcebergCatalog.tableExists(IcebergCatalog.java:159) ~[connector-iceberg-2.3.13.jar:2.3.13]
+	at org.apache.seatunnel.api.sink.DefaultSaveModeHandler.tableExists(DefaultSaveModeHandler.java:169) ~[seatunnel-starter.jar:2.3.13]
+	at org.apache.seatunnel.api.sink.DefaultSaveModeHandler.createSchemaWhenNotExist(DefaultSaveModeHandler.java:138) ~[seatunnel-starter.jar:2.3.13]
+	at org.apache.seatunnel.api.sink.DefaultSaveModeHandler.handleSchemaSaveMode(DefaultSaveModeHandler.java:88) ~[seatunnel-starter.jar:2.3.13]
+	at org.apache.seatunnel.api.sink.SaveModeHandler.handleSaveMode(SaveModeHandler.java:42) ~[seatunnel-starter.jar:2.3.13]
+	at org.apache.seatunnel.api.sink.SaveModeExecuteWrapper.execute(SaveModeExecuteWrapper.java:36) ~[seatunnel-starter.jar:2.3.13]
+	at org.apache.seatunnel.engine.server.master.JobMaster.handleSaveMode(JobMaster.java:571) ~[seatunnel-starter.jar:2.3.13]
+	at org.apache.seatunnel.engine.server.master.JobMaster.handleSaveMode(JobMaster.java:582) ~[seatunnel-starter.jar:2.3.13]
+	at org.apache.seatunnel.engine.server.master.JobMaster.lambda$init$1(JobMaster.java:267) ~[seatunnel-starter.jar:2.3.13]
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183) ~[?:1.8.0_342]
+	at java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:175) ~[?:1.8.0_342]
+	at java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:193) ~[?:1.8.0_342]
+	at java.util.Iterator.forEachRemaining(Iterator.java:116) ~[?:1.8.0_342]
+	at java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801) ~[?:1.8.0_342]
+	at java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:482) ~[?:1.8.0_342]
+	at java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:472) ~[?:1.8.0_342]
+	at java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150) ~[?:1.8.0_342]
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173) ~[?:1.8.0_342]
+	at java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234) ~[?:1.8.0_342]
+	at java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:485) ~[?:1.8.0_342]
+	at org.apache.seatunnel.engine.server.master.JobMaster.init(JobMaster.java:261) ~[seatunnel-starter.jar:2.3.13]
+	at org.apache.seatunnel.engine.server.CoordinatorService.lambda$submitJob$6(CoordinatorService.java:663) ~[seatunnel-starter.jar:2.3.13]
+	at org.apache.seatunnel.api.tracing.MDCRunnable.run(MDCRunnable.java:43) [seatunnel-starter.jar:2.3.13]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511) [?:1.8.0_342]
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [?:1.8.0_342]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149) [?:1.8.0_342]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624) [?:1.8.0_342]
+	at java.lang.Thread.run(Thread.java:750) [?:1.8.0_342]
+2026-10-02 06:26:33,249 ERROR [o.a.h.h.m.u.MetaStoreUtils    ] [seatunnel-coordinator-service-2] - Converting exception to MetaException
+2026-10-02 06:26:33,254 ERROR [o.a.s.e.s.CoordinatorService  ] [seatunnel-coordinator-service-2] - [localhost]:5801 [seatunnel-198220] [5.1] submit job 1158288894827954177 error org.apache.seatunnel.common.exception.SeaTunnelRuntimeException: ErrorCode:[API-09], ErrorDescription:[Handle save mode failed]
+	at org.apache.seatunnel.engine.server.master.JobMaster.handleSaveMode(JobMaster.java:576)
+	at org.apache.seatunnel.engine.server.master.JobMaster.handleSaveMode(JobMaster.java:582)
+	at org.apache.seatunnel.engine.server.master.JobMaster.lambda$init$1(JobMaster.java:267)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:175)
+	at java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:193)
+	at java.util.Iterator.forEachRemaining(Iterator.java:116)
+	at java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:482)
+	at java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:472)
+	at java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:485)
+	at org.apache.seatunnel.engine.server.master.JobMaster.init(JobMaster.java:261)
+	at org.apache.seatunnel.engine.server.CoordinatorService.lambda$submitJob$6(CoordinatorService.java:663)
+	at org.apache.seatunnel.api.tracing.MDCRunnable.run(MDCRunnable.java:43)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: org.apache.iceberg.hive.RuntimeMetaException: Failed to connect to Hive Metastore
+	at org.apache.iceberg.hive.HiveClientPool.newClient(HiveClientPool.java:85)
+	at org.apache.iceberg.hive.HiveClientPool.newClient(HiveClientPool.java:34)
+	at org.apache.iceberg.ClientPoolImpl.get(ClientPoolImpl.java:143)
+	at org.apache.iceberg.ClientPoolImpl.run(ClientPoolImpl.java:70)
+	at org.apache.iceberg.ClientPoolImpl.run(ClientPoolImpl.java:65)
+	at org.apache.iceberg.hive.CachedClientPool.run(CachedClientPool.java:122)
+	at org.apache.iceberg.hive.HiveTableOperations.doRefresh(HiveTableOperations.java:147)
+	at org.apache.iceberg.BaseMetastoreTableOperations.refresh(BaseMetastoreTableOperations.java:90)
+	at org.apache.iceberg.BaseMetastoreTableOperations.current(BaseMetastoreTableOperations.java:73)
+	at org.apache.iceberg.BaseMetastoreCatalog.loadTable(BaseMetastoreCatalog.java:49)
+	at org.apache.iceberg.catalog.Catalog.tableExists(Catalog.java:281)
+	at org.apache.seatunnel.connectors.seatunnel.iceberg.catalog.IcebergCatalog.tableExists(IcebergCatalog.java:159)
+	at org.apache.seatunnel.api.sink.DefaultSaveModeHandler.tableExists(DefaultSaveModeHandler.java:169)
+	at org.apache.seatunnel.api.sink.DefaultSaveModeHandler.createSchemaWhenNotExist(DefaultSaveModeHandler.java:138)
+	at org.apache.seatunnel.api.sink.DefaultSaveModeHandler.handleSchemaSaveMode(DefaultSaveModeHandler.java:88)
+	at org.apache.seatunnel.api.sink.SaveModeHandler.handleSaveMode(SaveModeHandler.java:42)
+	at org.apache.seatunnel.api.sink.SaveModeExecuteWrapper.execute(SaveModeExecuteWrapper.java:36)
+	at org.apache.seatunnel.engine.server.master.JobMaster.handleSaveMode(JobMaster.java:571)
+	... 21 more
+Caused by: java.lang.RuntimeException: Unable to instantiate org.apache.hadoop.hive.metastore.HiveMetaStoreClient
+	at org.apache.hadoop.hive.metastore.utils.JavaUtils.newInstance(JavaUtils.java:86)
+	at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.<init>(RetryingMetaStoreClient.java:95)
+	at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.getProxy(RetryingMetaStoreClient.java:148)
+	at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.getProxy(RetryingMetaStoreClient.java:119)
+	at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.getProxy(RetryingMetaStoreClient.java:112)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.iceberg.common.DynMethods$UnboundMethod.invokeChecked(DynMethods.java:62)
+	at org.apache.iceberg.common.DynMethods$UnboundMethod.invoke(DynMethods.java:74)
+	at org.apache.iceberg.common.DynMethods$StaticMethod.invoke(DynMethods.java:187)
+	at org.apache.iceberg.hive.HiveClientPool.newClient(HiveClientPool.java:63)
+	... 38 more
+Caused by: java.lang.reflect.InvocationTargetException
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at org.apache.hadoop.hive.metastore.utils.JavaUtils.newInstance(JavaUtils.java:84)
+	... 50 more
+Caused by: MetaException(message:Got exception: java.net.URISyntaxException Illegal character in hostname at index 48: thrift://iceberg-learning-hms-1.iceberg-learning_default:9083)
+	at org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.logAndThrowMetaException(MetaStoreUtils.java:168)
+	at org.apache.hadoop.hive.metastore.HiveMetaStoreClient.resolveUris(HiveMetaStoreClient.java:267)
+	at org.apache.hadoop.hive.metastore.HiveMetaStoreClient.<init>(HiveMetaStoreClient.java:182)
+	... 55 more
+ 
+2026-10-02 06:26:33,259 INFO  [c.h.c.LifecycleService        ] [main] - hz.client_1 [seatunnel-198220] [5.1] HazelcastClient 5.1 (20220228 - 21f20e7) is SHUTTING_DOWN
+2026-10-02 06:26:33,264 INFO  [c.h.i.s.t.TcpServerConnection ] [hz.main.IO.thread-in-1] - [localhost]:5801 [seatunnel-198220] [5.1] Connection[id=1, /127.0.0.1:5801->/127.0.0.1:54923, qualifier=null, endpoint=[127.0.0.1]:54923, remoteUuid=d655d8c7-1b92-4003-ad87-f067dc6351f9, alive=false, connectionType=JVM, planeIndex=-1] closed. Reason: Connection closed by the other side
+2026-10-02 06:26:33,265 INFO  [.c.i.c.ClientConnectionManager] [main] - hz.client_1 [seatunnel-198220] [5.1] Removed connection to endpoint: [localhost]:5801:8cec52f1-509c-4758-800c-04dd536f97da, connection: ClientConnection{alive=false, connectionId=1, channel=NioChannel{/127.0.0.1:54923->localhost/127.0.0.1:5801}, remoteAddress=[localhost]:5801, lastReadTime=2026-10-02 06:26:33.257, lastWriteTime=2026-10-02 06:26:32.981, closedTime=2026-10-02 06:26:33.263, connected server version=5.1}
+2026-10-02 06:26:33,265 INFO  [c.h.c.LifecycleService        ] [main] - hz.client_1 [seatunnel-198220] [5.1] HazelcastClient 5.1 (20220228 - 21f20e7) is CLIENT_DISCONNECTED
+2026-10-02 06:26:33,266 INFO  [c.h.c.i.ClientEndpointManager ] [hz.main.event-4] - [localhost]:5801 [seatunnel-198220] [5.1] Destroying ClientEndpoint{connection=Connection[id=1, /127.0.0.1:5801->/127.0.0.1:54923, qualifier=null, endpoint=[127.0.0.1]:54923, remoteUuid=d655d8c7-1b92-4003-ad87-f067dc6351f9, alive=false, connectionType=JVM, planeIndex=-1], clientUuid=d655d8c7-1b92-4003-ad87-f067dc6351f9, clientName=hz.client_1, authenticated=true, clientVersion=5.1, creationTime=1790922392433, latest clientAttributes=lastStatisticsCollectionTime=1790922392471,enterprise=false,clientType=JVM,clientVersion=5.1,clusterConnectionTimestamp=1790922392427,clientAddress=127.0.0.1,clientName=hz.client_1,credentials.principal=null,os.committedVirtualMemorySize=6489190400,os.freePhysicalMemorySize=3939565568,os.freeSwapSpaceSize=0,os.maxFileDescriptorCount=1048576,os.openFileDescriptorCount=90,os.processCpuTime=4290000000,os.systemLoadAverage=0.44,os.totalPhysicalMemorySize=10415738880,os.totalSwapSpaceSize=0,runtime.availableProcessors=6,runtime.freeMemory=211982576,runtime.maxMemory=1431830528,runtime.totalMemory=295698432,runtime.uptime=2884,runtime.usedMemory=83715856, labels=[]}
+2026-10-02 06:26:33,267 INFO  [c.h.c.LifecycleService        ] [main] - hz.client_1 [seatunnel-198220] [5.1] HazelcastClient 5.1 (20220228 - 21f20e7) is SHUTDOWN
+2026-10-02 06:26:33,268 INFO  [s.c.s.s.c.ClientExecuteCommand] [main] - Closed SeaTunnel client......
+2026-10-02 06:26:33,268 INFO  [c.h.c.LifecycleService        ] [main] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5801 is SHUTTING_DOWN
+2026-10-02 06:26:33,270 INFO  [c.h.i.p.i.MigrationManager    ] [hz.main.cached.thread-7] - [localhost]:5801 [seatunnel-198220] [5.1] Shutdown request of Member [localhost]:5801 - 8cec52f1-509c-4758-800c-04dd536f97da [master node] [active master] this is handled
+2026-10-02 06:26:33,274 INFO  [c.h.i.i.Node                  ] [main] - [localhost]:5801 [seatunnel-198220] [5.1] Shutting down connection manager...
+2026-10-02 06:26:33,275 INFO  [c.h.i.i.Node                  ] [main] - [localhost]:5801 [seatunnel-198220] [5.1] Shutting down node engine...
+2026-10-02 06:26:33,282 INFO  [.s.s.o.e.j.s.AbstractConnector] [main] - Stopped ServerConnector@7a6ea47d{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-10-02 06:26:33,282 INFO  [o.a.s.s.o.e.j.s.session       ] [main] - node0 Stopped scavenging
+2026-10-02 06:26:33,282 INFO  [a.s.s.o.e.j.s.h.ContextHandler] [main] - Stopped o.a.s.s.o.e.j.s.ServletContextHandler@1cbc1dde{/,null,STOPPED}
+2026-10-02 06:26:33,284 INFO  [.c.c.DefaultClassLoaderService] [main] - close classloader service
+2026-10-02 06:26:33,286 INFO  [o.a.s.e.s.EventService        ] [event-forwarder-0] - Event forward thread interrupted
+2026-10-02 06:26:33,301 INFO  [c.h.i.i.NodeExtension         ] [main] - [localhost]:5801 [seatunnel-198220] [5.1] Destroying node NodeExtension.
+2026-10-02 06:26:33,302 INFO  [c.h.i.i.Node                  ] [main] - [localhost]:5801 [seatunnel-198220] [5.1] Hazelcast Shutdown is completed in 32 ms.
+2026-10-02 06:26:33,302 INFO  [c.h.c.LifecycleService        ] [main] - [localhost]:5801 [seatunnel-198220] [5.1] [localhost]:5801 is SHUTDOWN
+2026-10-02 06:26:33,302 INFO  [s.c.s.s.c.ClientExecuteCommand] [main] - Closed HazelcastInstance ......
+2026-10-02 06:26:33,302 ERROR [o.a.s.c.s.SeaTunnel           ] [main] - 
+
+===============================================================================
+
+
+2026-10-02 06:26:33,302 ERROR [o.a.s.c.s.SeaTunnel           ] [main] - Fatal Error, 
+
+2026-10-02 06:26:33,302 ERROR [o.a.s.c.s.SeaTunnel           ] [main] - Please submit bug report in https://github.com/apache/seatunnel/issues
+
+2026-10-02 06:26:33,302 ERROR [o.a.s.c.s.SeaTunnel           ] [main] - Reason:SeaTunnel job executed failed 
+
+2026-10-02 06:26:33,304 ERROR [o.a.s.c.s.SeaTunnel           ] [main] - Exception StackTrace:org.apache.seatunnel.core.starter.exception.CommandExecuteException: SeaTunnel job executed failed
+	at org.apache.seatunnel.core.starter.seatunnel.command.ClientExecuteCommand.execute(ClientExecuteCommand.java:266)
+	at org.apache.seatunnel.core.starter.SeaTunnel.run(SeaTunnel.java:40)
+	at org.apache.seatunnel.core.starter.seatunnel.SeaTunnelClient.main(SeaTunnelClient.java:40)
+Caused by: java.util.concurrent.CompletionException: org.apache.seatunnel.engine.common.exception.JobException: org.apache.seatunnel.common.exception.SeaTunnelRuntimeException: ErrorCode:[API-09], ErrorDescription:[Handle save mode failed]
+	at org.apache.seatunnel.engine.server.master.JobMaster.handleSaveMode(JobMaster.java:576)
+	at org.apache.seatunnel.engine.server.master.JobMaster.handleSaveMode(JobMaster.java:582)
+	at org.apache.seatunnel.engine.server.master.JobMaster.lambda$init$1(JobMaster.java:267)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:175)
+	at java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:193)
+	at java.util.Iterator.forEachRemaining(Iterator.java:116)
+	at java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:482)
+	at java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:472)
+	at java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:485)
+	at org.apache.seatunnel.engine.server.master.JobMaster.init(JobMaster.java:261)
+	at org.apache.seatunnel.engine.server.CoordinatorService.lambda$submitJob$6(CoordinatorService.java:663)
+	at org.apache.seatunnel.api.tracing.MDCRunnable.run(MDCRunnable.java:43)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: org.apache.iceberg.hive.RuntimeMetaException: Failed to connect to Hive Metastore
+	at org.apache.iceberg.hive.HiveClientPool.newClient(HiveClientPool.java:85)
+	at org.apache.iceberg.hive.HiveClientPool.newClient(HiveClientPool.java:34)
+	at org.apache.iceberg.ClientPoolImpl.get(ClientPoolImpl.java:143)
+	at org.apache.iceberg.ClientPoolImpl.run(ClientPoolImpl.java:70)
+	at org.apache.iceberg.ClientPoolImpl.run(ClientPoolImpl.java:65)
+	at org.apache.iceberg.hive.CachedClientPool.run(CachedClientPool.java:122)
+	at org.apache.iceberg.hive.HiveTableOperations.doRefresh(HiveTableOperations.java:147)
+	at org.apache.iceberg.BaseMetastoreTableOperations.refresh(BaseMetastoreTableOperations.java:90)
+	at org.apache.iceberg.BaseMetastoreTableOperations.current(BaseMetastoreTableOperations.java:73)
+	at org.apache.iceberg.BaseMetastoreCatalog.loadTable(BaseMetastoreCatalog.java:49)
+	at org.apache.iceberg.catalog.Catalog.tableExists(Catalog.java:281)
+	at org.apache.seatunnel.connectors.seatunnel.iceberg.catalog.IcebergCatalog.tableExists(IcebergCatalog.java:159)
+	at org.apache.seatunnel.api.sink.DefaultSaveModeHandler.tableExists(DefaultSaveModeHandler.java:169)
+	at org.apache.seatunnel.api.sink.DefaultSaveModeHandler.createSchemaWhenNotExist(DefaultSaveModeHandler.java:138)
+	at org.apache.seatunnel.api.sink.DefaultSaveModeHandler.handleSchemaSaveMode(DefaultSaveModeHandler.java:88)
+	at org.apache.seatunnel.api.sink.SaveModeHandler.handleSaveMode(SaveModeHandler.java:42)
+	at org.apache.seatunnel.api.sink.SaveModeExecuteWrapper.execute(SaveModeExecuteWrapper.java:36)
+	at org.apache.seatunnel.engine.server.master.JobMaster.handleSaveMode(JobMaster.java:571)
+	... 21 more
+Caused by: java.lang.RuntimeException: Unable to instantiate org.apache.hadoop.hive.metastore.HiveMetaStoreClient
+	at org.apache.hadoop.hive.metastore.utils.JavaUtils.newInstance(JavaUtils.java:86)
+	at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.<init>(RetryingMetaStoreClient.java:95)
+	at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.getProxy(RetryingMetaStoreClient.java:148)
+	at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.getProxy(RetryingMetaStoreClient.java:119)
+	at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.getProxy(RetryingMetaStoreClient.java:112)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.iceberg.common.DynMethods$UnboundMethod.invokeChecked(DynMethods.java:62)
+	at org.apache.iceberg.common.DynMethods$UnboundMethod.invoke(DynMethods.java:74)
+	at org.apache.iceberg.common.DynMethods$StaticMethod.invoke(DynMethods.java:187)
+	at org.apache.iceberg.hive.HiveClientPool.newClient(HiveClientPool.java:63)
+	... 38 more
+Caused by: java.lang.reflect.InvocationTargetException
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at org.apache.hadoop.hive.metastore.utils.JavaUtils.newInstance(JavaUtils.java:84)
+	... 50 more
+Caused by: MetaException(message:Got exception: java.net.URISyntaxException Illegal character in hostname at index 48: thrift://iceberg-learning-hms-1.iceberg-learning_default:9083)
+	at org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.logAndThrowMetaException(MetaStoreUtils.java:168)
+	at org.apache.hadoop.hive.metastore.HiveMetaStoreClient.resolveUris(HiveMetaStoreClient.java:267)
+	at org.apache.hadoop.hive.metastore.HiveMetaStoreClient.<init>(HiveMetaStoreClient.java:182)
+	... 55 more
+
+	at com.hazelcast.spi.impl.AbstractInvocationFuture.wrapInCompletionException(AbstractInvocationFuture.java:1347)
+	at com.hazelcast.spi.impl.AbstractInvocationFuture.cascadeException(AbstractInvocationFuture.java:1340)
+	at com.hazelcast.spi.impl.AbstractInvocationFuture.access$200(AbstractInvocationFuture.java:65)
+	at com.hazelcast.spi.impl.AbstractInvocationFuture$ApplyNode.execute(AbstractInvocationFuture.java:1478)
+	at com.hazelcast.spi.impl.AbstractInvocationFuture.unblockOtherNode(AbstractInvocationFuture.java:797)
+	at com.hazelcast.spi.impl.AbstractInvocationFuture.unblockAll(AbstractInvocationFuture.java:759)
+	at com.hazelcast.spi.impl.AbstractInvocationFuture.complete0(AbstractInvocationFuture.java:1235)
+	at com.hazelcast.spi.impl.AbstractInvocationFuture.completeExceptionallyInternal(AbstractInvocationFuture.java:1223)
+	at com.hazelcast.spi.impl.AbstractInvocationFuture.completeExceptionally(AbstractInvocationFuture.java:709)
+	at com.hazelcast.client.impl.spi.impl.ClientInvocation.completeExceptionally(ClientInvocation.java:294)
+	at com.hazelcast.client.impl.spi.impl.ClientInvocation.notifyExceptionWithOwnedPermission(ClientInvocation.java:321)
+	at com.hazelcast.client.impl.spi.impl.ClientInvocation.notifyException(ClientInvocation.java:304)
+	at com.hazelcast.client.impl.spi.impl.ClientResponseHandlerSupplier.handleResponse(ClientResponseHandlerSupplier.java:164)
+	at com.hazelcast.client.impl.spi.impl.ClientResponseHandlerSupplier.process(ClientResponseHandlerSupplier.java:141)
+	at com.hazelcast.client.impl.spi.impl.ClientResponseHandlerSupplier.access$300(ClientResponseHandlerSupplier.java:60)
+	at com.hazelcast.client.impl.spi.impl.ClientResponseHandlerSupplier$DynamicResponseHandler.accept(ClientResponseHandlerSupplier.java:251)
+	at com.hazelcast.client.impl.spi.impl.ClientResponseHandlerSupplier$DynamicResponseHandler.accept(ClientResponseHandlerSupplier.java:243)
+	at com.hazelcast.client.impl.connection.tcp.TcpClientConnection.handleClientMessage(TcpClientConnection.java:245)
+	at com.hazelcast.client.impl.protocol.util.ClientMessageDecoder.handleMessage(ClientMessageDecoder.java:135)
+	at com.hazelcast.client.impl.protocol.util.ClientMessageDecoder.onRead(ClientMessageDecoder.java:89)
+	at com.hazelcast.internal.networking.nio.NioInboundPipeline.process(NioInboundPipeline.java:136)
+	at com.hazelcast.internal.networking.nio.NioThread.processSelectionKey(NioThread.java:383)
+	at com.hazelcast.internal.networking.nio.NioThread.processSelectionKeys(NioThread.java:368)
+	at com.hazelcast.internal.networking.nio.NioThread.selectLoop(NioThread.java:294)
+	at com.hazelcast.internal.networking.nio.NioThread.executeRun(NioThread.java:249)
+	at com.hazelcast.internal.util.executor.HazelcastManagedThread.run(HazelcastManagedThread.java:102)
+Caused by: org.apache.seatunnel.engine.common.exception.JobException: org.apache.seatunnel.common.exception.SeaTunnelRuntimeException: ErrorCode:[API-09], ErrorDescription:[Handle save mode failed]
+	at org.apache.seatunnel.engine.server.master.JobMaster.handleSaveMode(JobMaster.java:576)
+	at org.apache.seatunnel.engine.server.master.JobMaster.handleSaveMode(JobMaster.java:582)
+	at org.apache.seatunnel.engine.server.master.JobMaster.lambda$init$1(JobMaster.java:267)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:175)
+	at java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:193)
+	at java.util.Iterator.forEachRemaining(Iterator.java:116)
+	at java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:482)
+	at java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:472)
+	at java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:485)
+	at org.apache.seatunnel.engine.server.master.JobMaster.init(JobMaster.java:261)
+	at org.apache.seatunnel.engine.server.CoordinatorService.lambda$submitJob$6(CoordinatorService.java:663)
+	at org.apache.seatunnel.api.tracing.MDCRunnable.run(MDCRunnable.java:43)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: org.apache.iceberg.hive.RuntimeMetaException: Failed to connect to Hive Metastore
+	at org.apache.iceberg.hive.HiveClientPool.newClient(HiveClientPool.java:85)
+	at org.apache.iceberg.hive.HiveClientPool.newClient(HiveClientPool.java:34)
+	at org.apache.iceberg.ClientPoolImpl.get(ClientPoolImpl.java:143)
+	at org.apache.iceberg.ClientPoolImpl.run(ClientPoolImpl.java:70)
+	at org.apache.iceberg.ClientPoolImpl.run(ClientPoolImpl.java:65)
+	at org.apache.iceberg.hive.CachedClientPool.run(CachedClientPool.java:122)
+	at org.apache.iceberg.hive.HiveTableOperations.doRefresh(HiveTableOperations.java:147)
+	at org.apache.iceberg.BaseMetastoreTableOperations.refresh(BaseMetastoreTableOperations.java:90)
+	at org.apache.iceberg.BaseMetastoreTableOperations.current(BaseMetastoreTableOperations.java:73)
+	at org.apache.iceberg.BaseMetastoreCatalog.loadTable(BaseMetastoreCatalog.java:49)
+	at org.apache.iceberg.catalog.Catalog.tableExists(Catalog.java:281)
+	at org.apache.seatunnel.connectors.seatunnel.iceberg.catalog.IcebergCatalog.tableExists(IcebergCatalog.java:159)
+	at org.apache.seatunnel.api.sink.DefaultSaveModeHandler.tableExists(DefaultSaveModeHandler.java:169)
+	at org.apache.seatunnel.api.sink.DefaultSaveModeHandler.createSchemaWhenNotExist(DefaultSaveModeHandler.java:138)
+	at org.apache.seatunnel.api.sink.DefaultSaveModeHandler.handleSchemaSaveMode(DefaultSaveModeHandler.java:88)
+	at org.apache.seatunnel.api.sink.SaveModeHandler.handleSaveMode(SaveModeHandler.java:42)
+	at org.apache.seatunnel.api.sink.SaveModeExecuteWrapper.execute(SaveModeExecuteWrapper.java:36)
+	at org.apache.seatunnel.engine.server.master.JobMaster.handleSaveMode(JobMaster.java:571)
+	... 21 more
+Caused by: java.lang.RuntimeException: Unable to instantiate org.apache.hadoop.hive.metastore.HiveMetaStoreClient
+	at org.apache.hadoop.hive.metastore.utils.JavaUtils.newInstance(JavaUtils.java:86)
+	at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.<init>(RetryingMetaStoreClient.java:95)
+	at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.getProxy(RetryingMetaStoreClient.java:148)
+	at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.getProxy(RetryingMetaStoreClient.java:119)
+	at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.getProxy(RetryingMetaStoreClient.java:112)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.iceberg.common.DynMethods$UnboundMethod.invokeChecked(DynMethods.java:62)
+	at org.apache.iceberg.common.DynMethods$UnboundMethod.invoke(DynMethods.java:74)
+	at org.apache.iceberg.common.DynMethods$StaticMethod.invoke(DynMethods.java:187)
+	at org.apache.iceberg.hive.HiveClientPool.newClient(HiveClientPool.java:63)
+	... 38 more
+Caused by: java.lang.reflect.InvocationTargetException
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at org.apache.hadoop.hive.metastore.utils.JavaUtils.newInstance(JavaUtils.java:84)
+	... 50 more
+Caused by: MetaException(message:Got exception: java.net.URISyntaxException Illegal character in hostname at index 48: thrift://iceberg-learning-hms-1.iceberg-learning_default:9083)
+	at org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.logAndThrowMetaException(MetaStoreUtils.java:168)
+	at org.apache.hadoop.hive.metastore.HiveMetaStoreClient.resolveUris(HiveMetaStoreClient.java:267)
+	at org.apache.hadoop.hive.metastore.HiveMetaStoreClient.<init>(HiveMetaStoreClient.java:182)
+	... 55 more
+
+	at org.apache.seatunnel.engine.server.CoordinatorService.lambda$submitJob$6(CoordinatorService.java:676)
+	at org.apache.seatunnel.api.tracing.MDCRunnable.run(MDCRunnable.java:43)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+ 
+2026-10-02 06:26:33,304 ERROR [o.a.s.c.s.SeaTunnel           ] [main] - 
+===============================================================================
+
+
+
+Exception in thread "main" org.apache.seatunnel.core.starter.exception.CommandExecuteException: SeaTunnel job executed failed
+	at org.apache.seatunnel.core.starter.seatunnel.command.ClientExecuteCommand.execute(ClientExecuteCommand.java:266)
+	at org.apache.seatunnel.core.starter.SeaTunnel.run(SeaTunnel.java:40)
+	at org.apache.seatunnel.core.starter.seatunnel.SeaTunnelClient.main(SeaTunnelClient.java:40)
+Caused by: java.util.concurrent.CompletionException: org.apache.seatunnel.engine.common.exception.JobException: org.apache.seatunnel.common.exception.SeaTunnelRuntimeException: ErrorCode:[API-09], ErrorDescription:[Handle save mode failed]
+	at org.apache.seatunnel.engine.server.master.JobMaster.handleSaveMode(JobMaster.java:576)
+	at org.apache.seatunnel.engine.server.master.JobMaster.handleSaveMode(JobMaster.java:582)
+	at org.apache.seatunnel.engine.server.master.JobMaster.lambda$init$1(JobMaster.java:267)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:175)
+	at java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:193)
+	at java.util.Iterator.forEachRemaining(Iterator.java:116)
+	at java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:482)
+	at java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:472)
+	at java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:485)
+	at org.apache.seatunnel.engine.server.master.JobMaster.init(JobMaster.java:261)
+	at org.apache.seatunnel.engine.server.CoordinatorService.lambda$submitJob$6(CoordinatorService.java:663)
+	at org.apache.seatunnel.api.tracing.MDCRunnable.run(MDCRunnable.java:43)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: org.apache.iceberg.hive.RuntimeMetaException: Failed to connect to Hive Metastore
+	at org.apache.iceberg.hive.HiveClientPool.newClient(HiveClientPool.java:85)
+	at org.apache.iceberg.hive.HiveClientPool.newClient(HiveClientPool.java:34)
+	at org.apache.iceberg.ClientPoolImpl.get(ClientPoolImpl.java:143)
+	at org.apache.iceberg.ClientPoolImpl.run(ClientPoolImpl.java:70)
+	at org.apache.iceberg.ClientPoolImpl.run(ClientPoolImpl.java:65)
+	at org.apache.iceberg.hive.CachedClientPool.run(CachedClientPool.java:122)
+	at org.apache.iceberg.hive.HiveTableOperations.doRefresh(HiveTableOperations.java:147)
+	at org.apache.iceberg.BaseMetastoreTableOperations.refresh(BaseMetastoreTableOperations.java:90)
+	at org.apache.iceberg.BaseMetastoreTableOperations.current(BaseMetastoreTableOperations.java:73)
+	at org.apache.iceberg.BaseMetastoreCatalog.loadTable(BaseMetastoreCatalog.java:49)
+	at org.apache.iceberg.catalog.Catalog.tableExists(Catalog.java:281)
+	at org.apache.seatunnel.connectors.seatunnel.iceberg.catalog.IcebergCatalog.tableExists(IcebergCatalog.java:159)
+	at org.apache.seatunnel.api.sink.DefaultSaveModeHandler.tableExists(DefaultSaveModeHandler.java:169)
+	at org.apache.seatunnel.api.sink.DefaultSaveModeHandler.createSchemaWhenNotExist(DefaultSaveModeHandler.java:138)
+	at org.apache.seatunnel.api.sink.DefaultSaveModeHandler.handleSchemaSaveMode(DefaultSaveModeHandler.java:88)
+	at org.apache.seatunnel.api.sink.SaveModeHandler.handleSaveMode(SaveModeHandler.java:42)
+	at org.apache.seatunnel.api.sink.SaveModeExecuteWrapper.execute(SaveModeExecuteWrapper.java:36)
+	at org.apache.seatunnel.engine.server.master.JobMaster.handleSaveMode(JobMaster.java:571)
+	... 21 more
+Caused by: java.lang.RuntimeException: Unable to instantiate org.apache.hadoop.hive.metastore.HiveMetaStoreClient
+	at org.apache.hadoop.hive.metastore.utils.JavaUtils.newInstance(JavaUtils.java:86)
+	at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.<init>(RetryingMetaStoreClient.java:95)
+	at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.getProxy(RetryingMetaStoreClient.java:148)
+	at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.getProxy(RetryingMetaStoreClient.java:119)
+	at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.getProxy(RetryingMetaStoreClient.java:112)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.iceberg.common.DynMethods$UnboundMethod.invokeChecked(DynMethods.java:62)
+	at org.apache.iceberg.common.DynMethods$UnboundMethod.invoke(DynMethods.java:74)
+	at org.apache.iceberg.common.DynMethods$StaticMethod.invoke(DynMethods.java:187)
+	at org.apache.iceberg.hive.HiveClientPool.newClient(HiveClientPool.java:63)
+	... 38 more
+Caused by: java.lang.reflect.InvocationTargetException
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at org.apache.hadoop.hive.metastore.utils.JavaUtils.newInstance(JavaUtils.java:84)
+	... 50 more
+Caused by: MetaException(message:Got exception: java.net.URISyntaxException Illegal character in hostname at index 48: thrift://iceberg-learning-hms-1.iceberg-learning_default:9083)
+	at org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.logAndThrowMetaException(MetaStoreUtils.java:168)
+	at org.apache.hadoop.hive.metastore.HiveMetaStoreClient.resolveUris(HiveMetaStoreClient.java:267)
+	at org.apache.hadoop.hive.metastore.HiveMetaStoreClient.<init>(HiveMetaStoreClient.java:182)
+	... 55 more
+
+	at com.hazelcast.spi.impl.AbstractInvocationFuture.wrapInCompletionException(AbstractInvocationFuture.java:1347)
+	at com.hazelcast.spi.impl.AbstractInvocationFuture.cascadeException(AbstractInvocationFuture.java:1340)
+	at com.hazelcast.spi.impl.AbstractInvocationFuture.access$200(AbstractInvocationFuture.java:65)
+	at com.hazelcast.spi.impl.AbstractInvocationFuture$ApplyNode.execute(AbstractInvocationFuture.java:1478)
+	at com.hazelcast.spi.impl.AbstractInvocationFuture.unblockOtherNode(AbstractInvocationFuture.java:797)
+	at com.hazelcast.spi.impl.AbstractInvocationFuture.unblockAll(AbstractInvocationFuture.java:759)
+	at com.hazelcast.spi.impl.AbstractInvocationFuture.complete0(AbstractInvocationFuture.java:1235)
+	at com.hazelcast.spi.impl.AbstractInvocationFuture.completeExceptionallyInternal(AbstractInvocationFuture.java:1223)
+	at com.hazelcast.spi.impl.AbstractInvocationFuture.completeExceptionally(AbstractInvocationFuture.java:709)
+	at com.hazelcast.client.impl.spi.impl.ClientInvocation.completeExceptionally(ClientInvocation.java:294)
+	at com.hazelcast.client.impl.spi.impl.ClientInvocation.notifyExceptionWithOwnedPermission(ClientInvocation.java:321)
+	at com.hazelcast.client.impl.spi.impl.ClientInvocation.notifyException(ClientInvocation.java:304)
+	at com.hazelcast.client.impl.spi.impl.ClientResponseHandlerSupplier.handleResponse(ClientResponseHandlerSupplier.java:164)
+	at com.hazelcast.client.impl.spi.impl.ClientResponseHandlerSupplier.process(ClientResponseHandlerSupplier.java:141)
+	at com.hazelcast.client.impl.spi.impl.ClientResponseHandlerSupplier.access$300(ClientResponseHandlerSupplier.java:60)
+	at com.hazelcast.client.impl.spi.impl.ClientResponseHandlerSupplier$DynamicResponseHandler.accept(ClientResponseHandlerSupplier.java:251)
+	at com.hazelcast.client.impl.spi.impl.ClientResponseHandlerSupplier$DynamicResponseHandler.accept(ClientResponseHandlerSupplier.java:243)
+	at com.hazelcast.client.impl.connection.tcp.TcpClientConnection.handleClientMessage(TcpClientConnection.java:245)
+	at com.hazelcast.client.impl.protocol.util.ClientMessageDecoder.handleMessage(ClientMessageDecoder.java:135)
+	at com.hazelcast.client.impl.protocol.util.ClientMessageDecoder.onRead(ClientMessageDecoder.java:89)
+	at com.hazelcast.internal.networking.nio.NioInboundPipeline.process(NioInboundPipeline.java:136)
+	at com.hazelcast.internal.networking.nio.NioThread.processSelectionKey(NioThread.java:383)
+	at com.hazelcast.internal.networking.nio.NioThread.processSelectionKeys(NioThread.java:368)
+	at com.hazelcast.internal.networking.nio.NioThread.selectLoop(NioThread.java:294)
+	at com.hazelcast.internal.networking.nio.NioThread.executeRun(NioThread.java:249)
+	at com.hazelcast.internal.util.executor.HazelcastManagedThread.run(HazelcastManagedThread.java:102)
+Caused by: org.apache.seatunnel.engine.common.exception.JobException: org.apache.seatunnel.common.exception.SeaTunnelRuntimeException: ErrorCode:[API-09], ErrorDescription:[Handle save mode failed]
+	at org.apache.seatunnel.engine.server.master.JobMaster.handleSaveMode(JobMaster.java:576)
+	at org.apache.seatunnel.engine.server.master.JobMaster.handleSaveMode(JobMaster.java:582)
+	at org.apache.seatunnel.engine.server.master.JobMaster.lambda$init$1(JobMaster.java:267)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:175)
+	at java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:193)
+	at java.util.Iterator.forEachRemaining(Iterator.java:116)
+	at java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:482)
+	at java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:472)
+	at java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:485)
+	at org.apache.seatunnel.engine.server.master.JobMaster.init(JobMaster.java:261)
+	at org.apache.seatunnel.engine.server.CoordinatorService.lambda$submitJob$6(CoordinatorService.java:663)
+	at org.apache.seatunnel.api.tracing.MDCRunnable.run(MDCRunnable.java:43)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: org.apache.iceberg.hive.RuntimeMetaException: Failed to connect to Hive Metastore
+	at org.apache.iceberg.hive.HiveClientPool.newClient(HiveClientPool.java:85)
+	at org.apache.iceberg.hive.HiveClientPool.newClient(HiveClientPool.java:34)
+	at org.apache.iceberg.ClientPoolImpl.get(ClientPoolImpl.java:143)
+	at org.apache.iceberg.ClientPoolImpl.run(ClientPoolImpl.java:70)
+	at org.apache.iceberg.ClientPoolImpl.run(ClientPoolImpl.java:65)
+	at org.apache.iceberg.hive.CachedClientPool.run(CachedClientPool.java:122)
+	at org.apache.iceberg.hive.HiveTableOperations.doRefresh(HiveTableOperations.java:147)
+	at org.apache.iceberg.BaseMetastoreTableOperations.refresh(BaseMetastoreTableOperations.java:90)
+	at org.apache.iceberg.BaseMetastoreTableOperations.current(BaseMetastoreTableOperations.java:73)
+	at org.apache.iceberg.BaseMetastoreCatalog.loadTable(BaseMetastoreCatalog.java:49)
+	at org.apache.iceberg.catalog.Catalog.tableExists(Catalog.java:281)
+	at org.apache.seatunnel.connectors.seatunnel.iceberg.catalog.IcebergCatalog.tableExists(IcebergCatalog.java:159)
+	at org.apache.seatunnel.api.sink.DefaultSaveModeHandler.tableExists(DefaultSaveModeHandler.java:169)
+	at org.apache.seatunnel.api.sink.DefaultSaveModeHandler.createSchemaWhenNotExist(DefaultSaveModeHandler.java:138)
+	at org.apache.seatunnel.api.sink.DefaultSaveModeHandler.handleSchemaSaveMode(DefaultSaveModeHandler.java:88)
+	at org.apache.seatunnel.api.sink.SaveModeHandler.handleSaveMode(SaveModeHandler.java:42)
+	at org.apache.seatunnel.api.sink.SaveModeExecuteWrapper.execute(SaveModeExecuteWrapper.java:36)
+	at org.apache.seatunnel.engine.server.master.JobMaster.handleSaveMode(JobMaster.java:571)
+	... 21 more
+Caused by: java.lang.RuntimeException: Unable to instantiate org.apache.hadoop.hive.metastore.HiveMetaStoreClient
+	at org.apache.hadoop.hive.metastore.utils.JavaUtils.newInstance(JavaUtils.java:86)
+	at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.<init>(RetryingMetaStoreClient.java:95)
+	at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.getProxy(RetryingMetaStoreClient.java:148)
+	at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.getProxy(RetryingMetaStoreClient.java:119)
+	at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.getProxy(RetryingMetaStoreClient.java:112)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.iceberg.common.DynMethods$UnboundMethod.invokeChecked(DynMethods.java:62)
+	at org.apache.iceberg.common.DynMethods$UnboundMethod.invoke(DynMethods.java:74)
+	at org.apache.iceberg.common.DynMethods$StaticMethod.invoke(DynMethods.java:187)
+	at org.apache.iceberg.hive.HiveClientPool.newClient(HiveClientPool.java:63)
+	... 38 more
+Caused by: java.lang.reflect.InvocationTargetException
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at org.apache.hadoop.hive.metastore.utils.JavaUtils.newInstance(JavaUtils.java:84)
+	... 50 more
+Caused by: MetaException(message:Got exception: java.net.URISyntaxException Illegal character in hostname at index 48: thrift://iceberg-learning-hms-1.iceberg-learning_default:9083)
+	at org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.logAndThrowMetaException(MetaStoreUtils.java:168)
+	at org.apache.hadoop.hive.metastore.HiveMetaStoreClient.resolveUris(HiveMetaStoreClient.java:267)
+	at org.apache.hadoop.hive.metastore.HiveMetaStoreClient.<init>(HiveMetaStoreClient.java:182)
+	... 55 more
+
+	at org.apache.seatunnel.engine.server.CoordinatorService.lambda$submitJob$6(CoordinatorService.java:676)
+	at org.apache.seatunnel.api.tracing.MDCRunnable.run(MDCRunnable.java:43)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+

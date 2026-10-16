@@ -1,0 +1,11 @@
+{
+  "superset_version": "6.0.0",
+  "database_id": 1,
+  "dataset_id": 1,
+  "dashboard_id": 1,
+  "dashboard_url": "http://localhost:8088/superset/dashboard/local-iceberg/",
+  "chart_ids": [
+    1,
+    2
+  ]
+}

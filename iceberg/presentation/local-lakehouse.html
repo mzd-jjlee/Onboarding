@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>로컬 데이터 레이크하우스 환경 구축하기</title>
+<style>
+/* ============================================================
+   로컬 데이터 레이크하우스 환경 구축하기 — 발표 슬라이드
+   기획: presentation/local-lakehouse-deck-plan.md
+   색 팔레트는 docs/assets/lakehouse-flow/*.png 에서 추출해 맞췄다.
+   쓰기 경로 = 주황, 읽기 경로 = 파랑 — 그림의 규칙을 덱에서도 유지한다.
+   ============================================================ */
+
+:root{
+  --navy:#0a2540;
+  --navy-deep:#06182b;
+  --blue:#1668e3;
+  --blue-soft:#e8f1fd;
+  --blue-line:#bcd7f8;
+  --orange:#ef7a1a;
+  --orange-soft:#fdf0e3;
+  --orange-line:#f6cfa4;
+  --green:#0f8a6a;
+  --green-soft:#e4f4ef;
+  --green-line:#aeddcf;
+  --ink:#11253d;
+  --muted:#5a6b80;
+  --line:#dce4ee;
+  --bg:#ffffff;
+  --bg-soft:#f5f8fc;
+  --mono:'SFMono-Regular',Menlo,Consolas,'D2Coding','Noto Sans Mono CJK KR',monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Pretendard','Noto Sans KR',
+         'Malgun Gothic',sans-serif;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--sans);
+  background:#1b2432;
+  color:var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- 무대: 16:9 고정, 뷰포트에 맞춰 축소 ---------- */
+.stage{
+  position:relative;
+  width:min(100vw, calc(100vh * 16 / 9));
+  height:min(100vh, calc(100vw * 9 / 16));
+  background:var(--bg);
+  overflow:hidden;
+  box-shadow:0 0 60px rgba(0,0,0,.5);
+}
+
+.slide{
+  position:absolute;inset:0;
+  container-type:size;
+  background:var(--bg);
+  padding:4.2cqw 5cqw 5.4cqw;
+  display:none;
+  flex-direction:column;
+}
+.slide.active{display:flex}
+
+/* ---------- 공통 타이포 ---------- */
+.eyebrow{
+  font-size:1.35cqw;font-weight:700;letter-spacing:.14em;
+  color:var(--blue);text-transform:uppercase;margin-bottom:1cqw;
+}
+.s-title{
+  font-size:3.05cqw;font-weight:800;color:var(--navy);
+  line-height:1.22;letter-spacing:-.015em;
+}
+.s-sub{
+  font-size:1.55cqw;color:var(--muted);margin-top:.85cqw;line-height:1.5;
+  font-weight:500;
+}
+.body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:1.7cqw}
+.body.top{justify-content:flex-start;padding-top:2cqw}
+
+/* ---------- 푸터 ---------- */
+.foot{
+  position:absolute;left:5cqw;right:5cqw;bottom:2.1cqw;
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:1.1cqw;color:#8a99ab;border-top:1px solid var(--line);
+  padding-top:1cqw;
+}
+.foot .num{font-variant-numeric:tabular-nums;font-weight:600}
+
+/* ---------- 타이틀 슬라이드 ---------- */
+.cover{
+  background:linear-gradient(140deg,#0a2540 0%,#123a6b 55%,#0d2d52 100%);
+  color:#fff;justify-content:center;padding:6cqw 7cqw;
+}
+.cover .kicker{
+  font-size:1.4cqw;letter-spacing:.3em;color:#7fb3f5;font-weight:700;margin-bottom:2.4cqw;
+}
+.cover h1{
+  font-size:5.4cqw;font-weight:800;line-height:1.16;letter-spacing:-.02em;
+}
+.cover .tag{
+  font-size:1.95cqw;color:#bcd7f8;margin-top:2cqw;font-weight:500;line-height:1.5;
+}
+.cover .meta{
+  margin-top:4.4cqw;padding-top:2.2cqw;border-top:1px solid rgba(255,255,255,.22);
+  display:flex;gap:2.6cqw;flex-wrap:wrap;font-size:1.25cqw;color:#9dc2f0;
+}
+.cover .meta b{color:#fff;font-weight:700}
+
+/* ---------- 섹션 구분 ---------- */
+.divider{background:var(--navy);color:#fff;justify-content:center}
+.divider .dlabel{
+  font-size:1.3cqw;letter-spacing:.28em;color:#6fa5ea;font-weight:700;margin-bottom:2.4cqw;
+}
+.toc{display:flex;flex-direction:column;gap:1cqw}
+.toc-row{
+  display:flex;align-items:baseline;gap:1.6cqw;
+  padding:.8cqw 1.4cqw;border-radius:.5cqw;opacity:.42;
+}
+.toc-row.on{opacity:1;background:rgba(255,255,255,.1)}
+.toc-row .n{
+  font-size:1.5cqw;font-weight:800;color:#6fa5ea;width:2.6cqw;flex:none;
+  font-variant-numeric:tabular-nums;
+}
+.toc-row.on .n{color:#ffb570}
+.toc-row .t{font-size:2cqw;font-weight:700}
+.toc-row .d{font-size:1.22cqw;color:#9dc2f0;font-weight:500}
+
+/* ---------- 카드 ---------- */
+.grid{display:grid;gap:1.4cqw}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.card{
+  background:var(--bg-soft);border:1px solid var(--line);
+  border-radius:.9cqw;padding:1.5cqw 1.6cqw;
+}
+.card h4{
+  font-size:1.52cqw;font-weight:800;color:var(--navy);margin-bottom:.7cqw;
+  display:flex;align-items:center;gap:.65cqw;
+}
+.card p{font-size:1.22cqw;line-height:1.58;color:var(--ink)}
+.card p + p{margin-top:.55cqw}
+.card .why{color:var(--muted);font-size:1.15cqw;line-height:1.55}
+.card .why b{color:var(--navy)}
+.card .pick{
+  display:inline-block;margin-top:.8cqw;font-size:1.12cqw;font-weight:700;
+  color:var(--blue);background:#fff;border:1px solid var(--blue-line);
+  border-radius:.4cqw;padding:.3cqw .7cqw;
+}
+.card .alt{
+  font-size:1.05cqw;color:#8a99ab;margin-top:.6cqw;line-height:1.5;
+}
+.card.b{background:var(--blue-soft);border-color:var(--blue-line)}
+.card.o{background:var(--orange-soft);border-color:var(--orange-line)}
+.card.gr{background:var(--green-soft);border-color:var(--green-line)}
+.badge-n{
+  width:2.05cqw;height:2.05cqw;border-radius:50%;background:var(--blue);color:#fff;
+  font-size:1.12cqw;display:inline-flex;align-items:center;justify-content:center;
+  flex:none;font-weight:800;
+}
+.card.o .badge-n{background:var(--orange)}
+.card.gr .badge-n{background:var(--green)}
+
+/* ---------- 큰 수치 ---------- */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1.3cqw}
+.stat{
+  background:var(--bg-soft);border:1px solid var(--line);border-radius:.9cqw;
+  padding:1.7cqw 1.3cqw;text-align:center;
+}
+.stat .v{
+  font-size:3.2cqw;font-weight:800;color:var(--navy);line-height:1.05;
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em;
+}
+.stat .v small{font-size:1.45cqw;font-weight:700;color:var(--muted);margin-left:.3cqw}
+.stat .k{font-size:1.12cqw;color:var(--muted);margin-top:.65cqw;font-weight:600}
+.stat.hero{background:var(--navy);border-color:var(--navy)}
+.stat.hero .v{color:#fff}
+.stat.hero .v small{color:#9dc2f0}
+.stat.hero .k{color:#9dc2f0}
+
+/* ---------- 그림 슬라이드 ---------- */
+.fig{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  min-height:0;margin-top:1.1cqw;
+}
+.fig img{
+  max-width:100%;max-height:100%;object-fit:contain;
+  border:1px solid var(--line);border-radius:.6cqw;
+}
+.cap{
+  font-size:1.18cqw;color:var(--muted);margin-top:1cqw;line-height:1.55;
+  display:flex;gap:.6cqw;align-items:flex-start;
+}
+.cap b{color:var(--navy);font-weight:700}
+.cap .flag{
+  flex:none;background:var(--orange-soft);border:1px solid var(--orange-line);
+  color:#a9540a;font-weight:700;border-radius:.35cqw;padding:.12cqw .55cqw;font-size:1.02cqw;
+}
+
+/* ---------- 표 ---------- */
+table{width:100%;border-collapse:collapse;font-size:1.2cqw}
+th,td{text-align:left;padding:.78cqw 1.05cqw;border-bottom:1px solid var(--line);vertical-align:top}
+th{
+  background:var(--navy);color:#fff;font-weight:700;font-size:1.12cqw;letter-spacing:.02em;
+}
+th:first-child{border-top-left-radius:.5cqw}
+th:last-child{border-top-right-radius:.5cqw}
+tbody tr:nth-child(even){background:var(--bg-soft)}
+td.mono{font-family:var(--mono);font-size:1.05cqw;color:var(--navy)}
+td b{color:var(--navy)}
+td.not{color:#a9540a}
+.ok{color:var(--green);font-weight:800}
+.no{color:var(--orange);font-weight:800}
+
+/* ---------- 코드 ---------- */
+pre{
+  background:var(--navy-deep);color:#dbe7f5;border-radius:.7cqw;
+  padding:1.3cqw 1.6cqw;font-family:var(--mono);font-size:1.1cqw;line-height:1.68;
+  overflow:hidden;white-space:pre;
+}
+pre .c{color:#7d93ad}
+pre .k{color:#8fc0ff}
+pre .s{color:#ffc08a}
+pre .hl{background:rgba(239,122,26,.22);color:#ffd2a6;border-radius:.2cqw;padding:0 .25cqw}
+.code-note{font-size:1.12cqw;color:var(--muted);margin-top:.85cqw;line-height:1.55}
+
+/* 실제 파일 목록을 보여줄 때 쓰는 밝은 코드 블록 */
+pre.tree{
+  background:var(--bg-soft);color:var(--ink);border:1px solid var(--line);
+  font-size:1.02cqw;line-height:1.75;padding:1.2cqw 1.4cqw;
+}
+pre.tree .lv{font-weight:800}
+pre.tree .l1{color:#8b5cf6}
+pre.tree .l2{color:var(--green)}
+pre.tree .l3{color:var(--orange)}
+pre.tree .l4{color:var(--blue)}
+pre.tree .dim{color:#9aaabd}
+
+/* 장 번호 길잡이 배지 */
+.achap{
+  display:inline-block;font-size:.9cqw;font-weight:800;color:#fff;background:var(--blue);
+  border-radius:.3cqw;padding:.08cqw .42cqw;margin-left:.4cqw;vertical-align:.08cqw;
+}
+
+/* 네 계층 중 지금 어디인지 보여주는 진행 띠 (walkthrough 전용) */
+.chain{display:flex;align-items:center;gap:.5cqw;margin-bottom:1.3cqw;flex-wrap:nowrap}
+.ch{
+  border:1px solid var(--line);background:var(--bg-soft);color:#90a0b3;
+  border-radius:.45cqw;padding:.45cqw .95cqw;font-size:1.08cqw;font-weight:700;white-space:nowrap;
+}
+.ch.done{background:#fff;border-color:var(--blue-line);color:var(--blue)}
+.ch.now{background:var(--navy);border-color:var(--navy);color:#fff}
+.chx{color:#b6c3d2;font-weight:800;font-size:1.05cqw;flex:none}
+.chtail{margin-left:auto;font-size:1.05cqw;color:var(--muted);font-weight:600}
+
+/* 실제 파일 내용 발췌 블록 */
+.excerpt{border-radius:.7cqw;overflow:hidden;border:1px solid var(--navy-deep)}
+.excerpt .hd{
+  background:#13314f;color:#cfe0f2;font-family:var(--mono);font-size:1cqw;
+  padding:.55cqw 1.2cqw;display:flex;justify-content:space-between;align-items:center;
+}
+.excerpt .hd b{color:#ffb570;font-weight:700}
+.excerpt pre{border-radius:0;border:0}
+
+/* Parquet 행 표 */
+table.rows{font-size:1.1cqw}
+table.rows th{background:#2b4b6b;font-size:1.02cqw;padding:.5cqw .9cqw}
+table.rows td{padding:.48cqw .9cqw;font-family:var(--mono);font-size:1.05cqw}
+
+/* 계층 설명 행 */
+.layer{display:flex;gap:.9cqw;align-items:flex-start;padding:.62cqw 0}
+.layer + .layer{border-top:1px dashed var(--line)}
+.layer .lno{
+  flex:none;width:1.85cqw;height:1.85cqw;border-radius:.35cqw;color:#fff;
+  font-size:1.05cqw;font-weight:800;display:flex;align-items:center;justify-content:center;
+}
+.layer .ltx{font-size:1.1cqw;line-height:1.5;color:var(--ink)}
+.layer .ltx b{color:var(--navy)}
+.layer .ltx .fld{font-family:var(--mono);font-size:.98cqw;color:var(--muted)}
+
+/* ---------- 쓰기/읽기 경로 다이어그램 ---------- */
+.paths{display:flex;flex-direction:column;gap:1cqw}
+.path{
+  display:flex;align-items:center;gap:.75cqw;padding:1.1cqw 1.4cqw;border-radius:.75cqw;
+}
+.path.w{background:var(--orange-soft);border:1px solid var(--orange-line)}
+.path.r{background:var(--blue-soft);border:1px solid var(--blue-line)}
+.path .plab{
+  font-size:1.15cqw;font-weight:800;flex:none;width:7.5cqw;line-height:1.3;
+}
+.path.w .plab{color:#a9540a}
+.path.r .plab{color:#12528f}
+.node{
+  background:#fff;border:1px solid var(--line);border-radius:.45cqw;
+  padding:.5cqw .85cqw;font-size:1.12cqw;font-weight:700;color:var(--navy);white-space:nowrap;
+}
+.node.key{background:var(--navy);color:#fff;border-color:var(--navy)}
+.arw{color:#9aaabd;font-weight:800;font-size:1.15cqw;flex:none}
+.meet{display:flex;gap:1.3cqw;justify-content:center;align-items:stretch}
+.meet .m{
+  background:var(--navy);color:#fff;border-radius:.7cqw;padding:1cqw 2.2cqw;text-align:center;
+}
+.meet .mt{font-size:1.55cqw;font-weight:800}
+.meet .md{font-size:1.05cqw;color:#9dc2f0;margin-top:.25cqw}
+
+/* ---------- 목록 ---------- */
+ul.arrow{list-style:none;display:flex;flex-direction:column;gap:1cqw}
+ul.arrow li{
+  font-size:1.4cqw;line-height:1.55;color:var(--ink);
+  padding-left:2.1cqw;position:relative;
+}
+ul.arrow li::before{
+  content:'▸';position:absolute;left:0;top:0;color:var(--blue);font-weight:800;font-size:1.48cqw;
+}
+ul.arrow li b{color:var(--navy);font-weight:800}
+ul.arrow li .sub{display:block;font-size:1.14cqw;color:var(--muted);margin-top:.22cqw}
+
+/* ---------- 강조 띠 ---------- */
+.banner{
+  background:var(--navy);color:#fff;border-radius:.8cqw;
+  padding:1.35cqw 1.9cqw;font-size:1.6cqw;font-weight:700;line-height:1.45;
+  display:flex;align-items:center;gap:1.1cqw;
+}
+.banner .ic{font-size:1.9cqw;flex:none}
+.banner.o{background:var(--orange)}
+.banner.g{background:var(--green)}
+.banner small{display:block;font-size:1.12cqw;font-weight:500;color:#bcd7f8;margin-top:.3cqw}
+.banner.o small,.banner.g small{color:rgba(255,255,255,.88)}
+
+.src{font-size:1cqw;color:#8a99ab;margin-top:.9cqw;font-family:var(--mono)}
+
+/* ---------- 개요 모드 ---------- */
+.overview .stage{display:none}
+#grid{
+  display:none;position:fixed;inset:0;background:#141c28;overflow:auto;
+  padding:28px;gap:14px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+}
+.overview #grid{display:grid}
+.thumb{
+  background:#fff;border-radius:6px;overflow:hidden;cursor:pointer;position:relative;
+  aspect-ratio:16/9;border:2px solid transparent;
+  display:flex;flex-direction:column;justify-content:center;padding:12px 14px;
+}
+.thumb:hover{border-color:var(--blue)}
+.thumb.cur{border-color:var(--orange)}
+.thumb .tn{position:absolute;top:6px;right:8px;font-size:10px;color:#9aa8b8;font-weight:700}
+.thumb .tt{font-size:12px;font-weight:800;color:var(--navy);line-height:1.3}
+.thumb .te{font-size:9px;color:var(--blue);font-weight:700;letter-spacing:.08em;margin-bottom:4px}
+.thumb.sec{background:var(--navy)}
+.thumb.sec .tt{color:#fff}
+
+/* ---------- 진행 막대 / 노트 / 도움말 ---------- */
+#bar{position:fixed;left:0;top:0;height:3px;background:var(--orange);z-index:50;transition:width .18s}
+#notes{
+  display:none;position:fixed;left:0;right:0;bottom:0;z-index:40;
+  background:rgba(10,37,64,.97);color:#dbe7f5;padding:14px 22px;
+  font-size:13px;line-height:1.6;max-height:28vh;overflow:auto;
+}
+#notes.on{display:block}
+/* 발표 중 거슬리지 않게 평소에는 거의 투명하게 둔다 */
+#help{
+  position:fixed;left:14px;bottom:10px;z-index:45;color:#7d8da0;font-size:11px;
+  background:rgba(0,0,0,.4);padding:4px 9px;border-radius:4px;
+  opacity:.12;transition:opacity .2s;pointer-events:none;
+}
+body:hover #help{opacity:.5}
+
+/* ---------- 인쇄: 한 슬라이드 = 한 페이지 ---------- */
+@page{size:297mm 167mm;margin:0}
+@media print{
+  html,body{height:auto}
+  body{display:block;background:#fff;overflow:visible}
+  *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
+  .stage{width:297mm;height:auto;box-shadow:none;overflow:visible;position:static}
+  .slide{
+    display:flex !important;position:relative;inset:auto;
+    width:297mm;height:167mm;overflow:hidden;
+    page-break-after:always;break-after:page;page-break-inside:avoid;break-inside:avoid;
+  }
+  .slide:last-child{page-break-after:auto;break-after:auto}
+  #bar,#help,#notes,#grid{display:none !important}
+}
+</style>
+</head>
+<body>
+
+<div id="bar"></div>
+<div class="stage" id="stage">
+<!-- ==================== 1. 타이틀 ==================== -->
+<section class="slide cover" data-notes="결과를 먼저 보여주고 시작한다. 이 발표의 주제는 '레이크하우스라는 환경을 어떻게 이해하고 조립했는가'이지, 특정 도구 사용법이 아니다.">
+  <div class="kicker">DATA ENGINEERING · ONBOARDING</div>
+  <h1>로컬 데이터 레이크하우스<br>환경 구축하기</h1>
+  <div class="tag">네 가지 역할을 어떻게 고르고, 연결하고, 검증했는가<br>
+  SeaTunnel · Apache Iceberg · Hive Metastore · Trino · Superset</div>
+  <div class="meta">
+    <span><b>2026-10-12</b></span>
+    <span>저장소 <b>Onboarding/iceberg</b></span>
+    <span>선행 공유 <b>Apache SeaTunnel 실습</b>의 다음 이야기</span>
+  </div>
+</section>
+
+<!-- ==================== 2. 목차 ==================== -->
+<section class="slide divider" data-notes="6개 섹션 예고. 03과 04가 이 과제의 두 축이고 04장이 가장 길다고 미리 말해둔다.">
+  <div class="dlabel">CONTENTS</div>
+  <div class="toc">
+    <div class="toc-row on"><span class="n">01</span><span><span class="t">레이크하우스란 무엇인가</span><br><span class="d">웨어하우스·레이크와 무엇이 다른가 · 네 가지 역할</span></span></div>
+    <div class="toc-row on"><span class="n">02</span><span><span class="t">로컬 레이크하우스 아키텍처</span><br><span class="d">Mac 한 대에 — 원본 DB에서 Iceberg 저장까지</span></span></div>
+    <div class="toc-row on"><span class="n">03</span><span><span class="t">구성요소의 역할과 경계</span><br><span class="d">각자 하는 일과 하지 않는 일 · 카탈로그의 자리</span></span></div>
+    <div class="toc-row on"><span class="n">04</span><span><span class="t">Iceberg가 파일을 관리하는 방법</span><br><span class="d">JSON · Avro · Parquet를 직접 열어본다</span></span></div>
+    <div class="toc-row on"><span class="n">05</span><span><span class="t">Trino·Superset으로 조회하기</span><br><span class="d">조회 계층을 붙이고 실제로 읽는다</span></span></div>
+    <div class="toc-row on"><span class="n">06</span><span><span class="t">정리</span><br><span class="d">전체 지도 · 확인한 것 · 남은 것</span></span></div>
+  </div>
+</section>
+
+<!-- ==================== 3. 데이터 웨어하우스 · 레이크 · 레이크하우스 ==================== -->
+<section class="slide" data-eyebrow="01. 레이크하우스란 무엇인가" data-notes="개념 도입. 표를 세로로 읽으면 레이크하우스가 어느 칸에서 뭘 가져왔는지 보인다 — 저장 방식은 레이크, 관리 기능은 웨어하우스. 아래 한 줄이 이 장의 요약이고, 그 '관리 기능'을 무엇이 제공하는지가 다음 장이다.">
+  <div class="eyebrow">01. 레이크하우스란 무엇인가</div>
+  <div class="s-title">데이터 웨어하우스 · 레이크 · 레이크하우스</div>
+  <div class="s-sub">같은 데이터를 어디에 어떻게 두느냐의 차이다.</div>
+  <div class="body">
+    <table>
+      <thead><tr><th style="width:19%">항목</th><th style="width:27%">데이터 웨어하우스</th><th style="width:27%">데이터 레이크</th><th>레이크하우스</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><b>저장 방식</b></td>
+          <td>데이터베이스 안에 넣어 관리한다</td>
+          <td>값싼 저장소에 <b>파일 그대로</b> 쌓는다</td>
+          <td class="ok">값싼 저장소에 <b>파일 그대로</b> 쌓는다</td>
+        </tr>
+        <tr>
+          <td><b>스키마 · 이력</b></td>
+          <td>있다</td>
+          <td class="no">없다</td>
+          <td class="ok">있다</td>
+        </tr>
+        <tr>
+          <td><b>쓰는 중에 읽으면</b></td>
+          <td>이전 상태가 보인다 (안전)</td>
+          <td class="no">쓰다 만 파일이 보인다</td>
+          <td class="ok">이전 상태가 보인다 (안전)</td>
+        </tr>
+        <tr>
+          <td><b>조회 도구</b></td>
+          <td class="no">그 시스템 전용</td>
+          <td>여러 도구로 읽을 수 있다</td>
+          <td class="ok">여러 도구로 읽을 수 있다</td>
+        </tr>
+        <tr>
+          <td><b>주로 겪는 문제</b></td>
+          <td>비용이 크고, 데이터를 꺼내려면 복사해야 한다</td>
+          <td class="no">뭐가 뭔지 모르게 된다</td>
+          <td>구성요소를 직접 조립해야 한다</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="banner">
+      <span class="ic">◆</span>
+      <span>레이크하우스 = <b>파일은 레이크처럼 두고, 관리 기능은 웨어하우스처럼</b>
+      <small>데이터 레이크는 파일을 싸게 많이 쌓을 수 있었지만 “이 폴더가 무엇인지” 아무도 모르는 상태가 되기 쉬웠다. 레이크하우스는 그 자리에 <b>테이블을 관리하는 계층</b>을 얹은 것이다 — 그 계층이 무엇으로 구성되는지가 다음 장이다.</small></span>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 4. 레이크하우스는 제품이 아니라 네 가지 역할의 조합이다 ==================== -->
+<section class="slide" data-eyebrow="01. 레이크하우스란 무엇인가" data-notes="★ 이 발표의 뼈대. 레이크하우스는 하나의 제품이 아니라 네 가지 역할의 조합이고, 괄호 안 도구는 전부 교체 가능하다는 점을 반드시 말한다. 아래 흐름 띠가 02~05장에서 차례로 펼쳐진다.">
+  <div class="eyebrow">01. 레이크하우스란 무엇인가</div>
+  <div class="s-title">레이크하우스를 이루는 네 가지 역할</div>
+  <div class="s-sub">제품이 아니라 역할의 조합이다. 각 칸은 교체 가능하고, 우리가 고른 건 괄호 안의 도구일 뿐이다.</div>
+  <div class="body">
+    <div class="grid g4">
+      <div class="card">
+        <h4><span class="badge-n">1</span>적재</h4>
+        <p class="why">원본 DB의 행을 읽어 레이크에 쓴다. 파일 작성과 테이블 커밋을 함께 처리한다.</p>
+        <span class="pick">SeaTunnel 2.3.13</span>
+      </div>
+      <div class="card">
+        <h4><span class="badge-n">2</span>테이블 포맷</h4>
+        <p class="why">쌓인 파일 중 <b>어떤 것이 현재 테이블인지</b> 정의한다. 스키마와 이력도 여기 있다.</p>
+        <span class="pick">Iceberg 1.6.1</span>
+      </div>
+      <div class="card">
+        <h4><span class="badge-n">3</span>카탈로그</h4>
+        <p class="why">테이블 이름 → <b>현재 메타데이터 파일 위치</b>를 관리한다. 조회의 시작점이다.</p>
+        <span class="pick">Hive Metastore 4.0.1</span>
+      </div>
+      <div class="card">
+        <h4><span class="badge-n">4</span>조회</h4>
+        <p class="why">SQL을 실행할 엔진과, 사람이 보는 화면. 둘은 다른 역할이다.</p>
+        <span class="pick">Trino 483 + Superset 6.0</span>
+      </div>
+    </div>
+    <div class="paths">
+      <div class="path w">
+        <span class="plab">쓰기<span class="achap">02장</span></span>
+        <span class="node">원본 PostgreSQL</span><span class="arw">→</span>
+        <span class="node">SeaTunnel</span><span class="arw">→</span>
+        <span class="node key">Iceberg 파일 (./lake)</span><span class="arw">+</span>
+        <span class="node key">HMS 커밋</span><span class="achap" style="background:#ffb570;color:#5a3000">03·04장</span>
+      </div>
+      <div class="path r">
+        <span class="plab">읽기<span class="achap">05장</span></span>
+        <span class="node">브라우저</span><span class="arw">→</span>
+        <span class="node">Superset</span><span class="arw">→</span>
+        <span class="node">Trino</span><span class="arw">→</span>
+        <span class="node key">HMS에서 위치 확인</span><span class="arw">+</span>
+        <span class="node key">./lake 읽기</span>
+      </div>
+    </div>
+    <div class="cap"><span>아래 두 줄이 <b>오늘 설명할 순서</b>다. 쓰는 쪽과 읽는 쪽은 서로를 모르고, <b>가운데 두 칸(카탈로그 · <span class="mono">./lake</span>)만 공유</b>한다 — 그래서 양쪽을 따로 갈아끼울 수 있다.</span></div>
+  </div>
+</section>
+
+<!-- ==================== 5. 섹션 02 ==================== -->
+<section class="slide divider" data-notes="로컬에 무엇을 어떻게 세웠는지. Trino·Superset은 아직 등장하지 않는다 — 저장까지다.">
+  <div class="dlabel">SECTION 02</div>
+  <div class="toc">
+    <div class="toc-row"><span class="n">01</span><span><span class="t">레이크하우스란 무엇인가</span></span></div>
+    <div class="toc-row on"><span class="n">02</span><span><span class="t">로컬 레이크하우스 아키텍처</span><br><span class="d">Mac 한 대에 — 원본 DB에서 Iceberg 저장까지</span></span></div>
+    <div class="toc-row"><span class="n">03</span><span><span class="t">구성요소의 역할과 경계</span></span></div>
+    <div class="toc-row"><span class="n">04</span><span><span class="t">Iceberg가 파일을 관리하는 방법</span></span></div>
+    <div class="toc-row"><span class="n">05</span><span><span class="t">Trino·Superset으로 조회하기</span></span></div>
+    <div class="toc-row"><span class="n">06</span><span><span class="t">정리</span></span></div>
+  </div>
+</section>
+
+<!-- ==================== 6. 전체 구성 ==================== -->
+<section class="slide" data-eyebrow="02. 로컬 아키텍처" data-notes="★ 전체 구성을 먼저 보여주고 들어간다. 자세히 설명하지 않는다 — 범례의 주황/파랑이 오늘의 순서라는 것만 말한다(02장 주황, 05장 파랑). 손으로 짚을 것 셋: 웹 브라우저가 Docker 밖, lake/는 bind mount, 그리고 04장의 1억 행 원본은 그림의 Source DB가 아니라 다른 compose 프로젝트의 Postgres(5440)라는 점. 질문이 나오면: Trino의 lake 마운트는 읽기 전용(:ro)이고, catalog-db↔HMS 화살표는 주황으로 그려졌지만 조회할 때도 쓰인다.">
+  <div class="eyebrow">02. 로컬 아키텍처</div>
+  <div class="s-title">데이터 레이크하우스 아키텍처</div>
+  <div class="s-sub">Mac 한 대의 Docker 컨테이너로 구성했다.</div>
+  <div class="fig"><img src="../docs/assets/lakehouse-flow/11-local-lakehouse-overview-v3.png" alt="내 로컬 PC 안의 Docker 컨테이너(Source DB·SeaTunnel·Hive Metastore·catalog-db·Trino·Superset·superset-db)와 bind mount로 연결된 로컬 저장소 lake/, 그리고 컨테이너 밖의 웹 브라우저"></div>
+  <div class="cap"><span><b>범례의 두 색이 오늘의 순서</b>다 — <b style="color:var(--orange)">주황(적재·등록)</b>은 이번 장, <b style="color:var(--blue)">파랑(조회)</b>은 05장에서 본다. <b>웹 브라우저만 Docker 밖</b>(호스트에서 실행)이고 나머지는 전부 컨테이너다. <span class="mono">lake/</span>는 <b>bind mount</b>라 호스트와 컨테이너가 같은 파일을 본다. 단, 04장에서 볼 <b>1억 행 원본은 이 Source DB가 아니라 별도 PostgreSQL</b>(<span class="mono">host.docker.internal:5440</span>)이다.</span></div>
+</section>
+
+<!-- ==================== 7. 파일을 쓰는 것과 테이블이 되는 것은 다른 단계다 ==================== -->
+<section class="slide" data-eyebrow="02. 로컬 아키텍처" data-notes="④ 파일 작성과 ⑤ HMS 커밋이 별개 단계라는 점이 이 그림의 핵심. 하단 띠의 '파일 작성 후 카탈로그 커밋이 성공해야 새 테이블 상태가 공개된다'를 그대로 읽어준다.">
+  <div class="eyebrow">02. 로컬 아키텍처</div>
+  <div class="s-title">적재 흐름</div>
+  <div class="s-sub">파일을 쓰는 것과 테이블이 되는 것은 다른 단계다.</div>
+  <div class="fig"><img src="../docs/assets/lakehouse-flow/02-ingestion-flow.png" alt="SeaTunnel JDBC source와 Iceberg sink의 파일 작성 및 HMS 커밋 흐름"></div>
+  <div class="cap"><span><b>④ 파일 작성 → ⑤ HMS 커밋</b>이 끝나야 새 상태가 공개된다. 파일만 써놓고 커밋이 안 되면 <b>아무도 참조하지 않는 파일</b>이 남는다. 둘을 묶는 단일 트랜잭션은 없다.</span></div>
+</section>
+
+<!-- ==================== 8. 쓰기 경로 전체가 설정 파일 하나에 선언된다 ==================== -->
+<section class="slide" data-eyebrow="02. 로컬 아키텍처" data-notes="설정 파일 한 장으로 쓰기 경로 전체가 선언된다는 점이 포인트. source는 어디서 읽고, sink는 어떤 포맷으로 어느 카탈로그에 쓰는지. transform 블록은 다음 장에서 설명한다.">
+  <div class="eyebrow">02. 로컬 아키텍처</div>
+  <div class="s-title">적재 작업 설정</div>
+  <div class="s-sub"><span class="mono">jobs/03_production_orders_100m.conf</span> — 어디서 읽어 어느 카탈로그의 어떤 테이블로 쓸지.</div>
+  <div class="body top">
+<pre><span class="c"># ── 어디서 읽나 ──  기본키 범위로 4등분해 병렬로 읽는다</span>
+<span class="k">source</span> { Jdbc {
+    url = <span class="s">"jdbc:postgresql://host.docker.internal:5440/srcdb?readOnly=true"</span>
+    query = <span class="s">"select order_id, factory_id, product_name, quantity, order_date, status
+             from public.production_orders_100m"</span>
+    fetch_size = 5000          <span class="c">// 커서로 5천 행씩 스트리밍 — 전부 메모리에 올리지 않는다</span>
+    partition_column = <span class="s">"order_id"</span>    partition_num = 4
+} }
+
+<span class="k">transform</span> { <span class="c">/* 컬럼 이름을 바꿨다 되돌린다 — 이유는 다음 장에서 */</span> }
+
+<span class="c"># ── 어디에 쓰나 ──  파일 저장소와 카탈로그를 각각 지정한다</span>
+<span class="k">sink</span> { Iceberg {
+    iceberg.catalog.config = { type = <span class="s">"hive"</span>
+                               uri = <span class="s">"thrift://hms:9083"</span>          <span class="c">← 카탈로그 (이름·위치)</span>
+                               warehouse = <span class="s">"file:///lake/warehouse"</span> }  <span class="c">← 파일 저장소</span>
+    namespace = <span class="s">"retail"</span>   table = <span class="s">"production_orders_100m"</span>
+    iceberg.table.write-props = { write.format.default = <span class="s">"parquet"</span>
+                                  write.parquet.compression-codec = <span class="s">"zstd"</span> }
+    data_save_mode = <span class="s">"APPEND_DATA"</span>   <span class="c">// 재실행하면 중복된다 — 래퍼 스크립트로 차단</span>
+} }</pre>
+    <div class="code-note"><b>주목할 점</b> — sink에 Trino나 Superset 얘기가 전혀 없다. 쓰는 쪽은 <b>읽는 쪽의 존재를 모른다.</b> 카탈로그 주소와 파일 경로만 알면 된다.</div>
+  </div>
+</section>
+
+<!-- ==================== 9. 섹션 03 ==================== -->
+<section class="slide divider" data-notes="각 구성요소의 역할과 경계. 이 과제의 두 축 중 하나다.">
+  <div class="dlabel">SECTION 03</div>
+  <div class="toc">
+    <div class="toc-row"><span class="n">01</span><span><span class="t">레이크하우스란 무엇인가</span></span></div>
+    <div class="toc-row"><span class="n">02</span><span><span class="t">로컬 레이크하우스 아키텍처</span></span></div>
+    <div class="toc-row on"><span class="n">03</span><span><span class="t">구성요소의 역할과 경계</span><br><span class="d">각자 하는 일과 하지 않는 일 · 카탈로그의 자리</span></span></div>
+    <div class="toc-row"><span class="n">04</span><span><span class="t">Iceberg가 파일을 관리하는 방법</span></span></div>
+    <div class="toc-row"><span class="n">05</span><span><span class="t">Trino·Superset으로 조회하기</span></span></div>
+    <div class="toc-row"><span class="n">06</span><span><span class="t">정리</span></span></div>
+  </div>
+</section>
+
+<!-- ==================== 10. 각자 하는 일과 하지 않는 일 ==================== -->
+<section class="slide" data-eyebrow="03. 구성요소의 역할과 경계" data-notes="★ 이해도를 가장 잘 보여주는 슬라이드. '하지 않는 일' 열을 천천히 읽는다. 특히 Iceberg가 docker ps에 안 나온다는 점은 처음 듣는 사람이 놀라는 지점이다. 하단 배너의 '문제가 생겼을 때 어디를 볼지가 정해진다'가 이 표의 실용적 가치다.">
+  <div class="eyebrow">03. 구성요소의 역할과 경계</div>
+  <div class="s-title">각자 <span style="color:var(--blue)">하는 일</span>과 <span style="color:var(--orange)">하지 않는 일</span></div>
+  <div class="s-sub">역할이 겹치지 않게 잘라두는 것이 조립형 구조의 핵심이다.</div>
+  <div class="body top">
+    <table>
+      <thead><tr><th style="width:15%">구성요소</th><th style="width:42%">하는 일</th><th>하지 않는 일</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><b>SeaTunnel</b></td>
+          <td>원본에서 행을 읽어 Parquet으로 쓰고, 카탈로그에 커밋한다</td>
+          <td class="not">계속 떠 있지 않는다 — 적재할 때 실행했다가 끝나면 종료된다. <b>조회할 때는 실행되지 않는다</b></td>
+        </tr>
+        <tr>
+          <td><b>Iceberg</b></td>
+          <td>어떤 파일이 현재 테이블인지 정의한다 (스키마 · 스냅샷 · 파일 목록)</td>
+          <td class="not">서버가 아니다. <b>docker ps에 나오지 않는다</b> — 파일 형식과 라이브러리일 뿐이다</td>
+        </tr>
+        <tr>
+          <td><b>Hive Metastore</b></td>
+          <td>테이블 이름 → 현재 metadata JSON 위치를 관리한다</td>
+          <td class="not">SQL을 실행하지 않는다 · Parquet을 읽지 않는다 · 폴더를 훑어 자동 등록하지 않는다</td>
+        </tr>
+        <tr>
+          <td><b>Trino</b></td>
+          <td>SQL을 받아 계획을 세우고, Parquet을 직접 읽어 계산한다</td>
+          <td class="not">데이터를 보관하지 않는다. 저장소가 아니라 <b>계산만 하는 엔진</b>이다</td>
+        </tr>
+        <tr>
+          <td><b>Superset</b></td>
+          <td>웹 화면 — SQL을 Trino에 전달하고 결과를 표·차트로 보여준다</td>
+          <td class="not">파일에 직접 접근하지 않는다. 조회 데이터의 <b>복사본을 갖지 않는다</b></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="banner">
+      <span class="ic">★</span>
+      <span>“하지 않는 일”을 아는 것이 실제로 쓸모 있는 이유
+      <small>문제가 생겼을 때 <b>어디를 볼지가 정해진다.</b> 조회가 느리면 HMS가 아니라 Trino와 Parquet을 본다. 테이블이 안 보이면 파일이 아니라 카탈로그 커밋을 본다.</small></span>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 11. 카탈로그가 하는 일은 생각보다 작다 ==================== -->
+<section class="slide" data-eyebrow="03. 구성요소의 역할과 경계" data-notes="앞 장 표에서 한 줄이었던 카탈로그를 조금 더 본다. 하단 띠 '우리는 HMS 서버를 개발하지 않고 공식 Hive 이미지를 설정해 실행한다'가 핵심 — 조립이 기본이라는 메시지와 연결된다. 다음 장(왜 이 조합인가)의 카탈로그 칸으로 이어진다.">
+  <div class="eyebrow">03. 구성요소의 역할과 경계</div>
+  <div class="s-title">Hive Metastore의 역할</div>
+  <div class="s-sub">테이블 이름과 현재 metadata 위치를 관리한다. 그 외에는 하지 않는다.</div>
+  <div class="fig"><img src="../docs/assets/lakehouse-flow/05-hms-responsibilities.png" alt="HMS의 이름 관리, 등록 정보 조회와 갱신, 동시 변경 지원 역할"></div>
+  <div class="cap"><span>HMS가 아는 것은 <b>“테이블 이름 → 현재 metadata JSON 위치”</b> 뿐이다. 그 다음부터는 읽는 쪽이 파일을 직접 따라간다(04장). 역할이 이렇게 작게 잘려 있어서 <b>카탈로그를 교체해도 파일은 그대로</b>다.</span></div>
+</section>
+
+<!-- ==================== 12. 왜 이 조합을 골랐나 ==================== -->
+<section class="slide" data-eyebrow="03. 구성요소의 역할과 경계" data-notes="★ 대안을 알고 골랐다는 걸 보여주는 슬라이드. 특히 HMS가 Iceberg의 필수가 아니라는 점을 분명히 말한다. 질문이 나오기 쉬운 지점이기도 하다.">
+  <div class="eyebrow">03. 구성요소의 역할과 경계</div>
+  <div class="s-title">구성요소 선택 근거</div>
+  <div class="s-sub">네 칸 모두 대안이 있다. 무엇을 포기하고 무엇을 얻었는지가 설계다.</div>
+  <div class="body">
+    <div class="grid g4">
+      <div class="card">
+        <h4><span class="badge-n">1</span>적재</h4>
+        <span class="pick">SeaTunnel</span>
+        <p class="why" style="margin-top:.7cqw">설정 파일만으로 source–sink를 선언하고, <b>Iceberg sink가 내장</b>돼 있다. 선행 실습 자산을 그대로 이었다.</p>
+        <p class="alt">대안 · Spark · Flink · NiFi · Airbyte</p>
+      </div>
+      <div class="card">
+        <h4><span class="badge-n">2</span>테이블 포맷</h4>
+        <span class="pick">Iceberg</span>
+        <p class="why" style="margin-top:.7cqw"><b>엔진 중립적</b>이다. Trino · Spark · PyIceberg가 모두 같은 파일을 읽는다. 실제로 세 가지로 읽어봤다.</p>
+        <p class="alt">대안 · Delta Lake · Apache Hudi</p>
+      </div>
+      <div class="card gr">
+        <h4><span class="badge-n">3</span>카탈로그</h4>
+        <span class="pick">Hive Metastore</span>
+        <p class="why" style="margin-top:.7cqw">SeaTunnel과 Trino <b>양쪽이 바로 지원</b>해 추가 구현이 없었다. <b>Iceberg의 필수 요소는 아니다.</b></p>
+        <p class="alt">대안 · JDBC Catalog · REST Catalog · AWS Glue</p>
+      </div>
+      <div class="card">
+        <h4><span class="badge-n">4</span>조회</h4>
+        <span class="pick">Trino + Superset</span>
+        <p class="why" style="margin-top:.7cqw">Trino는 Iceberg 커넥터가 성숙하고, Superset은 <b>Trino 드라이버를 공식 지원</b>한다.</p>
+        <p class="alt">대안 · Spark SQL · DuckDB / Metabase · Redash</p>
+      </div>
+    </div>
+    <div class="banner b" style="background:var(--blue-soft);color:var(--navy);border:1px solid var(--blue-line)">
+      <span class="ic" style="color:var(--blue)">◆</span>
+      <span style="color:var(--navy)">고를 때 적용한 기준 셋
+      <small style="color:var(--muted)">① 오픈소스이고 재단이 관리하는가 (특정 회사가 사라져도 남는가) &nbsp;·&nbsp; ② 로컬 단일 노드에서 뜨는가 &nbsp;·&nbsp; ③ <b>나중에 갈아끼울 수 있는가</b></small></span>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 13. 섹션 04 ==================== -->
+<section class="slide divider" data-notes="파일 네 개를 실제로 열어보는 섹션. 가장 긴 구간이고 두 축 중 하나다.">
+  <div class="dlabel">SECTION 04</div>
+  <div class="toc">
+    <div class="toc-row"><span class="n">01</span><span><span class="t">레이크하우스란 무엇인가</span></span></div>
+    <div class="toc-row"><span class="n">02</span><span><span class="t">로컬 레이크하우스 아키텍처</span></span></div>
+    <div class="toc-row"><span class="n">03</span><span><span class="t">구성요소의 역할과 경계</span></span></div>
+    <div class="toc-row on"><span class="n">04</span><span><span class="t">Iceberg가 파일을 관리하는 방법</span><br><span class="d">JSON · Avro · Parquet를 직접 열어본다</span></span></div>
+    <div class="toc-row"><span class="n">05</span><span><span class="t">Trino·Superset으로 조회하기</span></span></div>
+    <div class="toc-row"><span class="n">06</span><span><span class="t">정리</span></span></div>
+  </div>
+</section>
+
+<!-- ==================== 14. 파일 네 개를 차례로 따라가면 데이터가 나온다 ==================== -->
+<section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="walkthrough 시작. 1억 행 테이블의 실제 파일을 다섯 장에 걸쳐 연다고 예고한다. 확장자가 핵심 — JSON은 하나뿐이고 중간 둘은 Avro다. 흔한 오해 배너는 가볍게 짚고 넘어간다.">
+  <div class="eyebrow">04. Iceberg 파일 관리</div>
+  <div class="s-title">Iceberg가 만드는 파일 네 가지</div>
+  <div class="s-sub">지금부터 <b>1억 행을 적재한 <span class="mono">retail.production_orders_100m</span> 의 실제 파일</b>을 한 단계씩 열어본다.</div>
+  <div class="body">
+    <div class="grid g4">
+      <div class="card">
+        <h4><span class="badge-n" style="background:#8b5cf6">1</span>metadata JSON</h4>
+        <p class="why"><b>지금 이 테이블의 상태</b>를 적어둔 파일. 스키마와 스냅샷 목록이 있다.</p>
+        <p class="alt">00004-9489b5e8-….metadata.json</p>
+      </div>
+      <div class="card">
+        <h4><span class="badge-n" style="background:var(--green)">2</span>manifest list</h4>
+        <p class="why">고른 스냅샷이 <b>어떤 manifest들로 이뤄졌는지</b>의 목록.</p>
+        <p class="alt">snap-3279400440120366835-….avro</p>
+      </div>
+      <div class="card">
+        <h4><span class="badge-n">3</span>manifest</h4>
+        <p class="why">데이터 파일의 <b>경로와 통계</b>. 파일을 거를 근거가 여기 있다.</p>
+        <p class="alt">…-m0.avro × 4</p>
+      </div>
+      <div class="card">
+        <h4><span class="badge-n" style="background:var(--blue)">4</span>Parquet</h4>
+        <p class="why"><b>실제 주문 행</b> 1억 개. 여기까지 와야 데이터를 읽는다.</p>
+        <p class="alt">….parquet × 4</p>
+      </div>
+    </div>
+    <div class="banner o">
+      <span class="ic">!</span>
+      <span>확장자를 보자 — <b>JSON은 맨 위 하나뿐이고, 가운데 둘은 Avro</b>다
+      <small>자료를 찾다 보면 “manifest는 JSON”, “snapshot이 별도 파일”, “metadata.json에 데이터 파일 목록이 있다”는 설명이 자주 보이는데 <b>전부 사실과 다르다.</b> 다음 네 장에서 실제 파일로 확인한다.</small></span>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 15. ① JSON에서 현재 스냅샷을 고른다 ==================== -->
+<section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="실제 JSON이다. 병렬도 4로 적재했더니 커밋이 4번 일어났고 그게 스냅샷 4개로 남았다. current-snapshot-id와 같은 값을 배열에서 찾아 manifest-list를 따라간다. 스냅샷이 파일이 아니라는 점, 과거 스냅샷이 남아 시점 조회가 된다는 점을 말한다.">
+  <div class="eyebrow">04. Iceberg 파일 관리</div>
+  <div class="s-title">① metadata JSON — 현재 스냅샷 선택</div>
+  <div class="chain">
+    <span class="ch now">① metadata JSON</span><span class="chx">→</span>
+    <span class="ch">② manifest list</span><span class="chx">→</span>
+    <span class="ch">③ manifest</span><span class="chx">→</span>
+    <span class="ch">④ Parquet</span>
+    <span class="chtail">00004-9489b5e8-….metadata.json</span>
+  </div>
+  <div class="body top" style="padding-top:0">
+    <div class="grid" style="grid-template-columns:1.32fr 1fr;gap:1.5cqw">
+      <div class="excerpt">
+        <div class="hd"><span>실제 파일 발췌 · 스냅샷 4개</span><b>metadata.json</b></div>
+<pre><span class="hl"><span class="k">"current-snapshot-id"</span>: 3279400440120366835,</span>
+<span class="k">"snapshots"</span>: [
+  { <span class="k">"sequence-number"</span>: 1,  <span class="k">"added-records"</span>: <span class="s">"25000000"</span>,
+    <span class="k">"total-records"</span>: <span class="s">"25000000"</span>,  <span class="c">← 1차 커밋</span>
+    <span class="k">"manifest-list"</span>: <span class="s">"…/snap-7595650988843982042-….avro"</span> },
+
+  { <span class="k">"sequence-number"</span>: 2,  <span class="k">"total-records"</span>: <span class="s">"50000000"</span>,  <span class="c">← 2차</span>
+    <span class="k">"manifest-list"</span>: <span class="s">"…/snap-6342618545276158258-….avro"</span> },
+
+  { <span class="k">"sequence-number"</span>: 3,  <span class="k">"total-records"</span>: <span class="s">"75000000"</span>,  <span class="c">← 3차</span>
+    <span class="k">"manifest-list"</span>: <span class="s">"…/snap-805239592947289981-….avro"</span> },
+
+  { <span class="hl"><span class="k">"snapshot-id"</span>: 3279400440120366835,  <span class="c">← 현재</span></span>
+    <span class="k">"sequence-number"</span>: 4,  <span class="k">"total-records"</span>: <span class="s">"100000000"</span>,
+    <span class="hl"><span class="k">"manifest-list"</span>: <span class="s">"…/snap-3279400440120366835-….avro"</span> }</span>
+]</pre>
+      </div>
+      <div>
+        <div class="card gr" style="padding:1.3cqw 1.5cqw">
+          <h4 style="font-size:1.42cqw">하는 일은 단순하다</h4>
+          <p class="why"><span class="mono">current-snapshot-id</span> 와 <b>같은 값</b>을 배열에서 찾고, 그 항목의 <span class="mono">manifest-list</span> 경로로 넘어간다. 그게 전부다.</p>
+        </div>
+        <div class="card" style="padding:1.3cqw 1.5cqw;margin-top:1cqw">
+          <h4 style="font-size:1.42cqw">병렬도 4 → 커밋 4번</h4>
+          <p class="why">2,500만 행씩 네 번에 나눠 커밋됐다. <b>25,000,000 → 50,000,000 → 75,000,000 → 100,000,000</b> 누적이 그대로 기록돼 있다.</p>
+        </div>
+        <div class="card o" style="padding:1.3cqw 1.5cqw;margin-top:1cqw">
+          <h4 style="font-size:1.42cqw">스냅샷은 파일이 아니다</h4>
+          <p class="why"><b>JSON 안의 배열 원소</b>다. 과거 셋이 그대로 남아 있어 <b>포인터만 바꾸면 그 시점으로 돌아간다</b> — 커밋이 “파일 교체”가 아니라 <b>포인터 교체</b>인 이유다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 16. ② manifest list에서 manifest 경로를 ==================== -->
+<section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="Avro라 fastavro로 읽었다. 레코드 4개 = manifest 4개. 25,000,000 × 4 = 100,000,000이 파일을 하나도 열기 전에 나온다는 게 핵심. seq 순서가 뒤섞여 있는 건 병렬 writer라 자연스러운 것.">
+  <div class="eyebrow">04. Iceberg 파일 관리</div>
+  <div class="s-title">② manifest list — 참조하는 manifest 목록</div>
+  <div class="chain">
+    <span class="ch done">① metadata JSON</span><span class="chx">→</span>
+    <span class="ch now">② manifest list</span><span class="chx">→</span>
+    <span class="ch">③ manifest</span><span class="chx">→</span>
+    <span class="ch">④ Parquet</span>
+    <span class="chtail">snap-3279400440120366835-….avro</span>
+  </div>
+  <div class="body top" style="padding-top:0">
+    <div class="grid" style="grid-template-columns:1.32fr 1fr;gap:1.5cqw">
+      <div class="excerpt">
+        <div class="hd"><span>Avro라서 fastavro로 읽은 결과 · 레코드 4개</span><b>manifest list</b></div>
+<pre><span class="c">[1]</span> <span class="hl"><span class="k">manifest_path</span>   : 7418ba24-…-m0.avro</span>
+    <span class="k">added_rows_count</span>: <span class="s">25,000,000</span>   <span class="k">files</span>: 1   <span class="k">seq</span>: 4
+
+<span class="c">[2]</span> <span class="hl"><span class="k">manifest_path</span>   : cfb7e80e-…-m0.avro</span>
+    <span class="k">added_rows_count</span>: <span class="s">25,000,000</span>   <span class="k">files</span>: 1   <span class="k">seq</span>: 3
+
+<span class="c">[3]</span> <span class="hl"><span class="k">manifest_path</span>   : 72c17056-…-m0.avro</span>
+    <span class="k">added_rows_count</span>: <span class="s">25,000,000</span>   <span class="k">files</span>: 1   <span class="k">seq</span>: 2
+
+<span class="c">[4]</span> <span class="hl"><span class="k">manifest_path</span>   : dea34216-…-m0.avro</span>
+    <span class="k">added_rows_count</span>: <span class="s">25,000,000</span>   <span class="k">files</span>: 1   <span class="k">seq</span>: 1
+    ──────────────────────────────────────────
+    <span class="k">합계</span>            : <span class="s">100,000,000</span></pre>
+      </div>
+      <div>
+        <div class="card gr" style="padding:1.3cqw 1.5cqw">
+          <h4 style="font-size:1.42cqw">여기서 이미 1억 행이 보인다</h4>
+          <p class="why"><b>25,000,000 × 4 = 100,000,000.</b> Parquet을 하나도 열지 않고 레코드 수만 더해도 전체 행 수가 나온다.</p>
+          <p class="why"><span class="mono">COUNT(*)</span>가 빠른 이유가 이것이다.</p>
+        </div>
+        <div class="card" style="padding:1.3cqw 1.5cqw;margin-top:1cqw">
+          <h4 style="font-size:1.42cqw">커밋마다 manifest 하나</h4>
+          <p class="why">네 번의 커밋이 각각 manifest를 남겼고, <b>현재 스냅샷은 넷 다 참조</b>한다. 새 커밋이 기존 것을 덮어쓰지 않는다.</p>
+          <p class="why"><span class="mono">seq</span> 순서가 뒤섞인 건 <b>병렬로 쓴</b> 결과다.</p>
+        </div>
+        <div class="card o" style="padding:1.3cqw 1.5cqw;margin-top:1cqw">
+          <h4 style="font-size:1.42cqw">이 파일은 Avro다</h4>
+          <p class="why">텍스트 편집기로 열면 깨져 보인다. 파일 머리 4바이트가 <span class="mono">4f 62 6a 01</span>(<span class="mono">Obj\x01</span>)인 <b>Avro 컨테이너</b>다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 17. ③ manifest에서 Parquet 경로와 통계를 얻 ==================== -->
+<section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="★ 이 장이 walkthrough의 핵심. order_id 범위가 파일마다 딱 잘려 있어 WHERE order_id = 7이면 파일 하나만 읽는다. 반대로 status·factory_id는 네 파일이 범위가 똑같아서 거르는 데 전혀 도움이 안 된다 — 어떤 컬럼이냐에 따라 효과가 갈린다는 점이 중요하다.">
+  <div class="eyebrow">04. Iceberg 파일 관리</div>
+  <div class="s-title">③ manifest — Parquet 경로와 통계</div>
+  <div class="chain">
+    <span class="ch done">① metadata JSON</span><span class="chx">→</span>
+    <span class="ch done">② manifest list</span><span class="chx">→</span>
+    <span class="ch now">③ manifest</span><span class="chx">→</span>
+    <span class="ch">④ Parquet</span>
+    <span class="chtail">…-m0.avro × 4 · 읽기 쉽게 order_id 범위 순으로 정렬</span>
+  </div>
+  <div class="body top" style="padding-top:0">
+    <table>
+      <thead><tr><th style="width:17%">manifest</th><th style="width:25%">data_file.file_path</th><th style="width:13%">record_count</th><th style="width:13%">file_size</th><th>order_id 범위 (lower ~ upper)</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">72c17056…</td><td class="mono">…354905-a195136c….parquet</td><td class="mono">25,000,000</td><td class="mono">82,639,066</td><td class="mono"><b>1 ~ 25,000,000</b></td></tr>
+        <tr><td class="mono">dea34216…</td><td class="mono">…343013-f5379e81….parquet</td><td class="mono">25,000,000</td><td class="mono">82,619,148</td><td class="mono"><b>25,000,001 ~ 50,000,000</b></td></tr>
+        <tr><td class="mono">7418ba24…</td><td class="mono">…346272-94f8a69d….parquet</td><td class="mono">25,000,000</td><td class="mono">82,618,924</td><td class="mono"><b>50,000,001 ~ 75,000,000</b></td></tr>
+        <tr><td class="mono">cfb7e80e…</td><td class="mono">…349766-d38698f2….parquet</td><td class="mono">25,000,000</td><td class="mono">82,619,061</td><td class="mono"><b>75,000,001 ~ 100,000,000</b></td></tr>
+      </tbody>
+    </table>
+    <div class="grid g2" style="margin-top:1.3cqw">
+      <div class="card gr" style="padding:1.3cqw 1.5cqw">
+        <h4 style="font-size:1.42cqw">통계가 파일을 걸러낸다</h4>
+        <p class="why"><span class="mono">WHERE order_id = 7</span> → 범위가 겹치는 파일은 <b>첫 번째 하나뿐</b>이다.</p>
+        <p class="why"><b>나머지 세 파일(약 248MB·7,500만 행)은 열지도 않는다.</b> 1억 행 테이블이지만 실제로 읽는 건 2,500만 행짜리 파일 하나다.</p>
+      </div>
+      <div class="card o" style="padding:1.3cqw 1.5cqw">
+        <h4 style="font-size:1.42cqw">모든 컬럼이 그런 건 아니다</h4>
+        <p class="why">같은 manifest에서 <span class="mono">status</span>는 네 파일 모두 <span class="mono">CANCELLED ~ IN_PROGRESS</span>, <span class="mono">factory_id</span>는 모두 <span class="mono">F001 ~ F030</span>이다.</p>
+        <p class="why"><b>→ 이 컬럼들로는 하나도 못 거른다.</b> 통계가 쓸모 있으려면 <b>값이 파일마다 몰려 있어야</b> 한다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 18. ④ Parquet에 실제 행이 있다 ==================== -->
+<section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="드디어 실제 데이터. 25,000,000행 중 5행만 보여준다. 오른쪽 컬럼별 크기가 다음 장 컬럼 프루닝의 근거다. status 15KB vs 전체 16.3MB를 짚어둔다.">
+  <div class="eyebrow">04. Iceberg 파일 관리</div>
+  <div class="s-title">④ Parquet — 실제 행 데이터</div>
+  <div class="chain">
+    <span class="ch done">① metadata JSON</span><span class="chx">→</span>
+    <span class="ch done">② manifest list</span><span class="chx">→</span>
+    <span class="ch done">③ manifest</span><span class="chx">→</span>
+    <span class="ch now">④ Parquet</span>
+    <span class="chtail">…354905-a195136c….parquet · 25,000,000행 중 5행</span>
+  </div>
+  <div class="body top" style="padding-top:0">
+    <div class="grid" style="grid-template-columns:1.25fr 1fr;gap:1.5cqw">
+      <div>
+        <table class="rows">
+          <thead><tr><th>order_id</th><th>factory_id</th><th>product_name</th><th>quantity</th><th>order_date</th><th>status</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>F002</td><td>Engine Block</td><td>384</td><td>2025-11-17</td><td>IN_PROGRESS</td></tr>
+            <tr><td>2</td><td>F003</td><td>Circuit Board</td><td>294</td><td>2026-06-11</td><td>COMPLETED</td></tr>
+            <tr><td>3</td><td>F004</td><td>Gearbox</td><td>226</td><td>2026-09-05</td><td>CANCELLED</td></tr>
+            <tr><td>4</td><td>F005</td><td>Bearing Assembly</td><td>418</td><td>2026-05-06</td><td>CREATED</td></tr>
+            <tr><td>5</td><td>F006</td><td>Chassis Panel</td><td>346</td><td>2026-06-01</td><td>IN_PROGRESS</td></tr>
+          </tbody>
+        </table>
+        <div class="cap" style="margin-top:.8cqw"><span>앞 장 manifest의 <span class="mono">record_count 25,000,000</span>과 <span class="mono">order_id 1 ~ 25,000,000</span>이 실제 내용과 맞는다. 파일 하나당 <b>row group 6개</b>, zstd 압축.</span></div>
+      </div>
+      <div>
+        <div style="font-size:1.12cqw;color:var(--muted);margin-bottom:.5cqw;font-weight:600">row group 하나(약 16MB)의 컬럼별 압축 크기</div>
+        <table class="rows">
+          <thead><tr><th>컬럼</th><th>압축 후</th><th>압축 전</th></tr></thead>
+          <tbody>
+            <tr><td>order_id</td><td>5,044,946</td><td>39,463,174</td></tr>
+            <tr><td>factory_id</td><td>41,379</td><td>3,101,768</td></tr>
+            <tr><td>product_name</td><td>23,873</td><td>2,485,190</td></tr>
+            <tr><td>quantity</td><td>5,570,971</td><td>5,569,729</td></tr>
+            <tr><td>order_date</td><td>5,570,904</td><td>5,569,226</td></tr>
+            <tr style="background:var(--green-soft)"><td><b>status</b></td><td><b>14,901</b></td><td>1,251,582</td></tr>
+          </tbody>
+        </table>
+        <div class="card gr" style="padding:1.1cqw 1.4cqw;margin-top:1cqw">
+          <h4 style="font-size:1.38cqw">컬럼별로 따로 저장된다</h4>
+          <p class="why">값이 몇 종류뿐인 <span class="mono">status</span>는 <b>15KB</b>로 줄고, 전부 다른 <span class="mono">order_id</span>는 5MB다. <b>필요한 컬럼만 읽을 수 있는 이유</b>가 이것이다 — 다음 장.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 19. 구조는 데이터 크기와 무관하다 ==================== -->
+<section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="앞 다섯 장이 1억 행이었다는 걸 확인하고, 같은 구조가 5행짜리 테이블에서도 똑같다는 걸 보여준다. 단계 수가 데이터 크기와 무관하다는 게 핵심. 파일이 N개로 늘어나도 계층은 깊어지지 않는다.">
+  <div class="eyebrow">04. Iceberg 파일 관리</div>
+  <div class="s-title">테이블 크기별 구조 비교</div>
+  <div class="s-sub">방금 1억 행에서 따라간 네 단계가, 5행짜리 테이블에서도 그대로다.</div>
+  <div class="body">
+    <table>
+      <thead><tr><th style="width:26%">따라가는 단계</th><th style="width:37%">production_orders_100m (방금 본 것)</th><th>retail.orders (첫 실습, 5행)</th></tr></thead>
+      <tbody>
+        <tr><td><b>① metadata JSON</b></td><td class="mono">1개 · 스냅샷 <b>4</b></td><td class="mono">1개 · 스냅샷 2</td></tr>
+        <tr><td><b>② manifest list</b></td><td class="mono">1개 · 레코드 <b>4</b></td><td class="mono">1개 · 레코드 2</td></tr>
+        <tr><td><b>③ manifest</b></td><td class="mono"><b>4개</b> · 각 1파일</td><td class="mono">2개 · 각 1파일</td></tr>
+        <tr><td><b>④ Parquet</b></td><td class="mono"><b>4개</b> · 각 25,000,000행</td><td class="mono">2개 · 3행 + 2행</td></tr>
+        <tr style="background:var(--green-soft)"><td><b>합계</b></td><td class="mono"><b>100,000,000행</b> · 330.5 MB</td><td class="mono">5행 · 2,460 bytes</td></tr>
+      </tbody>
+    </table>
+    <div class="grid g2">
+      <div class="card gr">
+        <h4>단계 수가 늘지 않는다</h4>
+        <p class="why">2만 배 차이가 나지만 <b>따라가는 깊이는 넷으로 같다.</b> manifest가 N개가 돼도 경로는 <b>JSON → manifest list → 여러 manifest → 수많은 Parquet</b>으로 동일하다.</p>
+      </div>
+      <div class="card">
+        <h4>커지면 달라지는 것</h4>
+        <p class="why">깊이는 같아도 <b>manifest 수와 파일 수는 늘어난다.</b> 그래서 운영에서는 작은 파일을 합치고(compaction) 오래된 스냅샷을 정리한다.</p>
+        <p class="why" style="color:#a9540a">계층을 따른다는 것만으로 <b>속도가 보장되지는 않는다.</b></p>
+      </div>
+    </div>
+    <div class="src">확인 방법 · metadata JSON 파싱 + fastavro로 Avro 읽기 + pyarrow로 Parquet 읽기 · analysis/read_parquet.ipynb</div>
+  </div>
+</section>
+
+<!-- ==================== 20. Iceberg 파일 관리의 이점 ==================== -->
+<section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="04장 마무리 ①. 네 가지 메커니즘. 근거/미사용 라벨을 반드시 짚는다 — ①②는 앞에서 실제로 봤고, ③은 파일에서 ID만 확인했으며, ④는 이번 테이블에 파티션이 없어 안 써봤다. 안 써본 기능을 해봤다고 말하지 않는다. 상세는 docs/md/lakehouse-concept.md 4절.">
+  <div class="eyebrow">04. Iceberg 파일 관리</div>
+  <div class="s-title">Iceberg 파일 관리의 이점</div>
+  <div class="s-sub">앞에서 본 메타데이터 구조가 실제로 무엇을 가능하게 하는가.</div>
+  <div class="body">
+    <div class="grid g2">
+      <div class="card gr">
+        <h4><span class="badge-n">1</span>스냅샷 기반 시점 보존과 롤백</h4>
+        <p class="why">커밋마다 스냅샷이 남는다. <b>포인터 교체 한 번</b>으로 공개되므로 쓰는 도중 읽어도 이전 상태가 보이고, 과거 시점 조회와 되돌리기가 된다.</p>
+        <p class="alt">✅ 확인 — 스냅샷 4개가 25M → 50M → 75M → 100M으로 누적 (15쪽). 단 <span class="mono">FOR VERSION AS OF</span> 쿼리는 미실행</p>
+      </div>
+      <div class="card gr">
+        <h4><span class="badge-n">2</span>메타데이터 통계 기반 파일 프루닝</h4>
+        <p class="why">manifest의 컬럼별 min/max로 <b>파일을 열기 전에</b> 후보를 거른다. 디렉터리를 훑지 않으므로 파일이 늘어도 조회 계획이 선형으로 느려지지 않는다.</p>
+        <p class="alt">✅ 확인 — order_id 범위로 4개 중 1개만 (17쪽), 축소 수치는 23쪽</p>
+      </div>
+      <div class="card">
+        <h4><span class="badge-n">3</span>컬럼 ID 기반 스키마 진화</h4>
+        <p class="why">컬럼마다 <b>불변 ID</b>가 붙어 추가·삭제·이름 변경·순서 변경이 <b>메타데이터만</b> 바꾼다. RDB에서 순서·타입 변경이 테이블 재작성과 잠금을 부르는 것과 다르다.</p>
+        <p class="alt">◐ 파일에서만 확인 — field ID 1~6. <b>스키마 변경은 해보지 않았다</b></p>
+      </div>
+      <div class="card">
+        <h4><span class="badge-n">4</span>숨은 파티셔닝과 파티션 명세 진화</h4>
+        <p class="why">파티션 값을 원본 컬럼에서 <b>변환으로 유도</b>해 사용자가 파티션 컬럼을 몰라도 된다. 명세를 바꿔도 <b>기존 데이터를 재작성하지 않는다</b>.</p>
+        <p class="alt">✕ 미사용 — 이번 테이블은 <span class="mono">partition-specs</span>가 비어 있다</p>
+      </div>
+    </div>
+    <div class="banner">
+      <span class="ic">&#9670;</span>
+      <span>네 가지 모두 <b>데이터 파일을 다시 쓰지 않는다</b>는 공통점이 있다
+      <small>스냅샷 · 통계 · 컬럼 ID · 파티션 명세는 전부 <b>메타데이터 쪽</b>에서 처리된다. Parquet은 한 번 쓰면 그대로다 — 그래서 대용량에서도 스키마 변경이 즉시 끝난다.</small></span>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 21. 스펙 기반 엔진 중립과 표준화 흐름 ==================== -->
+<section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="04장 마무리 ②. 앞 장이 기술 메커니즘이었다면 여기는 생태계 이유. 실무에서 Iceberg를 고르는 이유로 가장 자주 꼽히는 게 이쪽이라는 점을 말한다. 업계 동향은 공개 자료 조사이고 우리가 검증한 게 아니다 — 이미 1위가 아니라 수렴 중으로 말한다.">
+  <div class="eyebrow">04. Iceberg 파일 관리</div>
+  <div class="s-title">스펙 기반 엔진 중립과 표준화 흐름</div>
+  <div class="s-sub">앞 장의 기능 대부분은 Delta Lake·Hudi도 제공한다. <b>실무에서 갈리는 지점은 여기다.</b></div>
+  <div class="body">
+    <div class="grid g2">
+      <div class="card gr">
+        <h4>엔진 중립 — 우리가 확인한 것</h4>
+        <p class="why"><b>“적재를 Spark로 바꾸면 Trino 설정을 고쳐야 하나?”</b> → 아니다. 둘이 공유하는 건 <span class="mono">thrift://hms:9083</span> 과 <span class="mono">/lake</span> <b>두 줄뿐</b>이다.</p>
+        <p class="why" style="margin-top:.7cqw">✅ 같은 <span class="mono">./lake</span> 파일을 <b>SeaTunnel(쓰기) · Trino(조회) · PyIceberg(학습)</b> 세 도구로 다뤘다. 셋은 서로를 모른다.</p>
+      </div>
+      <div class="card">
+        <h4>그걸 가능하게 하는 것</h4>
+        <p class="why"><b>공개 스펙</b> — 문서만 보고 독립 구현이 가능하다. Trino · Spark · Flink · PyIceberg · DuckDB가 각자 구현했다.</p>
+        <p class="why" style="margin-top:.5cqw"><b>재단 거버넌스</b> — Apache 재단 프로젝트라 특정 회사의 제품 전략에 종속되지 않는다.</p>
+        <p class="why" style="margin-top:.5cqw"><b>카탈로그 표준화</b> — REST Catalog 스펙으로 카탈로그 구현(HMS · Glue · Polaris)까지 교체 가능한 방향으로 간다.</p>
+      </div>
+    </div>
+    <div class="banner b" style="background:var(--blue-soft);color:var(--navy);border:1px solid var(--blue-line)">
+      <span class="ic" style="color:var(--blue)">&#9670;</span>
+      <span style="color:var(--navy)">업계도 Iceberg로 <b>수렴하는 중</b>이다
+      <small style="color:var(--muted)">2024.06 Databricks가 Iceberg 창시자들의 회사 <b>Tabular 인수</b> &nbsp;·&nbsp; Snowflake가 <b>Polaris 카탈로그</b>를 Apache 재단에 기증 &nbsp;·&nbsp; <b>AWS S3 Tables</b> &nbsp;·&nbsp; 경쟁 포맷 Delta Lake도 <b>UniForm</b>으로 Iceberg 호환 제공. 다만 현재 도입 점유율은 Delta가 다소 앞선다는 조사도 있다(39% vs 31%) — <b>“이미 1위”가 아니라 “수렴 중”</b>이 정확하다.</small></span>
+    </div>
+    <div class="src">업계 동향은 공개 자료 기준이며 이번 실습에서 검증한 내용이 아니다 · 정리: docs/md/lakehouse-concept.md 4·5절</div>
+  </div>
+</section>
+
+<!-- ==================== 22. 섹션 05 ==================== -->
+<section class="slide divider" data-notes="조회 계층을 얹는 섹션. 04장에서 손으로 따라간 경로를 Trino가 자동으로 한다는 연결이 핵심.">
+  <div class="dlabel">SECTION 05</div>
+  <div class="toc">
+    <div class="toc-row"><span class="n">01</span><span><span class="t">레이크하우스란 무엇인가</span></span></div>
+    <div class="toc-row"><span class="n">02</span><span><span class="t">로컬 레이크하우스 아키텍처</span></span></div>
+    <div class="toc-row"><span class="n">03</span><span><span class="t">구성요소의 역할과 경계</span></span></div>
+    <div class="toc-row"><span class="n">04</span><span><span class="t">Iceberg가 파일을 관리하는 방법</span></span></div>
+    <div class="toc-row on"><span class="n">05</span><span><span class="t">Trino·Superset으로 조회하기</span><br><span class="d">조회 계층을 붙이고 실제로 읽는다</span></span></div>
+    <div class="toc-row"><span class="n">06</span><span><span class="t">정리</span></span></div>
+  </div>
+</section>
+
+<!-- ==================== 23. 조회 계층을 붙인다 — 설정으로 연결하고, Trino가 ==================== -->
+<section class="slide" data-eyebrow="05. Trino · Superset 조회" data-notes="05장 시작. 윗줄은 무엇으로 연결했는지(설정 파일), 아랫줄은 SQL 한 번에 무슨 일이 일어나는지. 오른쪽 아래 파일 체인이 04장에서 손으로 따라간 바로 그 경로라는 점을 짚는다. 그림 우하단 Parquet 칸에 실재 오타가 있다.">
+  <div class="eyebrow">05. Trino · Superset 조회</div>
+  <div class="s-title">Trino · Superset 연결과 조회 흐름</div>
+  <div class="s-sub">설정으로 연결하고, 파일은 Trino가 직접 읽는다.</div>
+  <div class="fig"><img src="../docs/assets/lakehouse-flow/10-trino-superset-iceberg-connection-crop.png" alt="Compose·Trino·Superset 연결 설정과, 사용자 SQL이 Superset과 Trino를 거쳐 HMS 조회 및 lake 파일 읽기로 이어지는 흐름"></div>
+  <div class="cap"><span>오른쪽 아래 <b>metadata JSON → Manifest List → Manifest → Parquet</b> 체인이 <b>04장에서 손으로 따라간 바로 그 경로</b>다. Trino가 그걸 자동으로 한다. 파일을 읽는 주체는 Superset도 HMS도 아닌 <b>Trino</b>다.</span></div>
+</section>
+
+<!-- ==================== 24. 1억 행 테이블이지만, 실제로 읽는 건 일부다 ==================== -->
+<section class="slide" data-eyebrow="05. Trino · Superset 조회" data-notes="앞 그림의 파일 체인이 실제로 얼마나 줄여주는지. 두 수치 모두 우리가 파일을 열어 잰 값이고 쿼리 실행 측정이 아니라는 단서를 꼭 단다.">
+  <div class="eyebrow">05. Trino · Superset 조회</div>
+  <div class="s-title">조회 시 실제로 읽는 데이터량</div>
+  <div class="s-sub">앞 그림의 파일 체인을 따라가는 동안 <b>두 번 줄어든다.</b></div>
+  <div class="body">
+    <div class="grid g2">
+      <div class="card gr">
+        <h4><span class="badge-n">1</span>첫 번째 축소 — 파일 거르기</h4>
+        <p class="why"><span class="mono">WHERE order_id = 7</span> 이면 manifest의 범위 통계로 <b>4개 중 1개</b>만 후보가 된다.</p>
+        <div class="stats" style="grid-template-columns:1fr 1fr;margin-top:1cqw">
+          <div class="stat"><div class="v">330<small>MB</small></div><div class="k">테이블 전체</div></div>
+          <div class="stat hero"><div class="v">83<small>MB</small></div><div class="k">실제 후보 파일</div></div>
+        </div>
+      </div>
+      <div class="card gr">
+        <h4><span class="badge-n">2</span>두 번째 축소 — 컬럼만 읽기</h4>
+        <p class="why"><span class="mono">SELECT status</span> 라면 컬럼형 저장이라 그 컬럼만 읽으면 된다.</p>
+        <div class="stats" style="grid-template-columns:1fr 1fr;margin-top:1cqw">
+          <div class="stat"><div class="v">16.3<small>MB</small></div><div class="k">row group 전체</div></div>
+          <div class="stat hero"><div class="v">15<small>KB</small></div><div class="k">status 컬럼만</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="banner">
+      <span class="ic">&#9670;</span>
+      <span>조회 경로에서 <b>데이터를 보관하는 것은 Parquet 하나뿐</b>이다
+      <small>Superset은 화면, Trino는 계산, HMS는 위치 — 셋 다 데이터를 갖지 않는다. <b>단서</b> — 위 수치는 <b>파일을 열어 잰 크기</b>이지 쿼리 실행 시간을 측정한 값이 아니다. 실제로는 메타데이터 읽기·캐시가 더해진다.</small></span>
+    </div>
+    <div class="src">출처 · manifest Avro의 lower/upper bounds · pyarrow ParquetFile.metadata.row_group(0)</div>
+  </div>
+</section>
+
+<!-- ==================== 25. 읽는 쪽은 카탈로그 주소와 파일 경로만 알면 된다 ==================== -->
+<section class="slide" data-eyebrow="05. Trino · Superset 조회" data-notes="local.location=/ 가 질문 나오기 쉬운 지점. 주석을 그대로 읽어주면 바로 이해된다. 읽기 전용을 두 겹으로 건 것도 짚는다.">
+  <div class="eyebrow">05. Trino · Superset 조회</div>
+  <div class="s-title">Trino Iceberg 커넥터 설정</div>
+  <div class="s-sub">쓰기 경로가 이미 만들어둔 파일을 <b>고치지 않고</b> 읽는 것이 목표였다.</div>
+  <div class="body top">
+<pre><span class="c"># config/trino/catalog/iceberg.properties
+# 파일명이 SQL의 catalog 이름이 된다 → iceberg.retail.orders</span>
+<span class="k">connector.name</span>=iceberg
+<span class="k">iceberg.catalog.type</span>=hive_metastore
+
+<span class="c"># catalog-db에 직접 접속하지 않는다. HMS API로 현재 JSON 위치만 얻는다.</span>
+<span class="k">hive.metastore.uri</span>=thrift://hms:9083
+
+<span class="c"># 조회 전용 — 적재 쪽이 관리하는 테이블을 Trino가 수정하지 못하게 막는다.</span>
+<span class="k">iceberg.security</span>=READ_ONLY
+
+<span class="hl"><span class="k">fs.local.enabled</span>=true</span>      <span class="c"># Trino 483의 native local filesystem</span>
+<span class="hl"><span class="k">local.location</span>=/</span>          <span class="c"># URI 접두사가 아니라 실제 파일시스템 루트(Path)다.
+                           # file:/lake/...의 path가 lake/...이므로
+                           # 루트 /와 합쳐 /lake/...로 읽힌다.
+                           # /lake로 쓰면 /lake/lake/...가 되어 못 찾는다.</span></pre>
+    <div class="grid g2" style="margin-top:1.3cqw">
+      <div class="card gr" style="padding:1.2cqw 1.5cqw">
+        <h4 style="font-size:1.38cqw">읽기 전용을 두 겹으로</h4>
+        <p class="why">카탈로그는 <span class="mono">READ_ONLY</span>, 볼륨은 <span class="mono">./lake:/lake:ro</span>. 조회 도구가 적재 결과를 건드릴 수 없게 했다.</p>
+      </div>
+      <div class="card" style="padding:1.2cqw 1.5cqw">
+        <h4 style="font-size:1.38cqw">운영이라면 다르다</h4>
+        <p class="why">로컬 파일시스템은 단일 노드 전용이다. 다중 노드로 가면 S3 호환 객체 저장소가 전제다 — 설계만 있고 <b>검증은 안 했다</b>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 26. “적재됐다”와 “값이 맞다”는 다르다 ==================== -->
+<section class="slide" data-eyebrow="05. Trino · Superset 조회" data-notes="'행 단위 전수 비교는 아니다'라는 단서를 반드시 말한다. 메타데이터 COUNT만 보고 끝내지 않았다는 게 포인트.">
+  <div class="eyebrow">05. Trino · Superset 조회</div>
+  <div class="s-title">원본과의 집계 대조 검증</div>
+  <div class="s-sub">원본 PostgreSQL 집계 ↔ Trino의 <b>실제 파일 스캔</b> 결과를 항목별로 대조했다.</div>
+  <div class="body top">
+    <table>
+      <thead><tr><th style="width:32%">대조 항목</th><th style="width:29%">원본 PostgreSQL</th><th style="width:29%">Iceberg · Trino</th><th>결과</th></tr></thead>
+      <tbody>
+        <tr><td>전체 행 수</td><td class="mono">100,000,000</td><td class="mono">100,000,000</td><td class="ok">일치</td></tr>
+        <tr><td>상태별 행 수 (4종)</td><td class="mono">각 25,000,000</td><td class="mono">각 25,000,000</td><td class="ok">일치</td></tr>
+        <tr><td>quantity 합계</td><td class="mono">25,500,992,494</td><td class="mono">25,500,992,494</td><td class="ok">일치</td></tr>
+        <tr><td>order_id 합계</td><td class="mono">5,000,000,050,000,000</td><td class="mono">5,000,000,050,000,000</td><td class="ok">일치</td></tr>
+        <tr><td>NULL quantity</td><td class="mono">0</td><td class="mono">0</td><td class="ok">일치</td></tr>
+        <tr><td>날짜 범위</td><td class="mono">2025-09-07 ~ 2026-09-07</td><td class="mono">2025-09-07 ~ 2026-09-07</td><td class="ok">일치</td></tr>
+        <tr><td>문자열 길이 합계</td><td class="mono">400,000,000 / 1,240,000,000</td><td class="mono">400,000,000 / 1,240,000,000</td><td class="ok">일치</td></tr>
+        <tr style="background:var(--green-soft)"><td><b>기존 5건 테이블</b> (보존 확인)</td><td class="mono">5행 / 170,000</td><td class="mono">5행 / 170,000</td><td class="ok">보존됨</td></tr>
+      </tbody>
+    </table>
+    <div class="cap"><span><b>단서</b> — 이건 <b>집계 대조이지 행 단위 전수 비교가 아니다.</b> Trino 집계 응답은 약 5.9초였지만 이는 <b>단일 실행 기록</b>이지 성능 측정값이 아니다.</span></div>
+    <div class="src">출처 · evidence/production-100m/verification.json (status: PASS) · source-summary.csv ↔ trino-summary.csv</div>
+  </div>
+</section>
+
+<!-- ==================== 27. 섹션 06 ==================== -->
+<section class="slide divider" data-notes="발표를 닫는 요약.">
+  <div class="dlabel">SECTION 06</div>
+  <div class="toc">
+    <div class="toc-row"><span class="n">01</span><span><span class="t">레이크하우스란 무엇인가</span></span></div>
+    <div class="toc-row"><span class="n">02</span><span><span class="t">로컬 레이크하우스 아키텍처</span></span></div>
+    <div class="toc-row"><span class="n">03</span><span><span class="t">구성요소의 역할과 경계</span></span></div>
+    <div class="toc-row"><span class="n">04</span><span><span class="t">Iceberg가 파일을 관리하는 방법</span></span></div>
+    <div class="toc-row"><span class="n">05</span><span><span class="t">Trino·Superset으로 조회하기</span></span></div>
+    <div class="toc-row on"><span class="n">06</span><span><span class="t">정리</span><br><span class="d">전체 지도 · 확인한 것 · 남은 것</span></span></div>
+  </div>
+</section>
+
+<!-- ==================== 28. 전체 지도 — 환경 준비 · 쓰기 · 읽기 ==================== -->
+<section class="slide" data-eyebrow="06. 정리" data-notes="전체 복습용 지도. 02~05장을 한 번에 되짚는다. ①은 최초 1회, ②는 완료, ③만 평소에 쓴다는 생애주기를 손으로 짚는다.">
+  <div class="eyebrow">06. 정리</div>
+  <div class="s-title">전체 실행 흐름</div>
+  <div class="fig"><img src="../docs/assets/lakehouse-flow/08-scripts-to-lakehouse.png" alt="환경 준비, 1억 행 적재, SQL 조회의 세 단계와 각 단계에서 사용하는 파일"></div>
+  <div class="cap"><span>①은 최초 1회, ②는 이미 완료, <b>평소에 쓰는 건 ③뿐</b>이다. 조회할 때 SeaTunnel은 실행되지 않는다 — 쓰기와 읽기는 시간적으로도 완전히 분리돼 있다.</span></div>
+</section>
+
+<!-- ==================== 29. 구축하며 확인한 것 ==================== -->
+<section class="slide" data-eyebrow="06. 정리" data-notes="핵심 메시지를 다시 말하고 끝낸다. 첫 줄은 5쪽에서 한 말과 똑같이 반복한다 — 의도된 반복이다.">
+  <div class="eyebrow">06. 정리</div>
+  <div class="s-title">구축하며 확인한 것</div>
+  <div class="body">
+    <ul class="arrow">
+      <li><b>레이크하우스는 제품이 아니라 네 가지 역할의 조합이다.</b> 적재 · 테이블 포맷 · 카탈로그 · 조회.
+        <span class="sub">우리는 SeaTunnel · Iceberg · Hive Metastore · Trino+Superset을 골랐을 뿐이고, 각 칸은 교체할 수 있다.</span></li>
+      <li><b>각 구성요소가 “하지 않는 일”을 아는 것이 더 쓸모 있었다.</b> 역할 경계가 분명해야 문제가 생겼을 때 어디를 볼지 정해진다.</li>
+      <li><b>쓰기 경로와 읽기 경로는 서로를 모른다.</b> 카탈로그와 파일 저장소 두 지점에서만 만난다. 이것이 구성요소를 갈아끼울 수 있는 이유다.</li>
+      <li><b>“파일을 썼다”와 “테이블이 됐다”는 다르다.</b> 카탈로그 커밋이 성공해야 새 상태가 공개된다. 둘을 묶는 트랜잭션은 없다.</li>
+      <li><b>“적재됐다”와 “값이 맞다”도 다르다.</b> 메타데이터 COUNT가 아니라 실제 파일을 스캔해 원본과 대조했다.</li>
+      <li><b>조립의 자유에는 경계를 책임지는 비용이 따른다.</b> 가장 오래 걸린 문제들은 전부 도구 사이의 접점에서 생겼다.</li>
+      <li><b>우리가 쓴 코드는 약 800줄이고 나머지는 조립이다.</b> 카탈로그 서버도 쿼리 엔진도 개발하지 않았다. 고르고 연결하고 검증했다.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ==================== 30. 남은 것 — 안 해본 것은 안 했다고 적는다 ==================== -->
+<section class="slide" data-eyebrow="06. 정리" data-notes="한계를 솔직하게. 안 해본 걸 했다고 말하지 않는다. 질문 받고 마무리.">
+  <div class="eyebrow">06. 정리</div>
+  <div class="s-title">남은 것과 한계</div>
+  <div class="s-sub">안 해본 것은 안 했다고 적는다.</div>
+  <div class="body">
+    <div class="grid g2">
+      <div class="card o">
+        <h4>지금 구성의 한계</h4>
+        <p class="why"><b>단일 Mac · 로컬 파일시스템 · 단일 노드 Trino.</b> 운영 환경이 아니다.</p>
+        <p class="why"><b>정적 배치 적재만</b> 했다. CDC·스트리밍은 이번 범위 밖이다.</p>
+        <p class="why"><b>추가(append) 전용</b>이라 삭제 파일, 파티션·스키마 진화는 경험하지 않았다.</p>
+        <p class="why">Superset에 1억 행 <b>Dataset·차트는 등록하지 않았다.</b> SQL Lab 조회만 확인했다.</p>
+      </div>
+      <div class="card b">
+        <h4>다음에 해볼 것</h4>
+        <p class="why"><b>S3 호환 객체 저장소로 전환</b> — 설계는 <span class="mono">docs/local-lakehouse-build-options.md</span>에 있고 실행 검증은 아직이다. 기존 <span class="mono">retail</span>은 그대로 두고 새 namespace에 적재한다.</p>
+        <p class="why"><b>카탈로그 교체 실험</b> — REST Catalog로 바꿔도 파일이 그대로인지 확인하면, “교체 가능하다”를 말이 아니라 증거로 보일 수 있다.</p>
+        <p class="why"><b>폐쇄망 이관 절차</b> — 이미지 반입과 사내 레지스트리 검토.</p>
+      </div>
+    </div>
+    <div class="banner">
+      <span class="ic">◆</span>
+      <span>모든 수치와 설정은 저장소에 기록으로 남아 있다
+      <small><span class="mono">evidence/</span> · <span class="mono">docs/</span> · <span class="mono">presentation/local-lakehouse-deck-plan.md</span> — 이 발표의 기획 문서와 출처 목록도 함께 커밋했다.</small></span>
+    </div>
+  </div>
+</section>
+</div><!-- /stage -->
+
+<div id="grid"></div>
+<div id="notes"></div>
+<div id="help">← → 이동 · O 개요 · F 전체화면 · S 노트</div>
+
+<script>
+(function(){
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total  = slides.length;
+  const bar    = document.getElementById('bar');
+  const grid   = document.getElementById('grid');
+  const notes  = document.getElementById('notes');
+  let cur = 0;
+
+  // 표지를 뺀 모든 슬라이드에 푸터를 자동으로 붙인다.
+  slides.forEach((s,i)=>{
+    if(s.classList.contains('cover')) return;
+    const f = document.createElement('div');
+    f.className = 'foot';
+    f.innerHTML = '<span>로컬 데이터 레이크하우스 구축 · 2026-10-12</span>'
+                + '<span class="num">'+(i+1)+' / '+total+'</span>';
+    if(s.classList.contains('divider')){
+      f.style.color='#6f8aa8'; f.style.borderTopColor='rgba(255,255,255,.18)';
+    }
+    s.appendChild(f);
+  });
+
+  function show(n){
+    cur = Math.max(0, Math.min(total-1, n));
+    slides.forEach((s,i)=>s.classList.toggle('active', i===cur));
+    bar.style.width = ((cur+1)/total*100)+'%';
+    const nt = slides[cur].dataset.notes || '';
+    notes.innerHTML = nt ? '<b>발표 노트 '+(cur+1)+'</b> · '+nt : '<b>발표 노트</b> · (없음)';
+    document.querySelectorAll('.thumb').forEach((t,i)=>t.classList.toggle('cur', i===cur));
+    try{ location.hash = cur+1; }catch(e){}
+  }
+
+  // 개요(격자) 모드 썸네일
+  slides.forEach((s,i)=>{
+    const d = document.createElement('div');
+    d.className = 'thumb' + (s.classList.contains('divider')||s.classList.contains('cover') ? ' sec' : '');
+    const eye = s.dataset.eyebrow || '';
+    const ttl = s.querySelector('.s-title, h1, .toc-row.on .t');
+    d.innerHTML = '<span class="tn">'+(i+1)+'</span>'
+                + (eye ? '<span class="te">'+eye+'</span>' : '')
+                + '<span class="tt">'+(ttl ? ttl.textContent.trim().slice(0,46) : '섹션')+'</span>';
+    d.onclick = ()=>{ document.body.classList.remove('overview'); show(i); };
+    grid.appendChild(d);
+  });
+
+  document.addEventListener('keydown', e=>{
+    const k = e.key;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '){ e.preventDefault(); show(cur+1); }
+    else if(k==='ArrowLeft'||k==='PageUp'){ e.preventDefault(); show(cur-1); }
+    else if(k==='Home'){ show(0); }
+    else if(k==='End'){ show(total-1); }
+    else if(k==='o'||k==='O'){ document.body.classList.toggle('overview'); }
+    else if(k==='s'||k==='S'){ notes.classList.toggle('on'); }
+    else if(k==='f'||k==='F'){
+      if(!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+      else document.exitFullscreen?.();
+    }
+    else if(k==='Escape'){ document.body.classList.remove('overview'); }
+  });
+
+  // 클릭: 오른쪽 2/3 다음, 왼쪽 1/3 이전
+  document.getElementById('stage').addEventListener('click', e=>{
+    show(e.clientX < window.innerWidth/3 ? cur-1 : cur+1);
+  });
+
+  const start = parseInt((location.hash||'').replace('#',''),10);
+  show(Number.isFinite(start) && start>0 ? start-1 : 0);
+})();
+</script>
+</body>
+</html>

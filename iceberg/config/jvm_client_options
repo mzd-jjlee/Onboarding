@@ -1,0 +1,4 @@
+-Xms256m
+-Xmx1536m
+-XX:+HeapDumpOnOutOfMemoryError
+-XX:HeapDumpPath=/tmp/seatunnel/dump

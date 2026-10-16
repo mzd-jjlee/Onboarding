@@ -1,210 +1,130 @@
-# 로컬 소규모 데이터 레이크 구성 옵션
+# 로컬 레이크하우스 구축 선택지: Trino·Superset 전환
 
-> **조사 원본 · 정정 안내 (2026-10-02):** 아래의 “Derby 동시 접속 1개” 설명은 오류다.
-> Hive REST의 버전·이미지 조건, `add_files` 파일 수명, unsafe guessing 설명도 보완이 필요하다.
-> [그림 중심 안내서 9절](local-lakehouse-visual-guide.md#9-기존-조사에서-확인한-내용과-정정할-내용)의 검증 결과를 우선한다.
-> 원래 조사와 정정 내용을 비교할 수 있도록 본문은 보존했다.
+개정일: 2026-10-06. [전체 구축 안내서](local-lakehouse-superset.md)를 먼저 읽는다.
+A안은 Trino 483으로 구현·조회 검증 완료했다. [실행 안내](trino-local-query.md)를 우선한다. B안의 S3 설정은 통합 실행 검증 전 설계 예시다.
 
-[iceberg-hive-duckdb-roles.md](iceberg-hive-duckdb-roles.md)에서 정리한 역할 분담을 전제로,
-**실제로 무엇을 띄우고 어떤 순서로 실습할지**에 대한 선택지를 비교한 문서다.
-아직 구현 전이며, 여기 적힌 설정값은 공식 문서 기준 초안이다(검증 필요 항목은 §5에 모아 뒀다).
+## 1. 고정할 것과 선택할 것
 
-## 1. 선택지 네 가지
+SeaTunnel Iceberg sink, Iceberg 테이블, Hive Metastore는 유지한다. 웹 조회는 Superset, SQL 엔진은 Trino로 정한다. Hive REST Catalog, PyIceberg `add_files()`, DuckLake는 이번 구축의 필수 단계가 아니다.
 
-| | 구성 | 띄워야 하는 것 | DuckDB 조회 경로 | 학습 가치 |
+| 선택지 | 저장소 | 장점 | 추가 검증/준비 | 선택 기준 |
 |---|---|---|---|---|
-| **Opt 1** | Iceberg(hadoop catalog) only | 없음 (디렉터리뿐) | `iceberg_scan('path')` 직결 | Iceberg 메타데이터 구조. Hive 역할은 안 보임 |
-| **Opt 2** | HMS(Thrift) + hadoop FS warehouse | HMS 컨테이너 1개 | PyIceberg 브릿지 / `hive_metastore` 익스텐션 | 카탈로그가 왜 필요한지 체감 |
-| **Opt 3** | Hive 4 HMS + Iceberg REST 서블릿 | HMS 컨테이너 1개(포트 2개) | `ATTACH (TYPE iceberg, ENDPOINT ...)` — 쓰기도 가능 | 현재 업계 표준 형태 |
-| **Opt 4** | DuckLake (대조군) | 없음 (SQLite/Postgres 카탈로그) | 네이티브 | "왜 이렇게 복잡한가"의 비교 기준 |
+| A. 기존 공유 디렉터리 | 호스트 `./lake` | 기존 파일·스냅샷 재사용, 서비스 추가 최소화 | Trino의 기존 `file:` URI 지원, 모든 노드의 `/lake` 마운트 | 먼저 작은 조회 시험 |
+| B. 로컬 S3 호환 저장소 | 로컬 객체 저장소 볼륨 | writer/reader가 공통 `s3://` URI 사용 | 저장소 서비스, bucket, S3FileIO 의존성, 새 적재 | A가 맞지 않거나 향후 다중 노드 구성을 고려할 때 |
 
-### 권장 경로: Opt 1 → Opt 2 → (여유 있으면) Opt 3
+B도 로컬 구축이다. MinIO 등 호환 저장소의 버전/이미지 배포 방식은 구현 시 확정하고 고정한다. S3 저장소가 HMS를 대체하지는 않는다. **HMS는 카탈로그, S3는 파일 저장소**다.
 
-Opt 1에서 **카탈로그 없이** 테이블이 성립하는 걸 먼저 보고,
-거기서 "동시 커밋이 되나? 다른 도구가 테이블 이름으로 찾을 수 있나?"라는 결핍을 직접 만난 뒤
-Opt 2에서 Hive를 넣는 순서가 가장 이해가 잘 된다. Opt 3은 DuckDB에서 **쓰기까지** 하고 싶을 때 필요하다.
+## 2. A안: 기존 writer 설정 유지
 
-## 2. 데이터가 들어가는 두 가지 방식
-
-### 방식 A — SeaTunnel은 parquet만 쓰고, PyIceberg가 메타데이터만 등록
-
-지금 하고 있는 `LocalFile` sink를 그대로 두고, Iceberg 테이블에 **파일을 복사 없이 등록**한다.
-
-```python
-from pyiceberg.catalog import load_catalog
-import pyarrow.parquet as pq
-
-catalog = load_catalog("local", **{
-    "type": "sql",                                   # 또는 "hive"
-    "uri": "sqlite:////lake/catalog.db",
-    "warehouse": "file:///lake/warehouse",
-})
-catalog.create_namespace_if_not_exists("retail")
-
-schema = pq.read_schema("/output/production_orders/part-0.parquet")
-tbl = catalog.create_table("retail.orders", schema=schema)   # Arrow 스키마로 생성
-tbl.add_files(["file:///output/production_orders/part-0.parquet"])  # 복사 없음, 메타만 커밋
-```
-
-`add_files()`의 제약 (실습 시 바로 걸리는 부분):
-
-- **parquet 스키마가 테이블 스키마와 정확히 일치**해야 한다. 그래서 위처럼 parquet에서 스키마를 읽어
-  테이블을 만드는 게 안전하다.
-- PyIceberg는 **마이크로초 정밀도까지만** 지원한다. 나노초 타임스탬프가 있으면 미리 변환해야 한다.
-- **한 파일이 여러 파티션에 걸쳐 있으면 안 된다.** 파티션 테이블로 만들려면 SeaTunnel 쪽에서
-  파티션 경계에 맞게 파일을 나눠 써야 한다.
-- 등록된 원본 파일은 **Iceberg가 관리하지 않는 위치**에 있다. 이후 `overwrite()` 같은 연산은
-  새 파일을 warehouse 안에 만들고, 원본은 활성 스냅샷에서 떨어져 나간다(orphan). 스냅샷 만료 시
-  정리 대상이 될 수 있다. → "외부 테이블"처럼 영구히 쓰는 용도로 착각하면 안 된다.
-
-**장점**: 각 레이어가 분리돼서 눈에 보인다. parquet은 그대로 두고 메타데이터만 얹는 걸 실감할 수 있다.
-SeaTunnel 쪽 설정을 전혀 안 바꿔도 된다.
-
-### 방식 B — SeaTunnel Iceberg sink로 직접 커밋
-
-SeaTunnel 2.3.13의 Iceberg sink는 hadoop/hive/rest/glue 카탈로그를 지원한다.
+[현재 SeaTunnel job](../jobs/01_orders_to_iceberg.conf)은 이미 다음 구성을 사용한다.
 
 ```hocon
 sink {
   Iceberg {
-    plugin_input = "production_orders_upper"
-    catalog_name = "local_lake"
+    catalog_name = "local_hive"
     iceberg.catalog.config = {
-      type = "hadoop"
+      type = "hive"
+      uri = "thrift://hms:9083"
       warehouse = "file:///lake/warehouse"
     }
     namespace = "retail"
     table = "orders"
     iceberg.table.write-props = {
       write.format.default = "parquet"
-      write.target-file-size-bytes = 536870912
     }
-    iceberg.table.partition-keys = "order_date"
-    iceberg.table.primary-keys = "order_id"
-    iceberg.table.upsert-mode-enabled = false
-    iceberg.table.schema-evolution-enabled = true
-    case_sensitive = true
+    schema_save_mode = "CREATE_SCHEMA_WHEN_NOT_EXIST"
+    data_save_mode = "APPEND_DATA"
   }
 }
 ```
 
-Hive 카탈로그로 바꿀 때는 `iceberg.catalog.config`만 교체한다:
+기존 namespace 준비 스크립트는 `retail`의 location을 `file:///lake/warehouse/retail.db`로 지정한다. SeaTunnel이 테이블을 생성하고 데이터를 쓴다. 기존 두 배치 실행을 완료했다면 재적재 없이 조회 계층만 추가한다.
+
+Trino 로컬 FS 설정과 `file:` URI 호환성 확인 절차는 [전체 안내서 4절](local-lakehouse-superset.md#4-먼저-결정할-것-기존-로컬-파일을-그대로-읽을-수-있는가)을 따른다. Trino 483에서도 현재 5건과 과거 스냅샷 조회에 성공했다.
+
+## 3. B안: 로컬 S3 호환 저장소 구성
+
+예시 이름은 저장소 서비스 `minio`, API `http://minio:9000`, bucket `lakehouse`, namespace `retail_s3`다. 모든 클라이언트가 같은 Docker 네트워크에서 해당 endpoint에 접근해야 한다.
+
+1. 저장소 서버에 영속 볼륨을 연결하고 서비스 준비 상태를 확인한다.
+2. 관리 도구로 `lakehouse` bucket을 먼저 생성하고 읽기/쓰기 가능한 실습 계정을 준비한다. bucket 생성은 Iceberg namespace 생성과 다르다.
+3. HMS에 **새 namespace `retail_s3`**를 만들고 location을 `s3://lakehouse/warehouse/retail_s3.db`로 지정한다. 기존 `retail`은 수정하지 않는다.
+4. SeaTunnel의 S3FileIO 및 AWS SDK 의존성을 준비하고 새 job으로 원본 5건을 한 번 적재한다.
+5. Trino에서 `iceberg.retail_s3.orders`를 읽은 뒤 Superset을 연결한다.
+
+namespace는 예를 들어 기존 `prepare_catalog.py`와 같은 HiveCatalog의 `create_namespace_if_not_exists` API로 만들 수 있다. 새 스크립트로 분리하고, 이미 namespace가 있다면 location도 조회해서 맞는지 확인한다. HMS가 생성 작업에서 S3 경로를 실제로 접근하려 한다면 HMS 측 파일시스템 설정/의존성도 준비해야 한다.
+
+### SeaTunnel Iceberg sink 설정 예시
 
 ```hocon
+# 새 job의 sink 예시. source는 기존 JDBC source를 사용하되,
+# 최초 5건 검증 시 batch_id 조건 없이 네 컬럼을 읽는다.
+sink {
+  Iceberg {
+    catalog_name = "local_hive_s3"
     iceberg.catalog.config = {
       type = "hive"
-      uri = "thrift://localhost:9083"
-      warehouse = "file:///lake/warehouse"
+      uri = "thrift://hms:9083"
+      warehouse = "s3://lakehouse/warehouse"
+      io-impl = "org.apache.iceberg.aws.s3.S3FileIO"
+      s3.endpoint = "http://minio:9000"
+      s3.path-style-access = "true"
+      s3.access-key-id = "<LOCAL_S3_ACCESS_KEY>"
+      s3.secret-access-key = "<LOCAL_S3_SECRET_KEY>"
+      client.region = "us-east-1"
     }
+    namespace = "retail_s3"
+    table = "orders"
+    iceberg.table.write-props = {
+      write.format.default = "parquet"
+    }
+    schema_save_mode = "CREATE_SCHEMA_WHEN_NOT_EXIST"
+    data_save_mode = "APPEND_DATA"
+  }
+}
 ```
 
-주의: 공식 예시의 hive 카탈로그는 warehouse가 `hdfs://`다. **로컬 `file://` warehouse + Thrift HMS
-조합은 문서에 예시가 없어서 직접 확인이 필요하다** — HMS 컨테이너와 SeaTunnel 컨테이너가 같은 경로를
-같은 내용으로 봐야 하므로, 두 컨테이너에 **동일한 호스트 디렉터리를 같은 경로로 마운트**하는 게 관건이다.
-(`/lake/warehouse`를 양쪽에 똑같이 마운트)
+`<...>`는 실제 설정을 주입하기 전의 자리표시자다. 커밋할 문서/job에 실제 키를 넣지 않는다. 원본 쿼리는 `select order_id, customer_name, amount, status from orders`다. 최초 적재가 성공했다면 반복 실행하지 않는다.
 
-**장점**: 실제 파이프라인의 모습. upsert, 스키마 진화, 파티셔닝을 SeaTunnel 설정만으로 쓸 수 있다.
-**단점**: 커넥터 jar/hadoop 의존성 문제로 처음에 막힐 가능성이 높고, 막혔을 때 어느 레이어 문제인지 가려내기 어렵다.
+이 설정은 SeaTunnel의 catalog 속성 전달과 Iceberg S3FileIO 구성을 조합한 설계다. **현재 이미지에 필요한 S3 JAR가 모두 있다는 뜻은 아니다.** 기존 실행 기록의 Iceberg 버전은 1.6.1이다. 그 버전과 맞는 Iceberg AWS/S3FileIO 및 AWS SDK 의존성을 선택하고 SeaTunnel Zeta 커넥터의 클래스 로딩 경로에서 검증한다. Flink용 JAR 설치 지침을 Zeta에 그대로 적용하지 않는다. [SeaTunnel sink](https://seatunnel.apache.org/docs/2.3.13/connectors/sink/Iceberg/), [Iceberg 1.6.1 AWS/S3FileIO](https://iceberg.apache.org/docs/1.6.1/aws/)
 
-→ 그래서 **A로 개념을 확인한 뒤 B로 넘어가는 순서**를 권한다.
+### Trino의 같은 저장소 연결
 
-## 3. Hive Metastore를 로컬에 띄우는 방법
+다음은 Trino 483 공식 문서 기준 속성명이다. 다른 버전이면 해당 버전 문서를 확인한다.
 
-### 가장 가벼운 선택: standalone metastore (embedded Derby + 로컬 FS)
-
-```bash
-docker run -p 9083:9083 \
-  -v /lake/warehouse:/lake/warehouse \
-  ghcr.io/criccomini/hive-metastore-standalone:latest
+```properties
+# /etc/trino/catalog/iceberg.properties
+connector.name=iceberg
+iceberg.catalog.type=hive_metastore
+hive.metastore.uri=thrift://hms:9083
+iceberg.security=READ_ONLY
+fs.s3.enabled=true
+s3.endpoint=http://minio:9000
+s3.region=us-east-1
+s3.path-style-access=true
+s3.aws-access-key=${ENV:LAKEHOUSE_S3_ACCESS_KEY}
+s3.aws-secret-key=${ENV:LAKEHOUSE_S3_SECRET_KEY}
 ```
 
-이 이미지는 Hive Metastore를 standalone 모드로, 백엔드 DB는 **임베디드 Derby**,
-파일시스템은 **로컬 FS**로 설정해 둔 것이다. 다른 컨테이너(HDFS 등) 없이 단독 실행된다.
+Trino 컨테이너에 위 환경변수를 전달한다. SeaTunnel의 `s3.access-key-id`와 Trino의 `s3.aws-access-key`처럼 같은 목적의 설정도 이름이 다르다. Trino는 저장소에서 직접 파일을 읽으므로 자체 자격증명이 필요하다. Superset은 Trino에 연결하므로 레이크 마운트나 S3 키가 필요 없다. [Trino S3 설정](https://trino.io/docs/current/object-storage/file-system-s3.html)
 
-**가장 중요한 제약: Derby는 동시 접속이 1개뿐이다.** 즉 SeaTunnel이 붙어 있는 동안
-PyIceberg가 동시에 붙으면 실패한다. 실습 중 "순차적으로 쓰고 → 조회"하는 흐름이면 괜찮지만,
-동시 접속을 보려면 백엔드를 **Postgres로 바꿔야** 한다 (이 저장소에는 이미 Postgres compose가 있어서 재활용 가능).
+### 데이터 전환 시 지킬 경계
 
-> 참고: 동시 커밋 충돌(compare-and-swap 재시도)을 눈으로 확인하는 게 이 실습의 하이라이트가 될 수 있는데,
-> **그걸 보려면 Derby가 아니라 Postgres 백엔드가 필요하다.**
+새 warehouse 설정은 기존 파일을 자동 복사하지 않고, 기존 metadata 내부 URI도 바꾸지 않는다. 새 테이블을 만들고 원본에서 재적재하는 방식은 현재 행을 재현하지만 원래 snapshot ID와 과거 이력을 보존하지 않는다. 원본 5건을 한 번에 적재했다면 새 테이블의 데이터 스냅샷 수가 기존 두 배치의 2개와 달라도 정상이다.
 
-### Opt 3: Hive 4 + REST 서블릿
+## 4. 구현 시 추가할 파일 목록
 
-Hive 4 공식 이미지(`apache/hive:4.x`)에서 `metastore.catalog.servlet.port`를 켜면
-REST 카탈로그가 뜬다. 공식 이미지 기본값은 **9001**이고 클라이언트 URL은 `http://localhost:9001/iceberg/v1/`.
-테스트 목적이면 인증을 `none` 또는 `simple`(`x-actor-username` 헤더)로 둘 수 있다
-— 둘 다 공식 문서가 **production 부적합**으로 명시한 모드다.
+아래 목록 중 Trino Compose·catalog·서버 설정은 구현 완료했다. Superset도 구현 완료했다 ([실행 안내](superset-local-ui.md)). B안 S3 관련 파일은 후속 제안이다.
 
-이러면 DuckDB에서:
+| 제안 파일/구성 | 목적 |
+|---|---|
+| `compose.analytics.yaml` | Trino, Superset, Superset DB를 기존 네트워크에 추가 |
+| `config/trino/catalog/iceberg.properties` | HMS와 선택한 저장소 연결 |
+| Trino 서버 설정 | 단일 coordinator/worker 구성, 메모리·HTTP 포트 |
+| `config/Dockerfile.superset` | 선택한 Superset 버전 + Trino/PostgreSQL 드라이버 |
+| `config/superset_config.py` | Superset 전용 메타데이터 DB와 SECRET_KEY |
+| Superset 초기화 절차 | DB 마이그레이션, 관리자, 권한 초기화 |
+| S3 서버·bucket 초기화 및 SeaTunnel 파생 이미지(B안) | 저장소와 writer 의존성 준비 |
+| S3 전용 namespace 준비·적재 job(B안) | 기존 테이블을 보존하며 새 테이블 적재 |
 
-```sql
-ATTACH 'warehouse' AS lake (TYPE iceberg, ENDPOINT 'http://localhost:9001/iceberg');
-SELECT * FROM lake.retail.orders;
-```
-
-DuckDB 문서는 "일부 카탈로그가 REST 스펙을 부분 구현해서 호환 옵션이 필요할 수 있다"고 언급한다.
-Hive의 REST 구현이 DuckDB가 기대하는 범위를 커버하는지는 **직접 붙여 봐야 안다** (§5).
-
-### 대안: HMS를 아예 건너뛰고 Lakekeeper/Polaris
-
-DuckDB 문서가 지원을 명시한 REST 카탈로그 구현체(Lakekeeper, Apache Polaris 등)를 쓰면
-"DuckDB ↔ REST 카탈로그"는 거의 확실히 동작한다. 다만 그러면 **Hive를 쓰는 실습이 아니게 된다.**
-목적이 "Hive의 역할 이해"라면 Opt 2/3을, "Iceberg 레이크하우스를 빠르게 동작시키기"라면 이쪽을 고르면 된다.
-
-## 4. 디렉터리/구성 초안
-
-```
-iceberg/
-├── docs/
-│   ├── iceberg-hive-duckdb-roles.md          # 역할·개념 (작성 완료)
-│   └── local-lakehouse-build-options.md      # 이 문서
-├── docker-compose.hms.yml                    # Hive Metastore (+ 백엔드 DB)
-├── jobs/
-│   ├── 01_postgres_to_parquet.conf           # 방식 A: 기존 LocalFile sink 재사용
-│   └── 02_postgres_to_iceberg.conf           # 방식 B: Iceberg sink
-├── src/
-│   ├── register_parquet.py                   # PyIceberg add_files()
-│   └── query_duckdb.py                       # DuckDB 조회 (경로 4가지 비교)
-├── notebooks/
-│   └── explore_metadata.ipynb                # metadata.json / manifest 직접 열어보기
-├── lake/
-│   └── warehouse/                            # Iceberg warehouse (gitignore)
-└── scripts/{up.sh,down.sh}
-```
-
-`lake/warehouse`는 **HMS 컨테이너·SeaTunnel 컨테이너·호스트에서 모두 같은 절대 경로로 보이게**
-마운트해야 한다. Iceberg 메타데이터에 데이터 파일의 **절대 경로가 박히기 때문**이다
-(경로가 달라지면 `allow_moved_paths` 같은 우회 옵션이 필요해진다).
-
-Airflow로 파이프라인을 묶을 경우, DAG는 `~/projects/.claude/rules/dag-style.md` 규칙에 따라
-TaskFlow API로 작성하고 `add_files` 등록/검증 로직은 `src/` 모듈로 분리한다.
-
-## 5. 구현 전에 검증해야 할 미확인 사항
-
-문서 근거로는 성립하지만 **실제로 붙여 봐야 확정되는** 항목들이다. 실습 순서를 정할 때 리스크로 반영한다.
-
-1. **DuckDB `iceberg` ATTACH ↔ Hive 4 REST 카탈로그 호환성.**
-   DuckDB가 공식 지원 목록에 Hive를 올려두지 않았고, REST 스펙 부분 구현 시 호환 옵션이 필요하다고만 적혀 있다.
-   → Opt 3의 성패가 여기 달려 있다. 안 되면 Opt 2(PyIceberg 브릿지)로 폴백.
-2. **SeaTunnel Zeta 엔진에서 Iceberg 커넥터의 jar 의존성.**
-   공식 문서의 의존성 안내는 Flink 엔진 기준(`hive-exec`, `libfb303`)이다. Zeta에서 hive 카탈로그를 쓸 때
-   필요한 플러그인/jar 배치가 문서에 명확하지 않다. → hadoop 카탈로그부터 시작하는 편이 안전.
-3. **SeaTunnel Iceberg sink + 로컬 `file://` warehouse + Thrift HMS** 조합의 동작.
-   공식 hive 예시는 HDFS warehouse뿐이다.
-4. **`add_files()`로 등록한 파일의 수명.** 이후 Iceberg 쓰기 연산이 들어오면 orphan이 되는 동작을
-   실제로 확인해 두면, "외부 parquet 등록"을 어디까지 믿을 수 있는지 판단 기준이 생긴다.
-5. **Derby 단일 접속 제약.** 동시 writer 실험을 하려면 백엔드를 Postgres로 교체해야 한다.
-6. **`unsafe_enable_version_guessing` 없이 `iceberg_scan`이 되는지.**
-   hadoop catalog는 `version-hint.text`를 쓰므로 될 가능성이 높지만, HMS 카탈로그로 만든 테이블은
-   version hint 파일이 없어서 guessing이 필요할 수 있다.
-
-## 출처
-
-- [DuckDB — Iceberg Extension](https://duckdb.org/docs/current/core_extensions/iceberg/overview), [Catalogs](https://duckdb.org/docs/current/core_extensions/iceberg/catalogs), [REST Catalogs](https://duckdb.org/docs/lts/core_extensions/iceberg/iceberg_rest_catalogs)
-- [DuckDB Community Extension — hive_metastore](https://duckdb.org/community_extensions/extensions/hive_metastore)
-- [Apache Hive — Iceberg REST Catalog API](https://hive.apache.org/docs/latest/admin/iceberg-rest-catalog/)
-- [Apache SeaTunnel 2.3.13 — Iceberg Sink](https://seatunnel.apache.org/docs/2.3.13/connectors/sink/Iceberg/)
-- [hive-metastore-standalone (Docker, embedded Derby + local FS)](https://github.com/criccomini/hive-metastore-standalone)
-- [Registering Parquet Files Into Iceberg Tables Without Rewrites Using PyIceberg](https://binayakd.tech/posts/2024-12-25-register-parquet-files-to-iceberg-without-rewrites/)
-- [PyIceberg API](https://py.iceberg.apache.org/api/)
-- [Iceberg REST Catalog with Hive Metastore](https://kevinjqliu.substack.com/p/iceberg-rest-catalog-with-hive-metastore)
+실제 구현 후에는 고정한 이미지/패키지 버전, startup 명령, Trino 결과, Superset 화면 및 재시작 결과를 별도 실행 기록으로 남긴다.

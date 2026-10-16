@@ -1,0 +1,21 @@
+ namespace | table_name |            PARAM_KEY            |                                                                                                                                                                       PARAM_VALUE                                                                                                                                                                       
+-----------+------------+---------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ retail    | orders     | comment                         | 
+ retail    | orders     | current-schema                  | {"type":"struct","schema-id":0,"identifier-field-ids":[1],"fields":[{"id":1,"name":"order_id","required":true,"type":"long"},{"id":2,"name":"customer_name","required":false,"type":"string"},{"id":3,"name":"amount","required":false,"type":"int"},{"id":4,"name":"status","required":false,"type":"string"}]}
+ retail    | orders     | current-snapshot-id             | 7763263029727631105
+ retail    | orders     | current-snapshot-summary        | {"added-data-files":"1","added-records":"2","added-files-size":"1196","changed-partition-count":"1","total-records":"5","total-files-size":"2460","total-data-files":"2","total-delete-files":"0","total-position-deletes":"0","total-equality-deletes":"0","iceberg-version":"Apache Iceberg 1.6.1 (commit 8e9d59d299be42b0bca9461457cd1e95dbaad086)"}
+ retail    | orders     | current-snapshot-timestamp-ms   | 1790922936621
+ retail    | orders     | DO_NOT_UPDATE_STATS             | true
+ retail    | orders     | EXTERNAL                        | TRUE
+ retail    | orders     | metadata_location               | file:/lake/warehouse/retail.db/orders/metadata/00002-90bf61b9-0378-48e1-8388-342257e85b94.metadata.json
+ retail    | orders     | numFiles                        | 2
+ retail    | orders     | numRows                         | 5
+ retail    | orders     | previous_metadata_location      | file:/lake/warehouse/retail.db/orders/metadata/00001-d6996a52-f932-4bb9-b776-daf1321dcfb4.metadata.json
+ retail    | orders     | snapshot-count                  | 2
+ retail    | orders     | table_type                      | ICEBERG
+ retail    | orders     | totalSize                       | 2460
+ retail    | orders     | transient_lastDdlTime           | 1790922596
+ retail    | orders     | uuid                            | 1cce93aa-ccd6-4213-befc-4f429e63f6e8
+ retail    | orders     | write.parquet.compression-codec | zstd
+(17 rows)
+

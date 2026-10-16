@@ -1,0 +1,88 @@
+{
+  "result": [
+    {
+      "cache_key": "539c67052621f80cd711c00fc2de7bbb",
+      "cached_dttm": null,
+      "cache_timeout": 60,
+      "applied_template_filters": [],
+      "annotation_data": {},
+      "error": null,
+      "is_cached": null,
+      "query": "SELECT order_id AS order_id, customer_name AS customer_name, amount AS amount, status AS status \nFROM iceberg.retail.orders GROUP BY order_id, customer_name, amount, status ORDER BY order_id ASC\nLIMIT 100;\n\n",
+      "status": "success",
+      "stacktrace": null,
+      "rowcount": 5,
+      "sql_rowcount": 5,
+      "from_dttm": null,
+      "to_dttm": null,
+      "label_map": {
+        "order_id": [
+          "order_id"
+        ],
+        "customer_name": [
+          "customer_name"
+        ],
+        "amount": [
+          "amount"
+        ],
+        "status": [
+          "status"
+        ]
+      },
+      "colnames": [
+        "order_id",
+        "customer_name",
+        "amount",
+        "status"
+      ],
+      "indexnames": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "coltypes": [
+        0,
+        1,
+        0,
+        1
+      ],
+      "data": [
+        {
+          "order_id": 1001,
+          "customer_name": "Alice",
+          "amount": 12000,
+          "status": "NEW"
+        },
+        {
+          "order_id": 1002,
+          "customer_name": "Bob",
+          "amount": 23000,
+          "status": "DONE"
+        },
+        {
+          "order_id": 1003,
+          "customer_name": "Carol",
+          "amount": 34000,
+          "status": "DONE"
+        },
+        {
+          "order_id": 1004,
+          "customer_name": "Dave",
+          "amount": 45000,
+          "status": "NEW"
+        },
+        {
+          "order_id": 1005,
+          "customer_name": "Eve",
+          "amount": 56000,
+          "status": "DONE"
+        }
+      ],
+      "result_format": "json",
+      "applied_filters": [],
+      "rejected_filters": []
+    }
+  ]
+}

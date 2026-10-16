@@ -1,0 +1,88 @@
+# 기존 Compose와 함께 사용: docker compose -f compose.yaml -f compose.analytics.yaml ...
+services:
+  trino:
+    image: trinodb/trino:483
+    # Mac에서는 localhost:8081, 같은 Docker 네트워크에서는 trino:8080으로 접속한다.
+    ports:
+      - "127.0.0.1:8081:8080"
+    mem_limit: 2g
+    volumes:
+      - ./config/trino:/etc/trino:ro
+      # metadata/manifest에 기록된 기존 /lake 절대 경로를 그대로 사용한다.
+      - ./lake:/lake:ro
+    depends_on:
+      hms:
+        condition: service_started
+    healthcheck:
+      test: [CMD-SHELL, "curl -fsS http://localhost:8080/v1/info | grep -q '\"starting\":false'"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 30s
+
+  # Superset의 사용자·연결·차트 저장소. HMS catalog-db와 독립된 DB/볼륨이다.
+  superset-db:
+    image: postgres:16
+    env_file:
+      - path: .env.superset
+        required: false
+    volumes:
+      - superset-db:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U superset -d superset]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  superset-init:
+    image: iceberg-superset:6.0.0
+    build:
+      context: .
+      dockerfile: config/Dockerfile.superset
+    profiles: [tools]
+    env_file:
+      - path: .env.superset
+        required: false
+    environment:
+      SUPERSET_CONFIG_PATH: /app/local-config/superset_config.py
+    volumes:
+      - ./config/superset:/app/local-config:ro
+      - ./scripts:/lab/scripts:ro
+    command: [bash, /lab/scripts/superset-init.sh]
+    depends_on:
+      superset-db:
+        condition: service_healthy
+
+  superset:
+    image: iceberg-superset:6.0.0
+    build:
+      context: .
+      dockerfile: config/Dockerfile.superset
+    env_file:
+      - path: .env.superset
+        required: false
+    environment:
+      SUPERSET_CONFIG_PATH: /app/local-config/superset_config.py
+    # 동기 SQL Lab과 차트를 사용하는 로컬 구성. 별도 worker는 필요하지 않다.
+    command: [gunicorn, --bind, '0.0.0.0:8088', --workers, '1', --threads, '4', --worker-class, gthread, --timeout, '120', 'superset.app:create_app()']
+    ports:
+      - "127.0.0.1:8088:8088"
+    volumes:
+      - ./config/superset:/app/local-config:ro
+      - ./scripts:/lab/scripts:ro
+      - ./evidence/superset:/lab/evidence
+    mem_limit: 2g
+    depends_on:
+      superset-db:
+        condition: service_healthy
+      trino:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, curl, -fsS, 'http://localhost:8088/health']
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 30s
+
+volumes:
+  superset-db:

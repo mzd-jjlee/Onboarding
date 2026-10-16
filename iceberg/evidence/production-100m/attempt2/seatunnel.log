@@ -1,0 +1,449 @@
+time="2026-10-08T10:31:48+09:00" level=warning msg="Found orphan containers (iceberg-learning-production-100m, iceberg-learning-batch-2, iceberg-learning-batch-1-final, iceberg-learning-batch-1-retry, iceberg-learning-batch-1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Container iceberg-learning-production-100m-append Creating 
+ Container iceberg-learning-production-100m-append Created 
+2026-10-08 01:31:49,195 INFO  [c.h.i.c.AbstractConfigLocator ] [main] - Loading configuration '/opt/seatunnel/config/seatunnel.yaml' from System property 'seatunnel.config'
+2026-10-08 01:31:49,197 INFO  [c.h.i.c.AbstractConfigLocator ] [main] - Using configuration file at /opt/seatunnel/config/seatunnel.yaml
+2026-10-08 01:31:49,200 INFO  [o.a.s.e.c.c.SeaTunnelConfig   ] [main] - seatunnel.home is /opt/seatunnel
+2026-10-08 01:31:49,258 INFO  [amlSeaTunnelDomConfigProcessor] [main] - Dynamic slot is enabled, the schedule strategy is set to REJECT
+2026-10-08 01:31:49,259 INFO  [c.h.i.c.AbstractConfigLocator ] [main] - Loading configuration '/opt/seatunnel/config/hazelcast.yaml' from System property 'hazelcast.config'
+2026-10-08 01:31:49,259 INFO  [c.h.i.c.AbstractConfigLocator ] [main] - Using configuration file at /opt/seatunnel/config/hazelcast.yaml
+2026-10-08 01:31:49,422 INFO  [c.h.i.c.AbstractConfigLocator ] [main] - Loading configuration '/opt/seatunnel/config/hazelcast-client.yaml' from System property 'hazelcast.client.config'
+2026-10-08 01:31:49,422 INFO  [c.h.i.c.AbstractConfigLocator ] [main] - Using configuration file at /opt/seatunnel/config/hazelcast-client.yaml
+2026-10-08 01:31:49,457 WARN  [c.h.i.AddressPicker           ] [main] - [LOCAL] [seatunnel-728620] [5.1] You configured your member address as host name. Please be aware of that your dns can be spoofed. Make sure that your dns configurations are correct.
+2026-10-08 01:31:49,457 INFO  [c.h.i.AddressPicker           ] [main] - [LOCAL] [seatunnel-728620] [5.1] Resolving domain name 'localhost' to address(es): [127.0.0.1, 0:0:0:0:0:0:0:1]
+2026-10-08 01:31:49,458 INFO  [c.h.i.AddressPicker           ] [main] - [LOCAL] [seatunnel-728620] [5.1] Interfaces is disabled, trying to pick one address from TCP-IP config addresses: [localhost/127.0.0.1, localhost/0:0:0:0:0:0:0:1]
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+2026-10-08 01:31:49,787 INFO  [o.a.s.e.s.SeaTunnelServer     ] [main] - SeaTunnel server start...
+2026-10-08 01:31:49,789 INFO  [c.h.system                    ] [main] - [localhost]:5801 [seatunnel-728620] [5.1] Based on Hazelcast IMDG version: 5.1.0 (20220228 - 21f20e7)
+2026-10-08 01:31:49,789 INFO  [c.h.system                    ] [main] - [localhost]:5801 [seatunnel-728620] [5.1] Cluster name: seatunnel-728620
+2026-10-08 01:31:49,789 INFO  [c.h.system                    ] [main] - [localhost]:5801 [seatunnel-728620] [5.1] 
+                                                         
+ _____               _____                             _ 
+/  ___|             |_   _|                           | |
+\ `--.   ___   __ _   | |   _   _  _ __   _ __    ___ | |
+ `--. \ / _ \ / _` |  | |  | | | || '_ \ | '_ \  / _ \| |
+/\__/ /|  __/| (_| |  | |  | |_| || | | || | | ||  __/| |
+\____/  \___| \__,_|  \_/   \__,_||_| |_||_| |_| \___||_|
+                                                         
+
+2026-10-08 01:31:49,789 INFO  [c.h.system                    ] [main] - [localhost]:5801 [seatunnel-728620] [5.1] Copyright © 2021-2024 The Apache Software Foundation. Apache SeaTunnel, SeaTunnel, and its feather logo are trademarks of The Apache Software Foundation.
+2026-10-08 01:31:49,789 INFO  [c.h.system                    ] [main] - [localhost]:5801 [seatunnel-728620] [5.1] Integrity Checker is disabled. Fail-fast on corrupted executables will not be performed.
+To enable integrity checker do one of the following: 
+  - Change member config using Java API: config.setIntegrityCheckerEnabled(true);
+  - Change XML/YAML configuration property: Set hazelcast.integrity-checker.enabled to true
+  - Add system property: -Dhz.integritychecker.enabled=true (for Hazelcast embedded, works only when loading config via Config.load)
+  - Add environment variable: HZ_INTEGRITYCHECKER_ENABLED=true (recommended when running container image. For Hazelcast embedded, works only when loading config via Config.load)
+2026-10-08 01:31:49,791 INFO  [c.h.system                    ] [main] - [localhost]:5801 [seatunnel-728620] [5.1] The Jet engine is disabled.
+To enable the Jet engine on the members, do one of the following:
+  - Change member config using Java API: config.getJetConfig().setEnabled(true)
+  - Change XML/YAML configuration property: Set hazelcast.jet.enabled to true
+  - Add system property: -Dhz.jet.enabled=true (for Hazelcast embedded, works only when loading config via Config.load)
+  - Add environment variable: HZ_JET_ENABLED=true (recommended when running container image. For Hazelcast embedded, works only when loading config via Config.load)
+2026-10-08 01:31:50,003 INFO  [c.h.s.security                ] [main] - [localhost]:5801 [seatunnel-728620] [5.1] Enable DEBUG/FINE log level for log category com.hazelcast.system.security  or use -Dhazelcast.security.recommendations system property to see 🔒 security recommendations and the status of current config.
+2026-10-08 01:31:50,075 INFO  [o.a.s.e.s.SeaTunnelNodeContext] [main] - Using LiteNodeDropOutTcpIpJoiner TCP/IP discovery
+2026-10-08 01:31:50,076 WARN  [c.h.c.CPSubsystem             ] [main] - [localhost]:5801 [seatunnel-728620] [5.1] CP Subsystem is not enabled. CP data structures will operate in UNSAFE mode! Please note that UNSAFE mode will not provide strong consistency guarantees.
+2026-10-08 01:31:50,176 INFO  [.c.c.DefaultClassLoaderService] [main] - start classloader service with cache mode
+2026-10-08 01:31:50,180 INFO  [c.h.i.c.AbstractConfigLocator ] [main] - Loading configuration '/opt/seatunnel/config/seatunnel.yaml' from System property 'seatunnel.config'
+2026-10-08 01:31:50,180 INFO  [c.h.i.c.AbstractConfigLocator ] [main] - Using configuration file at /opt/seatunnel/config/seatunnel.yaml
+2026-10-08 01:31:50,183 INFO  [amlSeaTunnelDomConfigProcessor] [main] - Dynamic slot is enabled, the schedule strategy is set to REJECT
+2026-10-08 01:31:50,183 INFO  [c.h.i.c.AbstractConfigLocator ] [main] - Loading configuration '/opt/seatunnel/config/hazelcast.yaml' from System property 'hazelcast.config'
+2026-10-08 01:31:50,183 INFO  [c.h.i.c.AbstractConfigLocator ] [main] - Using configuration file at /opt/seatunnel/config/hazelcast.yaml
+2026-10-08 01:31:50,189 WARN  [o.a.s.e.s.TaskExecutionService] [pool-3-thread-1] - [localhost]:5801 [seatunnel-728620] [5.1] The Node is not ready yet, Node state STARTING,looking forward to the next scheduling
+2026-10-08 01:31:50,189 INFO  [o.a.s.e.s.TaskExecutionService] [main] - [localhost]:5801 [seatunnel-728620] [5.1] Created new BusWork : 927369095
+2026-10-08 01:31:50,195 WARN  [a.s.e.s.s.s.DefaultSlotService] [hz.main.seaTunnel.slotService.thread] - failed send heartbeat to resource manager, will retry later. this address: [localhost]:5801
+2026-10-08 01:31:50,197 INFO  [o.a.s.e.s.CoordinatorService  ] [main] - [localhost]:5801 [seatunnel-728620] [5.1] Start pending job schedule thread
+2026-10-08 01:31:50,311 WARN  [o.a.h.u.NativeCodeLoader      ] [main] - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2026-10-08 01:31:50,397 INFO  [o.a.s.e.s.CoordinatorService  ] [pool-7-thread-1] - [localhost]:5801 [seatunnel-728620] [5.1] 
+***********************************************
+     CoordinatorService Thread Pool Status
+***********************************************
+activeCount               :                   1
+corePoolSize              :                  10
+maximumPoolSize           :          2147483647
+poolSize                  :                   1
+completedTaskCount        :                   0
+taskCount                 :                   1
+***********************************************
+
+2026-10-08 01:31:50,402 INFO  [o.a.s.e.s.JettyService        ] [main] - SeaTunnel REST service will start on port 8080
+2026-10-08 01:31:50,409 INFO  [o.a.s.s.o.e.j.u.log           ] [main] - Logging initialized @1541ms to org.apache.seatunnel.shade.org.eclipse.jetty.util.log.Slf4jLog
+2026-10-08 01:31:50,443 WARN  [a.s.s.o.e.j.s.h.ContextHandler] [main] - Empty contextPath
+2026-10-08 01:31:50,465 INFO  [o.a.s.s.o.e.j.s.Server        ] [main] - jetty-9.4.56.v20240826; built: 2024-08-26T17:15:05.868Z; git: ec6782ff5ead824dabdcf47fa98f90a4aedff401; jvm 1.8.0_342-b07
+2026-10-08 01:31:50,479 INFO  [o.a.s.s.o.e.j.s.session       ] [main] - DefaultSessionIdManager workerName=node0
+2026-10-08 01:31:50,479 INFO  [o.a.s.s.o.e.j.s.session       ] [main] - No SessionScavenger set, using defaults
+2026-10-08 01:31:50,480 INFO  [o.a.s.s.o.e.j.s.session       ] [main] - node0 Scavenging every 660000ms
+2026-10-08 01:31:50,577 INFO  [a.s.s.o.e.j.s.h.ContextHandler] [main] - Started o.a.s.s.o.e.j.s.ServletContextHandler@1cbc1dde{/,null,AVAILABLE}
+2026-10-08 01:31:50,583 INFO  [.s.s.o.e.j.s.AbstractConnector] [main] - Started ServerConnector@7a6ea47d{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-10-08 01:31:50,583 INFO  [o.a.s.s.o.e.j.s.Server        ] [main] - Started @1715ms
+2026-10-08 01:31:50,605 INFO  [c.h.i.d.Diagnostics           ] [main] - [localhost]:5801 [seatunnel-728620] [5.1] Diagnostics disabled. To enable add -Dhazelcast.diagnostics.enabled=true to the JVM arguments.
+2026-10-08 01:31:50,609 INFO  [c.h.c.LifecycleService        ] [main] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5801 is STARTING
+2026-10-08 01:31:50,634 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-5] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5825 is added to the blacklist.
+2026-10-08 01:31:50,635 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-10] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5804 is added to the blacklist.
+2026-10-08 01:31:50,635 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-7] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5813 is added to the blacklist.
+2026-10-08 01:31:50,635 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-10] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5824 is added to the blacklist.
+2026-10-08 01:31:50,635 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-5] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5826 is added to the blacklist.
+2026-10-08 01:31:50,635 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-7] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5814 is added to the blacklist.
+2026-10-08 01:31:50,635 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-10] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5812 is added to the blacklist.
+2026-10-08 01:31:50,635 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-5] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5818 is added to the blacklist.
+2026-10-08 01:31:50,635 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-9] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5806 is added to the blacklist.
+2026-10-08 01:31:50,635 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-2] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5817 is added to the blacklist.
+2026-10-08 01:31:50,635 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-10] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5807 is added to the blacklist.
+2026-10-08 01:31:50,635 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-5] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5805 is added to the blacklist.
+2026-10-08 01:31:50,635 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-16] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5820 is added to the blacklist.
+2026-10-08 01:31:50,635 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-2] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5809 is added to the blacklist.
+2026-10-08 01:31:50,635 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-16] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5803 is added to the blacklist.
+2026-10-08 01:31:50,636 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-4] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5827 is added to the blacklist.
+2026-10-08 01:31:50,636 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-12] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5808 is added to the blacklist.
+2026-10-08 01:31:50,636 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-14] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5802 is added to the blacklist.
+2026-10-08 01:31:50,635 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-7] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5816 is added to the blacklist.
+2026-10-08 01:31:50,635 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-5] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5828 is added to the blacklist.
+2026-10-08 01:31:50,635 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-9] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5811 is added to the blacklist.
+2026-10-08 01:31:50,636 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-8] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5819 is added to the blacklist.
+2026-10-08 01:31:50,636 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-13] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5829 is added to the blacklist.
+2026-10-08 01:31:50,636 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-3] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5823 is added to the blacklist.
+2026-10-08 01:31:50,637 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-15] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5822 is added to the blacklist.
+2026-10-08 01:31:50,637 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-6] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5815 is added to the blacklist.
+2026-10-08 01:31:50,637 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-10] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5830 is added to the blacklist.
+2026-10-08 01:31:50,638 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-1] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5821 is added to the blacklist.
+2026-10-08 01:31:50,638 INFO  [s.j.LiteNodeDropOutTcpIpJoiner] [hz.main.cached.thread-11] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5810 is added to the blacklist.
+2026-10-08 01:31:51,634 INFO  [c.h.i.c.ClusterService        ] [main] - [localhost]:5801 [seatunnel-728620] [5.1] 
+
+Members {size:1, ver:1} [
+	Member [localhost]:5801 - e3af21a8-74f7-4a07-8964-c824c6681b6d [master node] [active master] this
+]
+
+2026-10-08 01:31:51,642 INFO  [c.h.c.LifecycleService        ] [main] - [localhost]:5801 [seatunnel-728620] [5.1] [localhost]:5801 is STARTED
+2026-10-08 01:31:51,656 INFO  [.h.i.p.i.PartitionStateManager] [hz.main.cached.thread-4] - [localhost]:5801 [seatunnel-728620] [5.1] Initializing cluster partition table arrangement...
+2026-10-08 01:31:51,665 INFO  [.c.i.s.ClientInvocationService] [main] - hz.client_1 [seatunnel-728620] [5.1] Running with 2 response threads, dynamic=true
+2026-10-08 01:31:51,672 INFO  [c.h.c.LifecycleService        ] [main] - hz.client_1 [seatunnel-728620] [5.1] HazelcastClient 5.1 (20220228 - 21f20e7) is STARTING
+2026-10-08 01:31:51,673 INFO  [c.h.c.LifecycleService        ] [main] - hz.client_1 [seatunnel-728620] [5.1] HazelcastClient 5.1 (20220228 - 21f20e7) is STARTED
+2026-10-08 01:31:51,677 INFO  [.c.i.c.ClientConnectionManager] [main] - hz.client_1 [seatunnel-728620] [5.1] Trying to connect to cluster: seatunnel-728620
+2026-10-08 01:31:51,677 INFO  [.c.i.c.ClientConnectionManager] [main] - hz.client_1 [seatunnel-728620] [5.1] Trying to connect to [localhost]:5801
+2026-10-08 01:31:51,687 INFO  [.p.t.AuthenticationMessageTask] [hz.main.priority-generic-operation.thread-0] - [localhost]:5801 [seatunnel-728620] [5.1] Received auth from Connection[id=1, /127.0.0.1:5801->/127.0.0.1:51749, qualifier=null, endpoint=[127.0.0.1]:51749, remoteUuid=1d7eaaa7-a866-44ef-a0fc-77ffd893a407, alive=true, connectionType=JVM, planeIndex=-1], successfully authenticated, clientUuid: 1d7eaaa7-a866-44ef-a0fc-77ffd893a407, client name: hz.client_1, client version: 5.1
+2026-10-08 01:31:51,690 INFO  [c.h.c.LifecycleService        ] [main] - hz.client_1 [seatunnel-728620] [5.1] HazelcastClient 5.1 (20220228 - 21f20e7) is CLIENT_CONNECTED
+2026-10-08 01:31:51,690 INFO  [.c.i.c.ClientConnectionManager] [main] - hz.client_1 [seatunnel-728620] [5.1] Authenticated with server [localhost]:5801:e3af21a8-74f7-4a07-8964-c824c6681b6d, server version: 5.1, local address: /127.0.0.1:51749
+2026-10-08 01:31:51,691 INFO  [c.h.i.d.Diagnostics           ] [main] - hz.client_1 [seatunnel-728620] [5.1] Diagnostics disabled. To enable add -Dhazelcast.diagnostics.enabled=true to the JVM arguments.
+2026-10-08 01:31:51,698 INFO  [o.a.s.e.s.CoordinatorService  ] [pool-5-thread-1] - [localhost]:5801 [seatunnel-728620] [5.1] This node become a new active master node, begin init coordinator service
+2026-10-08 01:31:51,700 INFO  [c.h.c.i.s.ClientClusterService] [hz.client_1.event-7] - hz.client_1 [seatunnel-728620] [5.1] 
+
+Members [1] {
+	Member [localhost]:5801 - e3af21a8-74f7-4a07-8964-c824c6681b6d [master node]
+}
+
+2026-10-08 01:31:51,709 INFO  [o.a.s.e.s.CoordinatorService  ] [pool-5-thread-1] - [localhost]:5801 [seatunnel-728620] [5.1] Loaded event handlers: [org.apache.seatunnel.api.event.LoggingEventHandler@199fd680]
+2026-10-08 01:31:51,716 INFO  [.c.i.s.ClientStatisticsService] [main] - Client statistics is enabled with period 5 seconds.
+2026-10-08 01:31:51,749 INFO  [o.a.s.c.s.u.ConfigBuilder     ] [main] - Loading config file from path: /jobs/03_production_orders_100m.conf
+2026-10-08 01:31:51,844 INFO  [o.a.s.c.s.u.ConfigShadeUtils  ] [main] - Load config shade spi: [base64]
+2026-10-08 01:31:51,873 INFO  [o.a.s.c.s.u.ConfigBuilder     ] [main] - Parsed config file: 
+{
+    "env" : {
+        "parallelism" : 4,
+        "job.mode" : "BATCH"
+    },
+    "source" : [
+        {
+            "url" : "jdbc:postgresql://host.docker.internal:5440/srcdb?ApplicationName=iceberg_bulk_100m&readOnly=true",
+            "driver" : "org.postgresql.Driver",
+            "user" : "demo",
+            "password" : "******",
+            "query" : "select order_id, factory_id, product_name, quantity, order_date, status from public.production_orders_100m",
+            "fetch_size" : 5000,
+            "partition_column" : "order_id",
+            "partition_num" : 4,
+            "plugin_name" : "Jdbc"
+        }
+    ],
+    "sink" : [
+        {
+            "catalog_name" : "local_hive",
+            "iceberg.catalog.config" : {
+                "type" : "hive",
+                "uri" : "thrift://hms:9083",
+                "warehouse" : "file:///lake/warehouse"
+            },
+            "iceberg.table.upsert-mode-enabled" : false,
+            "namespace" : "retail",
+            "table" : "production_orders_100m",
+            "iceberg.table.write-props" : {
+                "write.format.default" : "parquet",
+                "write.parquet.compression-codec" : "zstd",
+                "write.target-file-size-bytes" : 134217728,
+                "write.parquet.row-group-size-bytes" : 16777216
+            },
+            "schema_save_mode" : "CREATE_SCHEMA_WHEN_NOT_EXIST",
+            "data_save_mode" : "APPEND_DATA",
+            "plugin_name" : "Iceberg"
+        }
+    ],
+    "transform" : []
+}
+
+2026-10-08 01:31:51,878 INFO  [p.MultipleTableJobConfigParser] [main] - add common jar in plugins :[]
+2026-10-08 01:31:51,887 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - Load SeaTunnelSink Plugin from /opt/seatunnel/connectors
+2026-10-08 01:31:51,890 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - Discovery plugin jar for: PluginIdentifier{engineType='seatunnel', pluginType='source', pluginName='Jdbc'} at: [file:/opt/seatunnel/connectors/connector-jdbc-2.3.13.jar]
+2026-10-08 01:31:51,890 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - find connector jar and dependency for PluginIdentifier{engineType='seatunnel', pluginType='source', pluginName='Jdbc'}: [file:/opt/seatunnel/connectors/connector-jdbc-2.3.13.jar]
+2026-10-08 01:31:51,893 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - Load SeaTunnelSink Plugin from /opt/seatunnel/connectors
+2026-10-08 01:31:51,896 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - Load SeaTunnelSink Plugin from /opt/seatunnel/connectors
+2026-10-08 01:31:51,896 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - Discovery plugin jar for: PluginIdentifier{engineType='seatunnel', pluginType='sink', pluginName='Iceberg'} at: [file:/opt/seatunnel/connectors/connector-iceberg-2.3.13.jar]
+2026-10-08 01:31:51,896 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - find connector jar and dependency for PluginIdentifier{engineType='seatunnel', pluginType='sink', pluginName='Iceberg'}: [file:/opt/seatunnel/connectors/connector-iceberg-2.3.13.jar]
+2026-10-08 01:31:51,898 INFO  [p.MultipleTableJobConfigParser] [main] - start generating all sources.
+2026-10-08 01:31:51,920 WARN  [o.a.s.a.c.ReadonlyConfig      ] [main] - Please use the new key 'username' instead of the deprecated key 'user'.
+2026-10-08 01:31:51,935 INFO  [o.a.s.c.s.j.u.JdbcCatalogUtils] [main] - Loading catalog tables for catalog : class org.apache.seatunnel.connectors.seatunnel.jdbc.catalog.psql.PostgresCatalog
+2026-10-08 01:31:52,057 INFO  [.s.c.s.j.c.AbstractJdbcCatalog] [main] - Catalog Postgres established connection to jdbc:postgresql://host.docker.internal:5440/srcdb?ApplicationName=iceberg_bulk_100m&readOnly=true
+2026-10-08 01:31:52,091 INFO  [o.a.s.c.s.j.u.JdbcCatalogUtils] [main] - Loaded 1 catalog tables for catalog : class org.apache.seatunnel.connectors.seatunnel.jdbc.catalog.psql.PostgresCatalog
+2026-10-08 01:31:52,091 INFO  [.s.c.s.j.c.AbstractJdbcCatalog] [main] - Catalog Postgres closing
+2026-10-08 01:31:52,092 INFO  [o.a.s.a.t.f.FactoryUtil       ] [main] - get the CatalogTable from source Jdbc: jdbc_catalog.null.production_orders_100m
+2026-10-08 01:31:52,099 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - Load SeaTunnelSource Plugin from /opt/seatunnel/connectors
+2026-10-08 01:31:52,104 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - Discovery plugin jar for: PluginIdentifier{engineType='seatunnel', pluginType='source', pluginName='Jdbc'} at: [file:/opt/seatunnel/connectors/connector-jdbc-2.3.13.jar]
+2026-10-08 01:31:52,104 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - find connector jar and dependency for PluginIdentifier{engineType='seatunnel', pluginType='source', pluginName='Jdbc'}: [file:/opt/seatunnel/connectors/connector-jdbc-2.3.13.jar]
+2026-10-08 01:31:52,106 INFO  [p.MultipleTableJobConfigParser] [main] - start generating all transforms.
+2026-10-08 01:31:52,106 INFO  [p.MultipleTableJobConfigParser] [main] - start generating all sinks.
+2026-10-08 01:31:52,108 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - Load SeaTunnelSink Plugin from /opt/seatunnel/connectors
+2026-10-08 01:31:52,108 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - Discovery plugin jar for: PluginIdentifier{engineType='seatunnel', pluginType='sink', pluginName='Iceberg'} at: [file:/opt/seatunnel/connectors/connector-iceberg-2.3.13.jar]
+2026-10-08 01:31:52,108 INFO  [.s.p.d.AbstractPluginDiscovery] [main] - find connector jar and dependency for PluginIdentifier{engineType='seatunnel', pluginType='sink', pluginName='Iceberg'}: [file:/opt/seatunnel/connectors/connector-iceberg-2.3.13.jar]
+2026-10-08 01:31:52,121 INFO  [o.a.s.a.t.f.FactoryUtil       ] [main] - Create sink 'Iceberg' with upstream input catalog-table[database: null, schema: null, table: production_orders_100m]
+2026-10-08 01:31:52,148 INFO  [o.a.s.e.c.j.ClientJobProxy    ] [main] - Start submit job, job id: 1160389063585300481, with plugin jar [file:/opt/seatunnel/connectors/connector-jdbc-2.3.13.jar, file:/opt/seatunnel/connectors/connector-iceberg-2.3.13.jar]
+2026-10-08 01:31:52,155 INFO  [.e.s.r.AbstractResourceManager] [hz.main.client.thread-4] - Init ResourceManager
+2026-10-08 01:31:52,155 INFO  [.e.s.r.AbstractResourceManager] [hz.main.client.thread-4] - initWorker... 
+2026-10-08 01:31:52,155 INFO  [.e.s.r.AbstractResourceManager] [hz.main.client.thread-4] - init live nodes: [[localhost]:5801]
+2026-10-08 01:31:52,156 INFO  [.e.s.r.AbstractResourceManager] [SeaTunnel-CompletableFuture-Thread-2] - received new worker register: [localhost]:5801
+2026-10-08 01:31:52,156 INFO  [.e.s.r.AbstractResourceManager] [hz.main.client.thread-4] - registerWorker: {[localhost]:5801=WorkerProfile(address=[localhost]:5801, profile=ResourceProfile{cpu=CPU{core=0}, heapMemory=Memory{bytes=3221225472}}, unassignedResource=ResourceProfile{cpu=CPU{core=0}, heapMemory=Memory{bytes=3221225472}}, dynamicSlot=true, assignedSlots=[], unassignedSlots=[], attributes={}, systemLoadInfo=null)}
+2026-10-08 01:31:52,168 INFO  [o.a.s.e.s.m.JobMaster         ] [seatunnel-coordinator-service-2] - in batch mode, the 'checkpoint.interval' configuration of env is missing, so checkpoint will be disabled
+2026-10-08 01:31:52,168 INFO  [o.a.s.e.s.m.JobMaster         ] [seatunnel-coordinator-service-2] - Init JobMaster for Job SeaTunnel_Job (1160389063585300481) 
+2026-10-08 01:31:52,168 INFO  [o.a.s.e.s.m.JobMaster         ] [seatunnel-coordinator-service-2] - Job SeaTunnel_Job (1160389063585300481) needed jar urls [file:/opt/seatunnel/connectors/connector-jdbc-2.3.13.jar, file:/opt/seatunnel/connectors/connector-iceberg-2.3.13.jar]
+2026-10-08 01:31:52,169 INFO  [.c.c.DefaultClassLoaderService] [seatunnel-coordinator-service-2] - Create classloader for job 1 with jars [file:/opt/seatunnel/connectors/connector-jdbc-2.3.13.jar]
+2026-10-08 01:31:52,169 INFO  [.c.c.DefaultClassLoaderService] [seatunnel-coordinator-service-2] - Create classloader for job 1 with jars [file:/opt/seatunnel/connectors/connector-iceberg-2.3.13.jar]
+2026-10-08 01:31:52,191 INFO  [a.s.c.s.i.IcebergCatalogLoader] [seatunnel-coordinator-service-2] - Hadoop config initialized: org.apache.hadoop.hdfs.HdfsConfiguration
+2026-10-08 01:31:52,190 WARN  [a.s.c.s.i.IcebergCatalogLoader] [seatunnel-coordinator-service-2] - Kerberos authentication is not configured, it will skip kerberos authentication
+2026-10-08 01:31:52,265 INFO  [a.s.a.s.SaveModeExecuteWrapper] [seatunnel-coordinator-service-2] - Executing save mode for table: retail.production_orders_100m, with SchemaSaveMode: CREATE_SCHEMA_WHEN_NOT_EXIST, DataSaveMode: APPEND_DATA using Catalog: Iceberg
+2026-10-08 01:31:52,279 INFO  [o.a.h.h.c.HiveConf            ] [seatunnel-coordinator-service-2] - Found configuration file null
+2026-10-08 01:31:52,379 INFO  [o.a.h.h.m.HiveMetaStoreClient ] [seatunnel-coordinator-service-2] - Trying to connect to metastore with URI thrift://iceberg-learning-hms-1.iceberg-learning-net:9083
+2026-10-08 01:31:52,390 INFO  [o.a.h.h.m.HiveMetaStoreClient ] [seatunnel-coordinator-service-2] - Opened a connection to metastore, current connections: 1
+2026-10-08 01:31:52,401 INFO  [o.a.h.h.m.HiveMetaStoreClient ] [seatunnel-coordinator-service-2] - Connected to metastore.
+2026-10-08 01:31:52,401 INFO  [.h.h.m.RetryingMetaStoreClient] [seatunnel-coordinator-service-2] - RetryingMetaStoreClient proxy=class org.apache.hadoop.hive.metastore.HiveMetaStoreClient ugi=root (auth:SIMPLE) retries=1 delay=1 lifetime=0
+2026-10-08 01:31:52,482 INFO  [i.BaseMetastoreTableOperations] [seatunnel-coordinator-service-2] - Refreshing table metadata from new version: file:/lake/warehouse/retail.db/production_orders_100m_append/metadata/00000-66753c21-6baf-4451-9219-9a6773211c0f.metadata.json
+2026-10-08 01:31:52,594 INFO  [o.a.i.BaseMetastoreCatalog    ] [seatunnel-coordinator-service-2] - Table loaded by catalog: local_hive.retail.production_orders_100m
+2026-10-08 01:31:52,644 INFO  [.s.e.s.c.CheckpointCoordinator] [seatunnel-coordinator-service-2] - Create CheckpointCoordinator for job(1@1160389063585300481) with plan(CheckpointPlan(pipelineId=1, pipelineSubtasks=[TaskLocation{taskGroupLocation=TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=1}, taskID=1000100000000, index=0}, TaskLocation{taskGroupLocation=TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=3}, taskID=1000300000000, index=0}, TaskLocation{taskGroupLocation=TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=3}, taskID=1000300010000, index=0}, TaskLocation{taskGroupLocation=TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=4}, taskID=1000400000001, index=1}, TaskLocation{taskGroupLocation=TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=4}, taskID=1000400010001, index=1}, TaskLocation{taskGroupLocation=TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=5}, taskID=1000500000002, index=2}, TaskLocation{taskGroupLocation=TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=5}, taskID=1000500010002, index=2}, TaskLocation{taskGroupLocation=TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=6}, taskID=1000600000003, index=3}, TaskLocation{taskGroupLocation=TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=6}, taskID=1000600010003, index=3}, TaskLocation{taskGroupLocation=TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=2}, taskID=1000200000000, index=0}], startingSubtasks=[TaskLocation{taskGroupLocation=TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=1}, taskID=1000100000000, index=0}], pipelineActions={ActionStateKey(name=ActionStateKey - pipeline-1 [Source[0]-Jdbc])=4, ActionStateKey(name=ActionStateKey - pipeline-1 [Sink[0]-Iceberg-MultiTableSink])=4}, subtaskActions={TaskLocation{taskGroupLocation=TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=1}, taskID=1000100000000, index=0}=[(ActionStateKey(name=ActionStateKey - pipeline-1 [Source[0]-Jdbc]), -1)], TaskLocation{taskGroupLocation=TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=3}, taskID=1000300010000, index=0}=[(ActionStateKey(name=ActionStateKey - pipeline-1 [Sink[0]-Iceberg-MultiTableSink]), 0)], TaskLocation{taskGroupLocation=TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=4}, taskID=1000400010001, index=1}=[(ActionStateKey(name=ActionStateKey - pipeline-1 [Sink[0]-Iceberg-MultiTableSink]), 1)], TaskLocation{taskGroupLocation=TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=5}, taskID=1000500000002, index=2}=[(ActionStateKey(name=ActionStateKey - pipeline-1 [Source[0]-Jdbc]), 2)], TaskLocation{taskGroupLocation=TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=6}, taskID=1000600000003, index=3}=[(ActionStateKey(name=ActionStateKey - pipeline-1 [Source[0]-Jdbc]), 3)], TaskLocation{taskGroupLocation=TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=3}, taskID=1000300000000, index=0}=[(ActionStateKey(name=ActionStateKey - pipeline-1 [Source[0]-Jdbc]), 0)], TaskLocation{taskGroupLocation=TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=4}, taskID=1000400000001, index=1}=[(ActionStateKey(name=ActionStateKey - pipeline-1 [Source[0]-Jdbc]), 1)], TaskLocation{taskGroupLocation=TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=5}, taskID=1000500010002, index=2}=[(ActionStateKey(name=ActionStateKey - pipeline-1 [Sink[0]-Iceberg-MultiTableSink]), 2)], TaskLocation{taskGroupLocation=TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=6}, taskID=1000600010003, index=3}=[(ActionStateKey(name=ActionStateKey - pipeline-1 [Sink[0]-Iceberg-MultiTableSink]), 3)], TaskLocation{taskGroupLocation=TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=2}, taskID=1000200000000, index=0}=[(ActionStateKey(name=ActionStateKey - pipeline-1 [Sink[0]-Iceberg-MultiTableSink]), -1)]}))
+2026-10-08 01:31:52,645 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-2] - The task Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Source[0]-Jdbc]-SourceTask (1/4)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=3}] is in state CREATED when init state future
+2026-10-08 01:31:52,645 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-2] - The task Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Source[0]-Jdbc]-SourceTask (2/4)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=4}] is in state CREATED when init state future
+2026-10-08 01:31:52,646 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-2] - The task Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Source[0]-Jdbc]-SourceTask (3/4)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=5}] is in state CREATED when init state future
+2026-10-08 01:31:52,646 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-2] - The task Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Source[0]-Jdbc]-SourceTask (4/4)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=6}] is in state CREATED when init state future
+2026-10-08 01:31:52,646 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-2] - The task Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Source[0]-Jdbc]-SplitEnumerator (1/1)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=1}] is in state CREATED when init state future
+2026-10-08 01:31:52,647 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-2] - The task Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Sink[0]-Iceberg-MultiTableSink]-AggregatedCommitterTask (1/1)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=2}] is in state CREATED when init state future
+2026-10-08 01:31:52,648 INFO  [o.a.s.e.c.j.ClientJobProxy    ] [main] - Submit job finished, job id: 1160389063585300481, job name: SeaTunnel_Job
+2026-10-08 01:31:52,649 WARN  [o.a.s.e.s.d.p.PhysicalPlan    ] [seatunnel-coordinator-service-2] - Job SeaTunnel_Job (1160389063585300481) state process is stopped
+2026-10-08 01:31:52,649 INFO  [o.a.s.e.s.d.p.PhysicalPlan    ] [seatunnel-coordinator-service-2] - Job SeaTunnel_Job (1160389063585300481) turned from state CREATED to PENDING.
+2026-10-08 01:31:52,649 INFO  [o.a.s.e.s.CoordinatorService  ] [seatunnel-coordinator-service-2] - [localhost]:5801 [seatunnel-728620] [5.1] The submit job enter the pending queue , jobId: 1160389063585300481 , jobName: SeaTunnel_Job
+2026-10-08 01:31:52,653 INFO  [o.a.s.e.s.CoordinatorService  ] [pending-job-schedule-runner] - [localhost]:5801 [seatunnel-728620] [5.1] Resources enough, start running: 1160389063585300481
+2026-10-08 01:31:52,654 INFO  [o.a.s.e.s.CoordinatorService  ] [seatunnel-coordinator-service-3] - [localhost]:5801 [seatunnel-728620] [5.1] The SUBMIT Job SeaTunnel_Job (1160389063585300481) is in PENDING state, restore pipeline and take over this job running
+2026-10-08 01:31:52,655 INFO  [o.a.s.e.s.d.p.PhysicalPlan    ] [seatunnel-coordinator-service-3] - Job SeaTunnel_Job (1160389063585300481) state process is start
+2026-10-08 01:31:52,656 INFO  [o.a.s.e.s.d.p.PhysicalPlan    ] [seatunnel-coordinator-service-3] - Job SeaTunnel_Job (1160389063585300481) turned from state PENDING to SCHEDULED.
+2026-10-08 01:31:52,656 INFO  [o.a.s.e.s.d.p.SubPlan         ] [seatunnel-coordinator-service-3] - Job SeaTunnel_Job (1160389063585300481), Pipeline: [(1/1)] state process is start
+2026-10-08 01:31:52,656 WARN  [o.a.s.e.c.j.JobMetricsRunner  ] [job-metrics-runner-1160389063585300481] - Failed to get job metrics summary, it maybe first-run
+2026-10-08 01:31:52,658 INFO  [o.a.s.e.s.d.p.SubPlan         ] [seatunnel-coordinator-service-3] - Job SeaTunnel_Job (1160389063585300481), Pipeline: [(1/1)] turned from state CREATED to SCHEDULED.
+2026-10-08 01:31:52,661 INFO  [o.a.s.e.s.d.p.SubPlan         ] [seatunnel-coordinator-service-3] - Resource allocation for pipeline Job SeaTunnel_Job (1160389063585300481), Pipeline: [(1/1)] completed. Task execution locations:
+2026-10-08 01:31:52,661 INFO  [o.a.s.e.s.d.p.SubPlan         ] [seatunnel-coordinator-service-3] -   Task [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=5}] will be executed on worker [[localhost]:5801], slotID [5], resourceProfile [ResourceProfile{cpu=CPU{core=0}, heapMemory=Memory{bytes=0}}], sequence [2845217d-b5ef-46dc-9d80-2255374dcd02], assigned [1160389063585300481]
+2026-10-08 01:31:52,661 INFO  [o.a.s.e.s.d.p.SubPlan         ] [seatunnel-coordinator-service-3] -   Task [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=6}] will be executed on worker [[localhost]:5801], slotID [6], resourceProfile [ResourceProfile{cpu=CPU{core=0}, heapMemory=Memory{bytes=0}}], sequence [2845217d-b5ef-46dc-9d80-2255374dcd02], assigned [1160389063585300481]
+2026-10-08 01:31:52,661 INFO  [o.a.s.e.s.d.p.SubPlan         ] [seatunnel-coordinator-service-3] -   Task [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=1}] will be executed on worker [[localhost]:5801], slotID [1], resourceProfile [ResourceProfile{cpu=CPU{core=0}, heapMemory=Memory{bytes=0}}], sequence [2845217d-b5ef-46dc-9d80-2255374dcd02], assigned [1160389063585300481]
+2026-10-08 01:31:52,661 INFO  [o.a.s.e.s.d.p.SubPlan         ] [seatunnel-coordinator-service-3] -   Task [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=2}] will be executed on worker [[localhost]:5801], slotID [2], resourceProfile [ResourceProfile{cpu=CPU{core=0}, heapMemory=Memory{bytes=0}}], sequence [2845217d-b5ef-46dc-9d80-2255374dcd02], assigned [1160389063585300481]
+2026-10-08 01:31:52,661 INFO  [o.a.s.e.s.d.p.SubPlan         ] [seatunnel-coordinator-service-3] -   Task [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=3}] will be executed on worker [[localhost]:5801], slotID [3], resourceProfile [ResourceProfile{cpu=CPU{core=0}, heapMemory=Memory{bytes=0}}], sequence [2845217d-b5ef-46dc-9d80-2255374dcd02], assigned [1160389063585300481]
+2026-10-08 01:31:52,661 INFO  [o.a.s.e.s.d.p.SubPlan         ] [seatunnel-coordinator-service-3] -   Task [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=4}] will be executed on worker [[localhost]:5801], slotID [4], resourceProfile [ResourceProfile{cpu=CPU{core=0}, heapMemory=Memory{bytes=0}}], sequence [2845217d-b5ef-46dc-9d80-2255374dcd02], assigned [1160389063585300481]
+2026-10-08 01:31:52,663 INFO  [o.a.s.e.s.d.p.SubPlan         ] [seatunnel-coordinator-service-3] - Job SeaTunnel_Job (1160389063585300481), Pipeline: [(1/1)] turned from state SCHEDULED to DEPLOYING.
+2026-10-08 01:31:52,663 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-3] - Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Source[0]-Jdbc]-SplitEnumerator (1/1)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=1}] state process is start
+2026-10-08 01:31:52,664 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-3] - Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Source[0]-Jdbc]-SplitEnumerator (1/1)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=1}] turned from state CREATED to DEPLOYING.
+2026-10-08 01:31:52,670 INFO  [o.a.s.e.s.TaskExecutionService] [seatunnel-coordinator-service-3] - [localhost]:5801 [seatunnel-728620] [5.1] received deploying task executionId [1160389067465031681]
+2026-10-08 01:31:52,673 INFO  [o.a.s.e.s.TaskExecutionService] [seatunnel-coordinator-service-3] - [localhost]:5801 [seatunnel-728620] [5.1] deploying task TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=1}, executionId [1160389067465031681]
+2026-10-08 01:31:52,673 INFO  [o.a.s.e.s.TaskExecutionService] [seatunnel-coordinator-service-3] - [localhost]:5801 [seatunnel-728620] [5.1] deploying TaskGroup TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=1} init success
+2026-10-08 01:31:52,676 INFO  [o.a.s.e.s.TaskExecutionService] [seatunnel-coordinator-service-3] - [localhost]:5801 [seatunnel-728620] [5.1] deploying TaskGroup TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=1} success
+2026-10-08 01:31:52,676 INFO  [.s.t.SourceSplitEnumeratorTask] [BlockingWorker-TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=1}] - starting seatunnel source split enumerator task, source name: pipeline-1 [Source[0]-Jdbc]
+2026-10-08 01:31:52,678 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-3] - Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Source[0]-Jdbc]-SplitEnumerator (1/1)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=1}] turned from state DEPLOYING to RUNNING.
+2026-10-08 01:31:52,678 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-3] - Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Source[0]-Jdbc]-SplitEnumerator (1/1)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=1}] current state equals target state: RUNNING, skip
+2026-10-08 01:31:52,678 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-3] - Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Sink[0]-Iceberg-MultiTableSink]-AggregatedCommitterTask (1/1)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=2}] state process is start
+2026-10-08 01:31:52,679 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-3] - Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Sink[0]-Iceberg-MultiTableSink]-AggregatedCommitterTask (1/1)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=2}] turned from state CREATED to DEPLOYING.
+2026-10-08 01:31:52,683 INFO  [o.a.s.e.s.TaskExecutionService] [seatunnel-coordinator-service-3] - [localhost]:5801 [seatunnel-728620] [5.1] received deploying task executionId [1160389067465097217]
+2026-10-08 01:31:52,684 INFO  [o.a.s.e.s.TaskExecutionService] [seatunnel-coordinator-service-3] - [localhost]:5801 [seatunnel-728620] [5.1] deploying task TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=2}, executionId [1160389067465097217]
+2026-10-08 01:31:52,684 INFO  [o.a.s.e.s.TaskExecutionService] [seatunnel-coordinator-service-3] - [localhost]:5801 [seatunnel-728620] [5.1] deploying TaskGroup TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=2} init success
+2026-10-08 01:31:52,684 INFO  [o.a.s.e.s.TaskExecutionService] [seatunnel-coordinator-service-3] - [localhost]:5801 [seatunnel-728620] [5.1] deploying TaskGroup TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=2} success
+2026-10-08 01:31:52,685 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-3] - Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Sink[0]-Iceberg-MultiTableSink]-AggregatedCommitterTask (1/1)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=2}] turned from state DEPLOYING to RUNNING.
+2026-10-08 01:31:52,685 INFO  [o.a.s.c.s.i.IcebergTableLoader] [BlockingWorker-TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=2}] - Config table name is empty, use catalog table name: production_orders_100m
+2026-10-08 01:31:52,685 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-3] - Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Sink[0]-Iceberg-MultiTableSink]-AggregatedCommitterTask (1/1)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=2}] current state equals target state: RUNNING, skip
+2026-10-08 01:31:52,686 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-3] - Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Source[0]-Jdbc]-SourceTask (1/4)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=3}] state process is start
+2026-10-08 01:31:52,687 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-3] - Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Source[0]-Jdbc]-SourceTask (1/4)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=3}] turned from state CREATED to DEPLOYING.
+2026-10-08 01:31:52,689 INFO  [o.a.s.c.s.j.s.ChunkSplitter   ] [hz.main.seaTunnel.task.thread-2] - Switch to fixed chunk splitter
+2026-10-08 01:31:52,695 INFO  [o.a.s.e.s.TaskExecutionService] [seatunnel-coordinator-service-3] - [localhost]:5801 [seatunnel-728620] [5.1] received deploying task executionId [1160389067465162753]
+2026-10-08 01:31:52,698 INFO  [o.a.s.a.e.LoggingEventHandler ] [hz.main.generic-operation.thread-11] - log event: EnumeratorOpenEvent(createdTime=1791423112697, jobId=1160389063585300481, eventType=LIFECYCLE_ENUMERATOR_OPEN)
+2026-10-08 01:31:52,699 INFO  [o.a.s.e.s.TaskExecutionService] [seatunnel-coordinator-service-3] - [localhost]:5801 [seatunnel-728620] [5.1] deploying task TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=3}, executionId [1160389067465162753]
+2026-10-08 01:31:52,699 INFO  [o.a.s.e.s.TaskExecutionService] [seatunnel-coordinator-service-3] - [localhost]:5801 [seatunnel-728620] [5.1] deploying TaskGroup TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=3} init success
+2026-10-08 01:31:52,700 INFO  [o.a.s.e.s.TaskExecutionService] [seatunnel-coordinator-service-3] - [localhost]:5801 [seatunnel-728620] [5.1] deploying TaskGroup TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=3} success
+2026-10-08 01:31:52,700 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-3] - Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Source[0]-Jdbc]-SourceTask (1/4)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=3}] turned from state DEPLOYING to RUNNING.
+2026-10-08 01:31:52,700 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-3] - Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Source[0]-Jdbc]-SourceTask (1/4)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=3}] current state equals target state: RUNNING, skip
+2026-10-08 01:31:52,700 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-3] - Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Source[0]-Jdbc]-SourceTask (2/4)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=4}] state process is start
+2026-10-08 01:31:52,703 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-3] - Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Source[0]-Jdbc]-SourceTask (2/4)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=4}] turned from state CREATED to DEPLOYING.
+2026-10-08 01:31:52,704 INFO  [s.e.s.t.TransformSeaTunnelTask] [BlockingWorker-TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=3}] - starting seatunnel transform task, index 0
+2026-10-08 01:31:52,704 INFO  [o.a.s.c.s.j.s.ChunkSplitter   ] [BlockingWorker-TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=3}] - Switch to fixed chunk splitter
+2026-10-08 01:31:52,704 INFO  [o.a.s.e.s.TaskExecutionService] [seatunnel-coordinator-service-3] - [localhost]:5801 [seatunnel-728620] [5.1] received deploying task executionId [1160389067465228289]
+2026-10-08 01:31:52,706 INFO  [o.a.s.e.s.TaskExecutionService] [seatunnel-coordinator-service-3] - [localhost]:5801 [seatunnel-728620] [5.1] deploying task TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=4}, executionId [1160389067465228289]
+2026-10-08 01:31:52,706 INFO  [o.a.s.e.s.TaskExecutionService] [seatunnel-coordinator-service-3] - [localhost]:5801 [seatunnel-728620] [5.1] deploying TaskGroup TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=4} init success
+2026-10-08 01:31:52,707 INFO  [o.a.s.e.s.TaskExecutionService] [seatunnel-coordinator-service-3] - [localhost]:5801 [seatunnel-728620] [5.1] deploying TaskGroup TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=4} success
+2026-10-08 01:31:52,707 INFO  [s.e.s.t.TransformSeaTunnelTask] [BlockingWorker-TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=4}] - starting seatunnel transform task, index 1
+2026-10-08 01:31:52,708 INFO  [o.a.s.c.s.j.s.ChunkSplitter   ] [BlockingWorker-TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=4}] - Switch to fixed chunk splitter
+2026-10-08 01:31:52,708 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-3] - Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Source[0]-Jdbc]-SourceTask (2/4)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=4}] turned from state DEPLOYING to RUNNING.
+2026-10-08 01:31:52,708 INFO  [.a.s.e.s.t.SourceSeaTunnelTask] [BlockingWorker-TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=3}] - starting seatunnel source task, index 0
+2026-10-08 01:31:52,709 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-3] - Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Source[0]-Jdbc]-SourceTask (2/4)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=4}] current state equals target state: RUNNING, skip
+2026-10-08 01:31:52,709 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-3] - Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Source[0]-Jdbc]-SourceTask (3/4)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=5}] state process is start
+2026-10-08 01:31:52,709 INFO  [.a.s.e.s.t.SourceSeaTunnelTask] [BlockingWorker-TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=4}] - starting seatunnel source task, index 1
+2026-10-08 01:31:52,710 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-3] - Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Source[0]-Jdbc]-SourceTask (3/4)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=5}] turned from state CREATED to DEPLOYING.
+2026-10-08 01:31:52,710 INFO  [o.a.s.c.s.i.IcebergTableLoader] [hz.main.seaTunnel.task.thread-5] - Config table name is empty, use catalog table name: production_orders_100m
+2026-10-08 01:31:52,710 INFO  [o.a.s.c.s.i.IcebergTableLoader] [hz.main.seaTunnel.task.thread-8] - Config table name is empty, use catalog table name: production_orders_100m
+2026-10-08 01:31:52,711 INFO  [o.a.s.e.s.TaskExecutionService] [seatunnel-coordinator-service-3] - [localhost]:5801 [seatunnel-728620] [5.1] received deploying task executionId [1160389067465293825]
+2026-10-08 01:31:52,712 INFO  [o.a.s.e.s.TaskExecutionService] [seatunnel-coordinator-service-3] - [localhost]:5801 [seatunnel-728620] [5.1] deploying task TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=5}, executionId [1160389067465293825]
+2026-10-08 01:31:52,712 INFO  [o.a.s.e.s.TaskExecutionService] [seatunnel-coordinator-service-3] - [localhost]:5801 [seatunnel-728620] [5.1] deploying TaskGroup TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=5} init success
+2026-10-08 01:31:52,713 INFO  [o.a.s.e.s.TaskExecutionService] [seatunnel-coordinator-service-3] - [localhost]:5801 [seatunnel-728620] [5.1] deploying TaskGroup TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=5} success
+2026-10-08 01:31:52,714 INFO  [s.e.s.t.TransformSeaTunnelTask] [BlockingWorker-TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=5}] - starting seatunnel transform task, index 2
+2026-10-08 01:31:52,714 INFO  [o.a.s.c.s.j.s.ChunkSplitter   ] [BlockingWorker-TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=5}] - Switch to fixed chunk splitter
+2026-10-08 01:31:52,715 INFO  [.a.s.e.s.t.SourceSeaTunnelTask] [BlockingWorker-TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=5}] - starting seatunnel source task, index 2
+2026-10-08 01:31:52,715 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-3] - Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Source[0]-Jdbc]-SourceTask (3/4)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=5}] turned from state DEPLOYING to RUNNING.
+2026-10-08 01:31:52,716 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-3] - Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Source[0]-Jdbc]-SourceTask (3/4)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=5}] current state equals target state: RUNNING, skip
+2026-10-08 01:31:52,716 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-3] - Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Source[0]-Jdbc]-SourceTask (4/4)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=6}] state process is start
+2026-10-08 01:31:52,716 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-3] - Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Source[0]-Jdbc]-SourceTask (4/4)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=6}] turned from state CREATED to DEPLOYING.
+2026-10-08 01:31:52,716 INFO  [o.a.s.c.s.i.IcebergTableLoader] [hz.main.seaTunnel.task.thread-11] - Config table name is empty, use catalog table name: production_orders_100m
+2026-10-08 01:31:52,717 INFO  [o.a.s.e.s.TaskExecutionService] [seatunnel-coordinator-service-3] - [localhost]:5801 [seatunnel-728620] [5.1] received deploying task executionId [1160389067465359361]
+2026-10-08 01:31:52,719 INFO  [o.a.s.e.s.TaskExecutionService] [seatunnel-coordinator-service-3] - [localhost]:5801 [seatunnel-728620] [5.1] deploying task TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=6}, executionId [1160389067465359361]
+2026-10-08 01:31:52,719 INFO  [o.a.s.e.s.TaskExecutionService] [seatunnel-coordinator-service-3] - [localhost]:5801 [seatunnel-728620] [5.1] deploying TaskGroup TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=6} init success
+2026-10-08 01:31:52,721 INFO  [a.s.a.s.m.MultiTableSinkWriter] [hz.main.seaTunnel.task.thread-11] - init multi table sink writer, queue size: 1
+2026-10-08 01:31:52,722 INFO  [a.s.a.s.m.MultiTableSinkWriter] [hz.main.seaTunnel.task.thread-8] - init multi table sink writer, queue size: 1
+2026-10-08 01:31:52,722 INFO  [a.s.a.s.m.MultiTableSinkWriter] [hz.main.seaTunnel.task.thread-5] - init multi table sink writer, queue size: 1
+2026-10-08 01:31:52,723 INFO  [o.a.s.e.s.TaskExecutionService] [seatunnel-coordinator-service-3] - [localhost]:5801 [seatunnel-728620] [5.1] deploying TaskGroup TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=6} success
+2026-10-08 01:31:52,723 INFO  [o.a.s.c.s.j.s.ChunkSplitter   ] [BlockingWorker-TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=6}] - Switch to fixed chunk splitter
+2026-10-08 01:31:52,723 INFO  [s.e.s.t.TransformSeaTunnelTask] [BlockingWorker-TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=6}] - starting seatunnel transform task, index 3
+2026-10-08 01:31:52,724 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-3] - Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Source[0]-Jdbc]-SourceTask (4/4)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=6}] turned from state DEPLOYING to RUNNING.
+2026-10-08 01:31:52,724 INFO  [o.a.s.e.s.d.p.PhysicalVertex  ] [seatunnel-coordinator-service-3] - Job (1160389063585300481), Pipeline: [(1/1)], task: [pipeline-1 [Source[0]-Jdbc]-SourceTask (4/4)], taskGroupLocation: [TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=6}] current state equals target state: RUNNING, skip
+2026-10-08 01:31:52,724 INFO  [.a.s.e.s.t.SourceSeaTunnelTask] [BlockingWorker-TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=6}] - starting seatunnel source task, index 3
+2026-10-08 01:31:52,724 INFO  [o.a.s.c.s.i.IcebergTableLoader] [hz.main.seaTunnel.task.thread-8] - Config table name is empty, use catalog table name: production_orders_100m
+2026-10-08 01:31:52,725 INFO  [a.s.a.s.m.MultiTableSinkWriter] [hz.main.seaTunnel.task.thread-8] - init multi table sink writer, queue size: 1
+2026-10-08 01:31:52,725 INFO  [o.a.s.e.s.d.p.SubPlan         ] [seatunnel-coordinator-service-3] - Job SeaTunnel_Job (1160389063585300481), Pipeline: [(1/1)] turned from state DEPLOYING to RUNNING.
+2026-10-08 01:31:52,725 INFO  [o.a.s.e.s.d.p.PhysicalPlan    ] [seatunnel-coordinator-service-3] - Job SeaTunnel_Job (1160389063585300481) turned from state SCHEDULED to RUNNING.
+2026-10-08 01:31:52,821 INFO  [o.a.s.a.e.LoggingEventHandler ] [hz.main.generic-operation.thread-43] - log event: ReaderOpenEvent(createdTime=1791423112821, jobId=1160389063585300481, eventType=LIFECYCLE_READER_OPEN)
+2026-10-08 01:31:52,821 INFO  [o.a.s.a.e.LoggingEventHandler ] [hz.main.generic-operation.thread-46] - log event: ReaderOpenEvent(createdTime=1791423112821, jobId=1160389063585300481, eventType=LIFECYCLE_READER_OPEN)
+2026-10-08 01:31:52,822 INFO  [.s.t.SourceSplitEnumeratorTask] [hz.main.seaTunnel.task.thread-8] - received reader register, readerID: TaskLocation{taskGroupLocation=TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=3}, taskID=1000300000000, index=0}
+2026-10-08 01:31:52,822 INFO  [.s.t.SourceSplitEnumeratorTask] [hz.main.seaTunnel.task.thread-5] - received reader register, readerID: TaskLocation{taskGroupLocation=TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=5}, taskID=1000500000002, index=2}
+2026-10-08 01:31:52,822 INFO  [.j.s.JdbcSourceSplitEnumerator] [hz.main.seaTunnel.task.thread-5] - Register reader 2 to JdbcSourceSplitEnumerator.
+2026-10-08 01:31:52,822 INFO  [.j.s.JdbcSourceSplitEnumerator] [hz.main.seaTunnel.task.thread-8] - Register reader 0 to JdbcSourceSplitEnumerator.
+2026-10-08 01:31:52,823 INFO  [o.a.s.a.e.LoggingEventHandler ] [hz.main.generic-operation.thread-0] - log event: ReaderOpenEvent(createdTime=1791423112823, jobId=1160389063585300481, eventType=LIFECYCLE_READER_OPEN)
+2026-10-08 01:31:52,823 INFO  [.s.t.SourceSplitEnumeratorTask] [hz.main.seaTunnel.task.thread-5] - received reader register, readerID: TaskLocation{taskGroupLocation=TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=4}, taskID=1000400000001, index=1}
+2026-10-08 01:31:52,823 INFO  [.j.s.JdbcSourceSplitEnumerator] [hz.main.seaTunnel.task.thread-5] - Register reader 1 to JdbcSourceSplitEnumerator.
+2026-10-08 01:31:52,825 INFO  [o.a.s.a.e.LoggingEventHandler ] [hz.main.generic-operation.thread-5] - log event: ReaderOpenEvent(createdTime=1791423112825, jobId=1160389063585300481, eventType=LIFECYCLE_READER_OPEN)
+2026-10-08 01:31:52,825 INFO  [.s.t.SourceSplitEnumeratorTask] [hz.main.seaTunnel.task.thread-5] - received reader register, readerID: TaskLocation{taskGroupLocation=TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=6}, taskID=1000600000003, index=3}
+2026-10-08 01:31:52,825 INFO  [.j.s.JdbcSourceSplitEnumerator] [hz.main.seaTunnel.task.thread-5] - Register reader 3 to JdbcSourceSplitEnumerator.
+2026-10-08 01:31:52,888 INFO  [.s.e.s.c.CheckpointCoordinator] [seatunnel-coordinator-service-8] - checkpoint is disabled, because in batch mode and 'checkpoint.interval' of env is missing.
+2026-10-08 01:31:52,982 INFO  [.s.t.SourceSplitEnumeratorTask] [BlockingWorker-TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=1}] - received enough reader, starting enumerator...
+2026-10-08 01:31:52,982 INFO  [.j.s.JdbcSourceSplitEnumerator] [BlockingWorker-TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=1}] - Starting split enumerator.
+2026-10-08 01:31:52,983 INFO  [.j.s.JdbcSourceSplitEnumerator] [BlockingWorker-TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=1}] - Splitting table production_orders_100m.
+2026-10-08 01:31:52,983 INFO  [o.a.s.c.s.j.s.ChunkSplitter   ] [BlockingWorker-TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=1}] - Start splitting table production_orders_100m into chunks...
+2026-10-08 01:31:53,000 INFO  [o.a.s.c.s.j.s.ChunkSplitter   ] [BlockingWorker-TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=1}] - Split table, query min max: SELECT MIN("order_id"), MAX("order_id") FROM (select order_id, factory_id, product_name, quantity, order_date, status from public.production_orders_100m) tmp
+2026-10-08 01:31:53,004 INFO  [o.a.s.c.s.j.s.ChunkSplitter   ] [BlockingWorker-TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=1}] - Split table production_orders_100m into 4 chunks, time cost: 21ms.
+2026-10-08 01:31:53,004 INFO  [.j.s.JdbcSourceSplitEnumerator] [BlockingWorker-TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=1}] - Split table production_orders_100m into 4 splits.
+2026-10-08 01:31:53,011 INFO  [.j.s.JdbcSourceSplitEnumerator] [BlockingWorker-TaskGroupLocation{jobId=1160389063585300481, pipelineId=1, taskGroupId=1}] - No more splits to assign. Sending NoMoreSplitsEvent to reader [0, 1, 2, 3].
+2026-10-08 01:31:54,142 INFO  [a.s.c.s.i.IcebergCatalogLoader] [st-multi-table-sink-writer-1] - Hadoop config initialized: org.apache.hadoop.hdfs.HdfsConfiguration
+2026-10-08 01:31:54,142 WARN  [a.s.c.s.i.IcebergCatalogLoader] [st-multi-table-sink-writer-1] - Kerberos authentication is not configured, it will skip kerberos authentication
+2026-10-08 01:31:54,174 INFO  [i.BaseMetastoreTableOperations] [st-multi-table-sink-writer-1] - Refreshing table metadata from new version: file:/lake/warehouse/retail.db/production_orders_100m_append/metadata/00000-66753c21-6baf-4451-9219-9a6773211c0f.metadata.json
+2026-10-08 01:31:54,178 INFO  [o.a.i.BaseMetastoreCatalog    ] [st-multi-table-sink-writer-1] - Table loaded by catalog: local_hive.retail.production_orders_100m
+2026-10-08 01:31:54,311 INFO  [o.a.h.i.c.CodecPool           ] [st-multi-table-sink-writer-1] - Got brand-new compressor [.zstd]
+2026-10-08 01:31:54,474 INFO  [o.a.h.i.c.CodecPool           ] [st-multi-table-sink-writer-1] - Got brand-new compressor [.zstd]
+2026-10-08 01:31:58,190 WARN  [a.s.c.s.i.IcebergCatalogLoader] [st-multi-table-sink-writer-1] - Kerberos authentication is not configured, it will skip kerberos authentication
+2026-10-08 01:31:58,192 INFO  [a.s.c.s.i.IcebergCatalogLoader] [st-multi-table-sink-writer-1] - Hadoop config initialized: org.apache.hadoop.hdfs.HdfsConfiguration
+2026-10-08 01:31:58,268 INFO  [i.BaseMetastoreTableOperations] [st-multi-table-sink-writer-1] - Refreshing table metadata from new version: file:/lake/warehouse/retail.db/production_orders_100m_append/metadata/00000-66753c21-6baf-4451-9219-9a6773211c0f.metadata.json
+2026-10-08 01:31:58,275 INFO  [o.a.i.BaseMetastoreCatalog    ] [st-multi-table-sink-writer-1] - Table loaded by catalog: local_hive.retail.production_orders_100m
+2026-10-08 01:31:58,278 INFO  [o.a.h.i.c.CodecPool           ] [st-multi-table-sink-writer-1] - Got brand-new compressor [.zstd]
+2026-10-08 01:31:58,283 INFO  [o.a.h.i.c.CodecPool           ] [st-multi-table-sink-writer-1] - Got brand-new compressor [.zstd]
+2026-10-08 01:32:03,259 WARN  [a.s.c.s.i.IcebergCatalogLoader] [st-multi-table-sink-writer-1] - Kerberos authentication is not configured, it will skip kerberos authentication
+2026-10-08 01:32:03,259 INFO  [a.s.c.s.i.IcebergCatalogLoader] [st-multi-table-sink-writer-1] - Hadoop config initialized: org.apache.hadoop.hdfs.HdfsConfiguration
+2026-10-08 01:32:03,338 INFO  [i.BaseMetastoreTableOperations] [st-multi-table-sink-writer-1] - Refreshing table metadata from new version: file:/lake/warehouse/retail.db/production_orders_100m_append/metadata/00000-66753c21-6baf-4451-9219-9a6773211c0f.metadata.json
+2026-10-08 01:32:03,346 INFO  [o.a.i.BaseMetastoreCatalog    ] [st-multi-table-sink-writer-1] - Table loaded by catalog: local_hive.retail.production_orders_100m
+2026-10-08 01:32:03,348 INFO  [o.a.h.i.c.CodecPool           ] [st-multi-table-sink-writer-1] - Got brand-new compressor [.zstd]
+2026-10-08 01:32:03,352 INFO  [o.a.h.i.c.CodecPool           ] [st-multi-table-sink-writer-1] - Got brand-new compressor [.zstd]
+2026-10-08 01:32:06,156 WARN  [a.s.c.s.i.IcebergCatalogLoader] [st-multi-table-sink-writer-1] - Kerberos authentication is not configured, it will skip kerberos authentication
+2026-10-08 01:32:06,157 INFO  [a.s.c.s.i.IcebergCatalogLoader] [st-multi-table-sink-writer-1] - Hadoop config initialized: org.apache.hadoop.hdfs.HdfsConfiguration
+2026-10-08 01:32:06,260 INFO  [i.BaseMetastoreTableOperations] [st-multi-table-sink-writer-1] - Refreshing table metadata from new version: file:/lake/warehouse/retail.db/production_orders_100m_append/metadata/00000-66753c21-6baf-4451-9219-9a6773211c0f.metadata.json
+2026-10-08 01:32:06,271 INFO  [o.a.i.BaseMetastoreCatalog    ] [st-multi-table-sink-writer-1] - Table loaded by catalog: local_hive.retail.production_orders_100m
+2026-10-08 01:32:06,276 INFO  [o.a.h.i.c.CodecPool           ] [st-multi-table-sink-writer-1] - Got brand-new compressor [.zstd]
+2026-10-08 01:32:06,341 INFO  [o.a.h.i.c.CodecPool           ] [st-multi-table-sink-writer-1] - Got brand-new compressor [.zstd]
+2026-10-08 01:32:14,215 INFO  [c.h.i.d.HealthMonitor         ] [hz.main.HealthMonitor] - [localhost]:5801 [seatunnel-728620] [5.1] processors=6, physical.memory.total=9.7G, physical.memory.free=144.7M, swap.space.total=0, swap.space.free=0, heap.memory.used=2.7G, heap.memory.free=290.4M, heap.memory.total=3.0G, heap.memory.max=3.0G, heap.memory.used/total=99.49%, heap.memory.used/max=99.49%, minor.gc.count=79, minor.gc.time=2976ms, major.gc.count=1, major.gc.time=2445ms, load.process=50.00%, load.system=100.00%, load.systemAverage=2.42, thread.count=194, thread.peakCount=194, cluster.timeDiff=0, event.q.size=0, executor.q.async.size=0, executor.q.client.size=0, executor.q.client.query.size=0, executor.q.client.blocking.size=0, executor.q.query.size=0, executor.q.scheduled.size=0, executor.q.io.size=0, executor.q.system.size=0, executor.q.operations.size=0, executor.q.priorityOperation.size=0, operations.completed.count=300, executor.q.mapLoad.size=0, executor.q.mapLoadAllKeys.size=0, executor.q.cluster.size=0, executor.q.response.size=0, operations.running.count=0, operations.pending.invocations.percentage=0.00%, operations.pending.invocations.count=0, proxy.count=11, clientEndpoint.count=1, connection.active.count=0, client.connection.count=0, connection.count=0
+2026-10-08 01:32:35,148 INFO  [c.h.i.d.HealthMonitor         ] [hz.main.HealthMonitor] - [localhost]:5801 [seatunnel-728620] [5.1] processors=6, physical.memory.total=9.7G, physical.memory.free=177.7M, swap.space.total=0, swap.space.free=0, heap.memory.used=2.9G, heap.memory.free=99.5M, heap.memory.total=3.0G, heap.memory.max=3.0G, heap.memory.used/total=96.73%, heap.memory.used/max=96.73%, minor.gc.count=117, minor.gc.time=3859ms, major.gc.count=7, major.gc.time=19146ms, load.process=24.64%, load.system=27.24%, load.systemAverage=2.02, thread.count=195, thread.peakCount=195, cluster.timeDiff=0, event.q.size=0, executor.q.async.size=0, executor.q.client.size=0, executor.q.client.query.size=0, executor.q.client.blocking.size=0, executor.q.query.size=0, executor.q.scheduled.size=0, executor.q.io.size=0, executor.q.system.size=0, executor.q.operations.size=0, executor.q.priorityOperation.size=0, operations.completed.count=310, executor.q.mapLoad.size=0, executor.q.mapLoadAllKeys.size=0, executor.q.cluster.size=0, executor.q.response.size=0, operations.running.count=0, operations.pending.invocations.percentage=0.00%, operations.pending.invocations.count=0, proxy.count=11, clientEndpoint.count=1, connection.active.count=0, client.connection.count=0, connection.count=0
+2026-10-08 01:32:51,141 INFO  [o.a.s.e.s.CoordinatorService  ] [pool-7-thread-1] - [localhost]:5801 [seatunnel-728620] [5.1] 
+***********************************************
+     CoordinatorService Thread Pool Status
+***********************************************
+activeCount               :                   2
+corePoolSize              :                  10
+maximumPoolSize           :          2147483647
+poolSize                  :                  10
+completedTaskCount        :                  22
+taskCount                 :                  24
+***********************************************
+
+2026-10-08 01:32:55,314 INFO  [c.h.i.d.HealthMonitor         ] [hz.main.HealthMonitor] - [localhost]:5801 [seatunnel-728620] [5.1] processors=6, physical.memory.total=9.7G, physical.memory.free=137.9M, swap.space.total=0, swap.space.free=0, heap.memory.used=3.0G, heap.memory.free=41.6M, heap.memory.total=3.0G, heap.memory.max=3.0G, heap.memory.used/total=98.64%, heap.memory.used/max=98.64%, minor.gc.count=150, minor.gc.time=4493ms, major.gc.count=17, major.gc.time=38694ms, load.process=23.86%, load.system=25.48%, load.systemAverage=1.73, thread.count=193, thread.peakCount=196, cluster.timeDiff=0, event.q.size=0, executor.q.async.size=0, executor.q.client.size=0, executor.q.client.query.size=0, executor.q.client.blocking.size=0, executor.q.query.size=0, executor.q.scheduled.size=0, executor.q.io.size=0, executor.q.system.size=0, executor.q.operations.size=1, executor.q.priorityOperation.size=0, operations.completed.count=326, executor.q.mapLoad.size=0, executor.q.mapLoadAllKeys.size=0, executor.q.cluster.size=0, executor.q.response.size=0, operations.running.count=0, operations.pending.invocations.percentage=0.00%, operations.pending.invocations.count=0, proxy.count=11, clientEndpoint.count=1, connection.active.count=0, client.connection.count=0, connection.count=0
+2026-10-08 01:32:57,337 INFO  [o.a.s.e.s.CoordinatorService  ] [pool-7-thread-1] - [localhost]:5801 [seatunnel-728620] [5.1] 
+***********************************************
+                Job info detail
+***********************************************
+createdJobCount           :                   0
+pendingJobCount           :                   0
+scheduledJobCount         :                   0
+runningJobCount           :                   1
+failingJobCount           :                   0
+failedJobCount            :                   0
+cancellingJobCount        :                   0
+canceledJobCount          :                   0
+finishedJobCount          :                   0
+***********************************************
+
+OpenJDK 64-Bit Server VM warning: GC locker is held; pre-dump GC was skipped
+2026-10-08 01:33:22,056 INFO  [c.h.i.d.HealthMonitor         ] [hz.main.HealthMonitor] - [localhost]:5801 [seatunnel-728620] [5.1] processors=6, physical.memory.total=9.7G, physical.memory.free=162.9M, swap.space.total=0, swap.space.free=0, heap.memory.used=3.0G, heap.memory.free=16.8M, heap.memory.total=3.0G, heap.memory.max=3.0G, heap.memory.used/total=99.19%, heap.memory.used/max=99.19%, minor.gc.count=189, minor.gc.time=4901ms, major.gc.count=31, major.gc.time=66284ms, load.process=0.00%, load.system=0.00%, load.systemAverage=1.74, thread.count=195, thread.peakCount=196, cluster.timeDiff=0, event.q.size=0, executor.q.async.size=0, executor.q.client.size=0, executor.q.client.query.size=0, executor.q.client.blocking.size=0, executor.q.query.size=0, executor.q.scheduled.size=0, executor.q.io.size=0, executor.q.system.size=0, executor.q.operations.size=0, executor.q.priorityOperation.size=0, operations.completed.count=339, executor.q.mapLoad.size=0, executor.q.mapLoadAllKeys.size=0, executor.q.cluster.size=0, executor.q.response.size=0, operations.running.count=0, operations.pending.invocations.percentage=0.00%, operations.pending.invocations.count=0, proxy.count=11, clientEndpoint.count=1, connection.active.count=0, client.connection.count=0, connection.count=0
+2026-10-08 01:33:54,662 INFO  [o.a.s.e.s.CoordinatorService  ] [pool-7-thread-1] - [localhost]:5801 [seatunnel-728620] [5.1] 
+***********************************************
+     CoordinatorService Thread Pool Status
+***********************************************
+activeCount               :                   2
+corePoolSize              :                  10
+maximumPoolSize           :          2147483647
+poolSize                  :                  10
+completedTaskCount        :                  22
+taskCount                 :                  24
+***********************************************
+
+2026-10-08 01:33:54,663 INFO  [o.a.s.e.c.j.JobMetricsRunner  ] [job-metrics-runner-1160389063585300481] - 
+***********************************************
+           Job Progress Information
+***********************************************
+Job Id                    : 1160389063585300481
+Read Count So Far         :             6367228
+Write Attempt Count So Far:             6363918
+Write Committed Count So Far:                   0
+Commit Rate               :               0.00%
+Average Read Count        :             53060/s
+Average Write Attempt Count:             53032/s
+Average Write Committed Count:                 0/s
+Last Statistic Time       : 2026-10-08 01:31:52
+Current Statistic Time    : 2026-10-08 01:33:52
+***********************************************
+
+2026-10-08 01:34:03,239 INFO  [o.a.s.e.s.CoordinatorService  ] [pool-7-thread-1] - [localhost]:5801 [seatunnel-728620] [5.1] 
+***********************************************
+                Job info detail
+***********************************************
+createdJobCount           :                   0
+pendingJobCount           :                   0
+scheduledJobCount         :                   0
+runningJobCount           :                   1
+failingJobCount           :                   0
+failedJobCount            :                   0
+cancellingJobCount        :                   0
+canceledJobCount          :                   0
+finishedJobCount          :                   0
+***********************************************
+
+2026-10-08 01:34:03,241 INFO  [c.h.i.d.HealthMonitor         ] [hz.main.HealthMonitor] - [localhost]:5801 [seatunnel-728620] [5.1] processors=6, physical.memory.total=9.7G, physical.memory.free=162.5M, swap.space.total=0, swap.space.free=0, heap.memory.used=3.0G, heap.memory.free=13.9M, heap.memory.total=3.0G, heap.memory.max=3.0G, heap.memory.used/total=99.55%, heap.memory.used/max=99.55%, minor.gc.count=205, minor.gc.time=5021ms, major.gc.count=38, major.gc.time=81006ms, load.process=24.32%, load.system=24.85%, load.systemAverage=1.83, thread.count=199, thread.peakCount=199, cluster.timeDiff=0, event.q.size=0, executor.q.async.size=0, executor.q.client.size=0, executor.q.client.query.size=0, executor.q.client.blocking.size=0, executor.q.query.size=0, executor.q.scheduled.size=0, executor.q.io.size=0, executor.q.system.size=0, executor.q.operations.size=0, executor.q.priorityOperation.size=0, operations.completed.count=355, executor.q.mapLoad.size=0, executor.q.mapLoadAllKeys.size=0, executor.q.cluster.size=0, executor.q.response.size=0, operations.running.count=0, operations.pending.invocations.percentage=0.00%, operations.pending.invocations.count=0, proxy.count=11, clientEndpoint.count=1, connection.active.count=0, client.connection.count=0, connection.count=0
+

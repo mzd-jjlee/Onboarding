@@ -1,0 +1,11 @@
+{
+  "lake/warehouse/retail.db/orders/data/00001-1790922598154-af29655d-fe79-4741-9baa-c6472415df39-00001.parquet": "1e640cd60096c89f500d2df2552b2daedbc53eaafdd351ef908e1d7ba5b80d89",
+  "lake/warehouse/retail.db/orders/data/00001-1790922935810-6cfe0f8d-b204-4b4e-aea8-195fca193c9b-00001.parquet": "b9a74f1da9db227cc57934ea73aa09e63aafe2fd88f051a3f9f3fdfbe55fedb1",
+  "lake/warehouse/retail.db/orders/metadata/00000-87534807-97a9-41ff-827c-4c9e3b4fe730.metadata.json": "715029389435331a81f89b990958f7f87b6a886bff3c02541f0a3cf12e74091b",
+  "lake/warehouse/retail.db/orders/metadata/00001-d6996a52-f932-4bb9-b776-daf1321dcfb4.metadata.json": "e9190f1d3ad90121c732ed837434346fe37fd5a4db980b337f8d85a7ae36ae9c",
+  "lake/warehouse/retail.db/orders/metadata/00002-90bf61b9-0378-48e1-8388-342257e85b94.metadata.json": "712e9f71ed595f45dc516cd2b3b9a09d33a60491b0718733d169e6c6ab73d695",
+  "lake/warehouse/retail.db/orders/metadata/32dc7a10-9da8-4527-8da0-20c188ae33e7-m0.avro": "14a35b3cb8e9705ff91c1b4409cf846b7dc2591640502feef0e4a07756a8d0b2",
+  "lake/warehouse/retail.db/orders/metadata/c4903247-2433-4038-b34b-2e3948ff4ff2-m0.avro": "710d6522c9f716343ab04a823d87e4afeae9e45e306a177837744c9eb9b9de01",
+  "lake/warehouse/retail.db/orders/metadata/snap-2162422063555107563-1-c4903247-2433-4038-b34b-2e3948ff4ff2.avro": "72d359f4cf63f23e7eaca6a66ab08bfe48761e03f2a8bf2de7b8c77a76ee6896",
+  "lake/warehouse/retail.db/orders/metadata/snap-7763263029727631105-1-32dc7a10-9da8-4527-8da0-20c188ae33e7.avro": "a6ed2ab0274902c4ddf627852baff9854e6c5f91533207d04d7e005add317de3"
+}

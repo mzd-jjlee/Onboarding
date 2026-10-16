@@ -1,35 +1,65 @@
-# iceberg — 로컬 소규모 데이터 레이크 실습
+# 로컬 데이터 레이크하우스
 
-SeaTunnel로 로컬에 parquet을 쌓고, 그것을 **Iceberg 테이블**로 관리하면서
-**DuckDB**로 조회하는 구성을 로컬에서 실험하는 프로젝트. 카탈로그는 **Hive Metastore**를 쓴다.
+목표 구조는 **SeaTunnel Iceberg sink → Iceberg + Hive Metastore → Trino → Apache Superset 웹 조회**다.
 
-현재 상태: **자료 조사 완료, 구현 전.**
+**먼저 [로컬 데이터 레이크하우스 구축 안내서](docs/local-lakehouse-superset.md)를 읽는다.** 구성요소 역할, 쓰기·조회 흐름, 로컬 저장소 호환성, Superset 연결, 검증 SQL과 구축 완료 기준을 정리했다.
+
+그림으로 먼저 보고 싶다면 [환경 배치·적재·웹 조회 그림 안내서](docs/md/local-lakehouse-flow.md)를 읽는다.
+
+**구축한 코드와 실행 흐름을 검토하려면 [스크립트에서 1억 행 적재·조회까지](docs/md/project-files-guide.md)를 먼저 읽는다.** 환경 준비 → SeaTunnel 실행 → Iceberg 파일 작성·HMS 등록 → Trino/Superset 조회 그림과 파일별 읽는 순서가 있다.
 
 ## 문서
 
-**먼저 읽기:** [그림 중심 안내서 (브라우저용 HTML)](docs/local-lakehouse-visual-guide.html) · [Markdown 원문](docs/local-lakehouse-visual-guide.md)
-
-역할, Docker 배치, 쓰기·조회 흐름, 스냅샷, OpenMetadata와의 차이를 **그림 8개**로 설명한다.
-2026-10-02 공식 문서 대조 결과와 기존 조사 정정 사항은 안내서 9절에 있다. 아래 두 문서는 조사 원본이며, 정정 사항을 함께 읽어야 한다.
-
-| 문서 | 내용 |
+| 문서 | 용도 |
 |---|---|
-| [docs/iceberg-hive-duckdb-roles.md](docs/iceberg-hive-duckdb-roles.md) | Iceberg가 실제로 어디에 있는지(디스크 구조/메타데이터 3계층), Hive Metastore가 왜 필요한지, DuckDB가 Iceberg를 읽는 4가지 경로와 각각의 한계 |
-| [docs/local-lakehouse-build-options.md](docs/local-lakehouse-build-options.md) | 구성 선택지 4가지 비교, 데이터 적재 두 방식(SeaTunnel parquet + PyIceberg `add_files` vs SeaTunnel Iceberg sink), HMS 로컬 기동 방법, 구현 전 검증 필요 항목 |
+| [새 구축 안내서](docs/local-lakehouse-superset.md) | 현재 목표의 전체 구조와 구현 순서 |
+| [구축 선택지](docs/local-lakehouse-build-options.md) | 기존 공유 디스크 재사용과 로컬 S3 대안의 설정 |
 
-## 세 줄 결론
+## Trino 조회
 
-- **Iceberg**는 오픈 테이블 포맷과 이를 처리하는 구현이다. 별도 Iceberg SQL 서버를 띄우는 구조가 아니다.
-- **Hive Metastore**는 테이블 이름과 현재 메타데이터 위치 등을 관리하는 카탈로그 서비스다.
-  Iceberg JSON·manifest 파일과 Parquet 데이터는 파일 저장소에 있다. 이 설계에 HiveServer2는 필요 없다.
-- **DuckDB**는 자체 저장 기능도 있는 임베디드 DB 엔진이다. 여기서는 외부 테이블을 SQL로 조회한다.
-  PyIceberg → Arrow 경로와, 카탈로그에서 얻은 정확한 metadata 경로를 DuckDB가 직접 읽는 경로를 먼저 비교한다.
+```sh
+bash scripts/up-trino.sh
+bash scripts/trino.sh --execute 'SELECT * FROM iceberg.retail.orders ORDER BY order_id'
+```
 
-## 다음 단계 (제안)
+DBeaver: Trino 연결, `localhost:8081`, catalog `iceberg`, schema `retail`, 사용자 `analyst`, 비밀번호 없음.
+[Trino 연결·검증 안내서](docs/trino-local-query.md)에 설정과 결과를 정리했다.
 
-1. 기존 Parquet을 DuckDB로 조회해 기준 결과 확인
-2. HMS + 백엔드 DB + 공유 `/lake`를 구성하고 PyIceberg로 작은 테이블 생성·파일 등록
-3. PyIceberg 경유 조회와 DuckDB 직접 읽기 비교, 커밋 전후·이전 스냅샷 확인
-4. SeaTunnel Iceberg sink로 전환한 뒤 CDC 수정·삭제 검증
+## 구현 상태
 
-안내서의 HTML과 SVG 재생성: `python3 docs/build_visual_guide.py` (외부 패키지 불필요).
+SeaTunnel 2.3.13 Iceberg sink, Hive Metastore 4.0.1, PostgreSQL 16, 공유 `/lake` 및 HMS 초기화 도구가 구현되어 있다. 2026-10-02 기록에서 첫 배치 3건, 추가 적재 후 5건·합계 170,000, 과거 스냅샷 및 카탈로그 재시작 보존을 확인했다.
+
+**Trino 483 및 Superset 6.0.0 연결 완료.** 기존 `retail.orders` 조회 외에, 2026-10-08 원본 PostgreSQL `production_orders_100m` 1억 행을 SeaTunnel으로 Iceberg에 적재했다. Trino가 Parquet 4개(약 330.5 MB)를 스캔해 원본 집계와 대조했고 결과가 일치했다. 사용자가 Superset SQL Lab에서도 이 테이블 조회를 확인했다. 설정·검증·SQL은 [1억 행 적재 안내서](docs/production-orders-100m.md), 실행 산출물은 `evidence/production-100m/`에 있다.
+
+기존 보조 조회·배치 검증 도구와 관련 산출물은 제거했다. Iceberg 실제 데이터와 원본·SeaTunnel·HMS 기록은 유지한다. 초기 구축 절차와 중복 적재 주의사항은 [구축 안내서](docs/local-lakehouse-superset.md#6-구현-순서)를 참고한다.
+
+에이전트 작업 규칙은 [AGENTS.md](AGENTS.md)와 [CLAUDE.md](CLAUDE.md)를 참조한다.
+
+## Superset 웹 조회
+
+[주문 대시보드 열기](http://localhost:8088/superset/dashboard/local-iceberg/) · [접속 및 구성 안내](docs/superset-local-ui.md)
+
+```sh
+# 로그인 정보 확인
+python3 scripts/show-superset-login.py
+# 전체 분석 계층 기동 및 초기 설정
+bash scripts/up-superset.sh
+```
+
+파일들의 사용 시점이 궁금하면 [config · jobs · scripts 그림 안내](docs/md/project-files-guide.md)를 참고한다.
+
+HMS의 역할은 [브라우저용 단계별 안내서](docs/web/hms-guide.html)에서 적재·조회·커밋 흐름을 눌러보며 확인할 수 있다. HTML 파일을 브라우저로 열면 동작한다.
+
+## JSON → Avro → Parquet 직접 열어보기
+
+[analysis/read_parquet.ipynb](analysis/read_parquet.ipynb)를 VS Code에서 열고 `.venv/bin/python` 커널을 선택한다. `uv sync` 후 위에서부터 실행하면 된다. 실제 catalog-db의 `metadata_location` → snapshot → manifest list → manifest → Parquet 순서로 읽으며, 현재 5행·합계 170000과 과거 3행·합계 69000의 실행 결과도 저장되어 있다.
+
+Docker 없이 학습하려면 노트북의 `SOURCE_MODE`를 `evidence`로 바꾼다 (현재 DB 대신 과거 HMS 출력 기록 사용). 기존 노트북은 `analysis/read_parquet.before-walkthrough.ipynb`에 보존했다. 삭제 파일·스키마 진화를 처리하는 범용 엔진이 아닌 현재 append 예제 전용이다.
+
+[JSON 하나에서 여러 Parquet를 찾는 그림과 설명 검토](docs/md/iceberg-json-to-parquet.md)에서 실제 Avro 참조 관계와 커밋·캐시·파일 선택의 의미를 확인할 수 있다.
+
+Iceberg sink의 파일 생성 과정은 [Parquet·Avro·JSON 생성 단계별 웹 안내](docs/web/iceberg-write-guide.html)에서 확인한다. HTML을 브라우저로 열고 단계 버튼을 누르면 된다.
+
+### 1억 행 테이블의 JSON·Avro·Parquet 직접 확인
+
+[analysis/read_parquet.ipynb](analysis/read_parquet.ipynb)를 프로젝트 `.venv/bin/python` 커널로 위에서부터 실행한다 (`uv sync --dev`). 기본 live 모드는 실행 중인 catalog-db를 SELECT하며, Docker 없이 보려면 `SOURCE_MODE = "evidence"`로 바꾼다. 파일당 5행 샘플과 footer만 확인하므로 1억 행 전체를 메모리에 올리지 않는다. JSON 5개·manifest list 4개·manifest 4개·Parquet 4개의 실제 참조 관계와 네 커밋의 누적 행 수를 표시한다. 이전 5행 노트북은 `analysis/read_parquet.orders-5rows.ipynb`에 보존했다. 실행 검증: `evidence/notebook/production-100m/execution.json`.

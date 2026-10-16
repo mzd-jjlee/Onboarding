@@ -1,0 +1,18 @@
+{
+  "notebook": "analysis/read_parquet.ipynb",
+  "source": "live catalog-db SELECT",
+  "code_cells": 12,
+  "errors": [],
+  "current_snapshot": {
+    "id": "7763263029727631105",
+    "rows": 5,
+    "sum_amount": 170000
+  },
+  "first_snapshot": {
+    "id": "2162422063555107563",
+    "rows": 3,
+    "sum_amount": 69000
+  },
+  "lake_files_unchanged": 9,
+  "outputs_saved": true
+}

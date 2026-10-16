@@ -1,0 +1,4 @@
+*
+!config/
+!config/Dockerfile.catalog
+!config/Dockerfile.superset

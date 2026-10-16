@@ -1,0 +1,92 @@
+{
+  "query_id": 1,
+  "status": "success",
+  "data": [
+    {
+      "order_count": 5,
+      "total_amount": 170000
+    }
+  ],
+  "columns": [
+    {
+      "column_name": "order_count",
+      "name": "order_count",
+      "type": "BIGINT",
+      "type_generic": 0,
+      "is_dttm": false
+    },
+    {
+      "column_name": "total_amount",
+      "name": "total_amount",
+      "type": "BIGINT",
+      "type_generic": 0,
+      "is_dttm": false
+    }
+  ],
+  "selected_columns": [
+    {
+      "column_name": "order_count",
+      "name": "order_count",
+      "type": "BIGINT",
+      "type_generic": 0,
+      "is_dttm": false
+    },
+    {
+      "column_name": "total_amount",
+      "name": "total_amount",
+      "type": "BIGINT",
+      "type_generic": 0,
+      "is_dttm": false
+    }
+  ],
+  "expanded_columns": [],
+  "query": {
+    "changed_on": "2026-10-07T00:22:55.950296",
+    "dbId": 1,
+    "db": "Local Iceberg / Trino",
+    "endDttm": 1791332575952.6511,
+    "errorMessage": null,
+    "executedSql": "SELECT\n  COUNT(*) AS order_count,\n  SUM(amount) AS total_amount\nFROM iceberg.retail.orders\nLIMIT 101",
+    "id": "1a23254457",
+    "queryId": 1,
+    "limit": 100,
+    "limitingFactor": "NOT_LIMITED",
+    "progress": 100,
+    "rows": 1,
+    "catalog": "iceberg",
+    "schema": "retail",
+    "ctas": false,
+    "serverId": 1,
+    "sql": "SELECT COUNT(*) AS order_count, SUM(amount) AS total_amount FROM iceberg.retail.orders",
+    "sqlEditorId": null,
+    "startDttm": 1791332575808.728,
+    "state": "success",
+    "tab": null,
+    "tempSchema": null,
+    "tempTable": null,
+    "userId": 1,
+    "user": "Local Admin",
+    "resultsKey": null,
+    "trackingUrl": "http://trino:8080/ui#/queries/20261007_002257_00017_4paw6",
+    "extra": {
+      "progress": null,
+      "cancel_query": "20261007_002257_00017_4paw6",
+      "columns": [
+        {
+          "column_name": "order_count",
+          "name": "order_count",
+          "type": "BIGINT",
+          "type_generic": 0,
+          "is_dttm": false
+        },
+        {
+          "column_name": "total_amount",
+          "name": "total_amount",
+          "type": "BIGINT",
+          "type_generic": 0,
+          "is_dttm": false
+        }
+      ]
+    }
+  }
+}

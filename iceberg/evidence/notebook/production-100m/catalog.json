@@ -1,0 +1,115 @@
+{
+  "captured_at": "2026-10-15T00:44:52.848548+00:00",
+  "source": "read-only catalog-db SELECT",
+  "sql": "\nSELECT COALESCE(json_agg(row_to_json(x)), '[]'::json)\nFROM (\n  SELECT d.\"NAME\" AS namespace, t.\"TBL_NAME\" AS table_name,\n         p.\"PARAM_KEY\" AS param_key, p.\"PARAM_VALUE\" AS param_value\n  FROM \"TBLS\" t\n  JOIN \"DBS\" d ON d.\"DB_ID\" = t.\"DB_ID\"\n  JOIN \"TABLE_PARAMS\" p ON p.\"TBL_ID\" = t.\"TBL_ID\"\n  WHERE d.\"NAME\" = 'retail' AND t.\"TBL_NAME\" = 'production_orders_100m'\n  ORDER BY p.\"PARAM_KEY\"\n) x;\n",
+  "rows": [
+    {
+      "namespace": "retail",
+      "table_name": "production_orders_100m",
+      "param_key": "current-schema",
+      "param_value": "{\"type\":\"struct\",\"schema-id\":0,\"fields\":[{\"id\":1,\"name\":\"order_id\",\"required\":true,\"type\":\"long\"},{\"id\":2,\"name\":\"factory_id\",\"required\":false,\"type\":\"string\"},{\"id\":3,\"name\":\"product_name\",\"required\":false,\"type\":\"string\"},{\"id\":4,\"name\":\"quantity\",\"required\":false,\"type\":\"int\"},{\"id\":5,\"name\":\"order_date\",\"required\":false,\"type\":\"date\"},{\"id\":6,\"name\":\"status\",\"required\":false,\"type\":\"string\"}]}"
+    },
+    {
+      "namespace": "retail",
+      "table_name": "production_orders_100m",
+      "param_key": "current-snapshot-id",
+      "param_value": "3279400440120366835"
+    },
+    {
+      "namespace": "retail",
+      "table_name": "production_orders_100m",
+      "param_key": "current-snapshot-summary",
+      "param_value": "{\"added-data-files\":\"1\",\"added-records\":\"25000000\",\"added-files-size\":\"82618924\",\"changed-partition-count\":\"1\",\"total-records\":\"100000000\",\"total-files-size\":\"330496199\",\"total-data-files\":\"4\",\"total-delete-files\":\"0\",\"total-position-deletes\":\"0\",\"total-equality-deletes\":\"0\",\"iceberg-version\":\"Apache Iceberg 1.6.1 (commit 8e9d59d299be42b0bca9461457cd1e95dbaad086)\"}"
+    },
+    {
+      "namespace": "retail",
+      "table_name": "production_orders_100m",
+      "param_key": "current-snapshot-timestamp-ms",
+      "param_value": "1791423500194"
+    },
+    {
+      "namespace": "retail",
+      "table_name": "production_orders_100m",
+      "param_key": "DO_NOT_UPDATE_STATS",
+      "param_value": "true"
+    },
+    {
+      "namespace": "retail",
+      "table_name": "production_orders_100m",
+      "param_key": "EXTERNAL",
+      "param_value": "TRUE"
+    },
+    {
+      "namespace": "retail",
+      "table_name": "production_orders_100m",
+      "param_key": "metadata_location",
+      "param_value": "file:/lake/warehouse/retail.db/production_orders_100m_append/metadata/00004-9489b5e8-15df-400a-b359-855c218e07bc.metadata.json"
+    },
+    {
+      "namespace": "retail",
+      "table_name": "production_orders_100m",
+      "param_key": "numFiles",
+      "param_value": "4"
+    },
+    {
+      "namespace": "retail",
+      "table_name": "production_orders_100m",
+      "param_key": "numRows",
+      "param_value": "100000000"
+    },
+    {
+      "namespace": "retail",
+      "table_name": "production_orders_100m",
+      "param_key": "previous_metadata_location",
+      "param_value": "file:/lake/warehouse/retail.db/production_orders_100m_append/metadata/00003-a9e2206d-8e0e-410e-ac3f-0a96d6275d12.metadata.json"
+    },
+    {
+      "namespace": "retail",
+      "table_name": "production_orders_100m",
+      "param_key": "snapshot-count",
+      "param_value": "4"
+    },
+    {
+      "namespace": "retail",
+      "table_name": "production_orders_100m",
+      "param_key": "table_type",
+      "param_value": "ICEBERG"
+    },
+    {
+      "namespace": "retail",
+      "table_name": "production_orders_100m",
+      "param_key": "totalSize",
+      "param_value": "330496199"
+    },
+    {
+      "namespace": "retail",
+      "table_name": "production_orders_100m",
+      "param_key": "transient_lastDdlTime",
+      "param_value": "1791423108"
+    },
+    {
+      "namespace": "retail",
+      "table_name": "production_orders_100m",
+      "param_key": "uuid",
+      "param_value": "2aaada46-1a99-4e86-a806-26b28ba35f11"
+    },
+    {
+      "namespace": "retail",
+      "table_name": "production_orders_100m",
+      "param_key": "write.parquet.compression-codec",
+      "param_value": "zstd"
+    },
+    {
+      "namespace": "retail",
+      "table_name": "production_orders_100m",
+      "param_key": "write.parquet.row-group-size-bytes",
+      "param_value": "16777216"
+    },
+    {
+      "namespace": "retail",
+      "table_name": "production_orders_100m",
+      "param_key": "write.target-file-size-bytes",
+      "param_value": "134217728"
+    }
+  ]
+}

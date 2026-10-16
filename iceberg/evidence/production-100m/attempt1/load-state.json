@@ -1,0 +1,8 @@
+{
+  "started_at": "2026-10-08T01:21:00.249031+00:00",
+  "status": "FAILED",
+  "table": "iceberg.retail.production_orders_100m",
+  "parallelism": 4,
+  "finished_at": "2026-10-08T01:29:26.552972+00:00",
+  "exit_code": 137
+}

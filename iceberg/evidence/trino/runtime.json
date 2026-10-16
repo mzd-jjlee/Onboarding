@@ -1,0 +1,13 @@
+{
+  "verified_on": "2026-10-06",
+  "image": "trinodb/trino:483",
+  "image_id_prefix": "db58cc93e593",
+  "platform": "linux/arm64",
+  "host_endpoint": "http://127.0.0.1:8081",
+  "host_http_info": "ACTIVE, starting=false, version=483",
+  "hms": "apache/hive:4.0.1",
+  "warehouse": "file:/lake/warehouse",
+  "local_location": "/",
+  "catalog_security": "READ_ONLY",
+  "data_mount": "./lake:/lake:ro"
+}

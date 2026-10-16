@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "rows": 100000000,
+  "parquet_files": 4,
+  "parquet_bytes": 330496199,
+  "trino_aggregate_seconds_including_cli": 5.872,
+  "comparison": "total and per-status count, ID sums/ranges, quantity sums/nulls, date ranges, string lengths; not row-by-row equality",
+  "original_orders": [
+    {
+      "n": "5",
+      "amount": "170000"
+    }
+  ]
+}

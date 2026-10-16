@@ -1,0 +1,6 @@
+"order_id","customer_name","amount","status"
+"1001","Alice","12000","NEW"
+"1002","Bob","23000","DONE"
+"1003","Carol","34000","DONE"
+"1004","Dave","45000","NEW"
+"1005","Eve","56000","DONE"

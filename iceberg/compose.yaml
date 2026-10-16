@@ -1,0 +1,102 @@
+name: iceberg-learning
+services:
+  # 이관할 주문 데이터가 들어 있는 원본 DB. HMS의 등록 정보 DB와는 별개다.
+  source-db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: demo
+      POSTGRES_PASSWORD: demo
+      POSTGRES_DB: ordersdb
+    volumes:
+      - source-db:/var/lib/postgresql/data
+      - ./config/source.sql:/docker-entrypoint-initdb.d/01-source.sql:ro
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U demo -d ordersdb]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+  # HMS의 영구 저장소: 테이블 이름·속성·현재 metadata_location 등을 저장한다.
+  # 실제 주문 Parquet와 Iceberg JSON/Avro는 이 DB가 아니라 ./lake에 저장된다.
+  catalog-db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: hive
+      POSTGRES_PASSWORD: hive
+      POSTGRES_DB: metastore
+    # Mac의 DBeaver → localhost:15432 → 컨테이너 PostgreSQL:5432.
+    # 컨테이너 간 HMS 연결은 기존 catalog-db:5432를 그대로 사용한다.
+    ports:
+      - "127.0.0.1:15432:5432"
+    volumes:
+      # 컨테이너를 다시 만들어도 HMS 등록 정보를 유지하는 Docker 볼륨.
+      - catalog-db:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U hive -d metastore]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+  # SeaTunnel/Trino의 테이블 등록·조회·갱신 요청을 처리하는 Hive Metastore 서버.
+  hms:
+    image: apache/hive:4.0.1
+    user: "0:0"
+    environment:
+      # 공식 Hive 이미지에서 SQL 서버가 아닌 metastore 서비스를 실행한다.
+      SERVICE_NAME: metastore
+      # HMS가 사용할 백엔드 DB 종류. 아래 JDBC 드라이버 JAR도 필요하다.
+      DB_DRIVER: postgres
+      # HMS → catalog-db 연결: 서버 catalog-db, 포트 5432, DB 이름 metastore.
+      # ConnectionUserName/Password는 위 catalog-db의 계정 설정과 일치해야 한다.
+      # warehouse.dir는 기본 파일 저장 경로이며, DB 내부 저장 위치가 아니다.
+      # 이 블록의 -D 옵션은 HMS Java 프로세스에 전달된다.
+      SERVICE_OPTS: >-
+        -Djavax.jdo.option.ConnectionDriverName=org.postgresql.Driver
+        -Djavax.jdo.option.ConnectionURL=jdbc:postgresql://catalog-db:5432/metastore
+        -Djavax.jdo.option.ConnectionUserName=hive
+        -Djavax.jdo.option.ConnectionPassword=hive
+        -Dhive.metastore.warehouse.dir=file:///lake/warehouse
+    volumes:
+      # 호스트 ./lake를 HMS의 /lake로 연결한다. SeaTunnel도 같은 경로를 사용한다.
+      - ./lake:/lake
+      # HMS Java 프로세스가 PostgreSQL에 연결할 때 사용하는 JDBC 드라이버.
+      - ./vendor/postgresql.jar:/opt/hive/lib/postgres.jar:ro
+    depends_on:
+      catalog-db:
+        condition: service_healthy
+  seatunnel:
+    image: apache/seatunnel:2.3.13
+    # 기본 상주 서비스와 분리한 작업용 서비스. 적재할 때 명시적으로 실행한다.
+    profiles: [tools]
+    working_dir: /opt/seatunnel
+    # 전달받은 /jobs/*.conf를 Zeta local mode로 실행한다.
+    entrypoint: [sh, /lab/scripts/seatunnel-entry.sh]
+    volumes:
+      # sink의 file:///lake/warehouse가 실제 호스트 ./lake/warehouse에 대응한다.
+      - ./lake:/lake
+      # 호스트 작업 설정을 컨테이너 /jobs에서 읽는다.
+      - ./jobs:/jobs:ro
+      - ./scripts:/lab/scripts:ro
+      - ./config/jvm_client_options:/opt/seatunnel/config/jvm_client_options:ro
+    depends_on:
+      source-db:
+        condition: service_healthy
+      hms:
+        condition: service_started
+  # 일회성 초기화 도구: prepare_catalog.py로 retail namespace만 준비한다.
+  # 테이블 생성·행 적재는 이후 SeaTunnel Iceberg sink가 수행한다.
+  catalog-tools:
+    build:
+      context: .
+      dockerfile: config/Dockerfile.catalog
+    profiles: [tools]
+    working_dir: /lab
+    volumes:
+      - ./scripts:/lab/scripts:ro
+    environment:
+      PYTHONUNBUFFERED: "1"
+volumes:
+  source-db:
+  catalog-db:
+networks:
+  default:
+    # 서비스들이 source-db, hms, catalog-db라는 이름으로 서로 접근하는 네트워크.
+    name: iceberg-learning-net

@@ -1,0 +1,7 @@
+"order_id","factory_id","product_name","quantity","order_date","status"
+"1","F002","Engine Block","384","2025-11-17","IN_PROGRESS"
+"2","F003","Circuit Board","294","2026-06-11","COMPLETED"
+"3","F004","Gearbox","226","2026-09-05","CANCELLED"
+"50000000","F021","Steel Frame","173","2025-11-20","CREATED"
+"99999999","F010","Turbine Blade","179","2025-11-07","CANCELLED"
+"100000000","F011","Steel Frame","94","2025-12-14","CREATED"

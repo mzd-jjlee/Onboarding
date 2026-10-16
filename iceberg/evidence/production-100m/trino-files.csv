@@ -1,0 +1,5 @@
+"file_path","record_count","file_size_in_bytes"
+"file:/lake/warehouse/retail.db/production_orders_100m_append/data/00001-1791423343013-f5379e81-139b-4f17-b91e-0e96178b3a43-00001.parquet","25000000","82619148"
+"file:/lake/warehouse/retail.db/production_orders_100m_append/data/00001-1791423346272-94f8a69d-8d6f-4a36-acee-e2902d3878c6-00001.parquet","25000000","82618924"
+"file:/lake/warehouse/retail.db/production_orders_100m_append/data/00001-1791423349766-d38698f2-6c8c-4453-b58a-2978fbe8c3cd-00001.parquet","25000000","82619061"
+"file:/lake/warehouse/retail.db/production_orders_100m_append/data/00001-1791423354905-a195136c-66f0-4a92-8905-bfde1d52c469-00001.parquet","25000000","82639066"
