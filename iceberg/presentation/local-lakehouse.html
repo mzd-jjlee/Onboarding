@@ -154,6 +154,23 @@ body{
 .card .alt{
   font-size:1.05cqw;color:#8a99ab;margin-top:.6cqw;line-height:1.5;
 }
+/* 카드 안 미니 도식 — 상자 몇 개로 '무엇이 바뀌고 무엇이 그대로인지'만 보여준다 */
+.mini{display:flex;align-items:center;flex-wrap:wrap;gap:.35cqw;margin:.85cqw 0 .15cqw}
+.mini .mb{
+  font-family:var(--mono);font-size:.92cqw;line-height:1;white-space:nowrap;
+  padding:.42cqw .6cqw;border-radius:.34cqw;
+  background:#fff;border:1px solid var(--line);color:#53677d;
+}
+.mini .mb.on{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:700}
+.mini .mb.off{opacity:.42;text-decoration:line-through}
+.mini .mb.gh{border-style:dashed;color:#92a3b5;background:transparent}
+.mini .ar{color:#a6b5c5;font-size:1.05cqw;margin:0 .1cqw}
+.mini .lb{font-size:1.0cqw;color:var(--muted);margin-left:.45cqw}
+.card .gain{font-size:1.1cqw;color:#53677d;margin-top:.7cqw;line-height:1.72}
+/* '무엇이 → 어떤 명세로' 두 줄을 세로로 맞춰 보여주는 격자 */
+.mini2{display:grid;grid-template-columns:max-content max-content max-content;
+       gap:.4cqw .5cqw;align-items:center;margin:.9cqw 0 .15cqw}
+.card .gain b{color:var(--navy)}
 .card.b{background:var(--blue-soft);border-color:var(--blue-line)}
 .card.o{background:var(--orange-soft);border-color:var(--orange-line)}
 .card.gr{background:var(--green-soft);border-color:var(--green-line)}
@@ -210,9 +227,11 @@ th{
 th:first-child{border-top-left-radius:.5cqw}
 th:last-child{border-top-right-radius:.5cqw}
 tbody tr:nth-child(even){background:var(--bg-soft)}
+.mono{font-family:var(--mono)}
 td.mono{font-family:var(--mono);font-size:1.05cqw;color:var(--navy)}
 td b{color:var(--navy)}
 td.not{color:#a9540a}
+table.mid td{vertical-align:middle}
 .ok{color:var(--green);font-weight:800}
 .no{color:var(--orange);font-weight:800}
 
@@ -247,7 +266,7 @@ pre.tree .dim{color:#9aaabd}
 }
 
 /* 네 계층 중 지금 어디인지 보여주는 진행 띠 (walkthrough 전용) */
-.chain{display:flex;align-items:center;gap:.5cqw;margin-bottom:1.3cqw;flex-wrap:nowrap}
+.chain{display:flex;align-items:center;gap:.5cqw;margin-top:1.5cqw;margin-bottom:2.2cqw;flex-wrap:nowrap}
 .ch{
   border:1px solid var(--line);background:var(--bg-soft);color:#90a0b3;
   border-radius:.45cqw;padding:.45cqw .95cqw;font-size:1.08cqw;font-weight:700;white-space:nowrap;
@@ -258,13 +277,14 @@ pre.tree .dim{color:#9aaabd}
 .chtail{margin-left:auto;font-size:1.05cqw;color:var(--muted);font-weight:600}
 
 /* 실제 파일 내용 발췌 블록 */
-.excerpt{border-radius:.7cqw;overflow:hidden;border:1px solid var(--navy-deep)}
+.excerpt{border-radius:.7cqw;overflow:hidden;border:1px solid var(--navy-deep);
+  display:flex;flex-direction:column;background:var(--navy-deep)}
 .excerpt .hd{
   background:#13314f;color:#cfe0f2;font-family:var(--mono);font-size:1cqw;
   padding:.55cqw 1.2cqw;display:flex;justify-content:space-between;align-items:center;
 }
 .excerpt .hd b{color:#ffb570;font-weight:700}
-.excerpt pre{border-radius:0;border:0}
+.excerpt pre{border-radius:0;border:0;flex:1;margin:0}
 
 /* Parquet 행 표 */
 table.rows{font-size:1.1cqw}
@@ -531,7 +551,6 @@ body:hover #help{opacity:.5}
 <section class="slide" data-eyebrow="02. 로컬 아키텍처" data-notes="★ 전체 구성을 먼저 보여주고 들어간다. 자세히 설명하지 않는다 — 범례의 주황/파랑이 오늘의 순서라는 것만 말한다(02장 주황, 05장 파랑). 손으로 짚을 것 셋: 웹 브라우저가 Docker 밖, lake/는 bind mount, 그리고 04장의 1억 행 원본은 그림의 Source DB가 아니라 다른 compose 프로젝트의 Postgres(5440)라는 점. 질문이 나오면: Trino의 lake 마운트는 읽기 전용(:ro)이고, catalog-db↔HMS 화살표는 주황으로 그려졌지만 조회할 때도 쓰인다.">
   <div class="eyebrow">02. 로컬 아키텍처</div>
   <div class="s-title">데이터 레이크하우스 아키텍처</div>
-  <div class="s-sub">Mac 한 대의 Docker 컨테이너로 구성했다.</div>
   <div class="fig"><img src="../docs/assets/lakehouse-flow/11-local-lakehouse-overview-v3.png" alt="내 로컬 PC 안의 Docker 컨테이너(Source DB·SeaTunnel·Hive Metastore·catalog-db·Trino·Superset·superset-db)와 bind mount로 연결된 로컬 저장소 lake/, 그리고 컨테이너 밖의 웹 브라우저"></div>
   <div class="cap"><span><b>범례의 두 색이 오늘의 순서</b>다 — <b style="color:var(--orange)">주황(적재·등록)</b>은 이번 장, <b style="color:var(--blue)">파랑(조회)</b>은 05장에서 본다. <b>웹 브라우저만 Docker 밖</b>(호스트에서 실행)이고 나머지는 전부 컨테이너다. <span class="mono">lake/</span>는 <b>bind mount</b>라 호스트와 컨테이너가 같은 파일을 본다. 단, 04장에서 볼 <b>1억 행 원본은 이 Source DB가 아니라 별도 PostgreSQL</b>(<span class="mono">host.docker.internal:5440</span>)이다.</span></div>
 </section>
@@ -546,37 +565,83 @@ body:hover #help{opacity:.5}
 </section>
 
 <!-- ==================== 8. 쓰기 경로 전체가 설정 파일 하나에 선언된다 ==================== -->
-<section class="slide" data-eyebrow="02. 로컬 아키텍처" data-notes="설정 파일 한 장으로 쓰기 경로 전체가 선언된다는 점이 포인트. source는 어디서 읽고, sink는 어떤 포맷으로 어느 카탈로그에 쓰는지. transform 블록은 다음 장에서 설명한다.">
+<section class="slide" data-eyebrow="02. 로컬 아키텍처" data-notes="설정 파일 하나에 source(어디서 읽나)와 sink(어디에 쓰나)가 선언된다는 점이 포인트. sink에 카탈로그 주소와 저장소 경로가 같이 있다는 것만 짚으면 된다. 실제 파일에는 transform 블록도 있지만 이번 발표 범위 밖이라 생략했다. 질문이 나오면: APPEND_DATA라 재실행하면 중복되므로 래퍼 스크립트가 막는다.">
   <div class="eyebrow">02. 로컬 아키텍처</div>
   <div class="s-title">적재 작업 설정</div>
-  <div class="s-sub"><span class="mono">jobs/03_production_orders_100m.conf</span> — 어디서 읽어 어느 카탈로그의 어떤 테이블로 쓸지.</div>
+  <div class="s-sub">SeaTunnel DB → Iceberg config 설정</div>
   <div class="body top">
-<pre><span class="c"># ── 어디서 읽나 ──  기본키 범위로 4등분해 병렬로 읽는다</span>
-<span class="k">source</span> { Jdbc {
-    url = <span class="s">"jdbc:postgresql://host.docker.internal:5440/srcdb?readOnly=true"</span>
-    query = <span class="s">"select order_id, factory_id, product_name, quantity, order_date, status
-             from public.production_orders_100m"</span>
-    fetch_size = 5000          <span class="c">// 커서로 5천 행씩 스트리밍 — 전부 메모리에 올리지 않는다</span>
-    partition_column = <span class="s">"order_id"</span>    partition_num = 4
+<pre style="font-size:1.02cqw;line-height:1.62"><span class="k">source</span> { Jdbc {
+    url              = <span class="s">"jdbc:postgresql://host.docker.internal:5440/srcdb?readOnly=true"</span>
+    query            = <span class="s">"select order_id, factory_id, product_name, quantity, order_date, status
+                        from public.production_orders_100m"</span>
+    fetch_size       = 5000
+    partition_column = <span class="s">"order_id"</span>
+    partition_num    = 4
 } }
 
-<span class="k">transform</span> { <span class="c">/* 컬럼 이름을 바꿨다 되돌린다 — 이유는 다음 장에서 */</span> }
-
-<span class="c"># ── 어디에 쓰나 ──  파일 저장소와 카탈로그를 각각 지정한다</span>
 <span class="k">sink</span> { Iceberg {
-    iceberg.catalog.config = { type = <span class="s">"hive"</span>
-                               uri = <span class="s">"thrift://hms:9083"</span>          <span class="c">← 카탈로그 (이름·위치)</span>
-                               warehouse = <span class="s">"file:///lake/warehouse"</span> }  <span class="c">← 파일 저장소</span>
-    namespace = <span class="s">"retail"</span>   table = <span class="s">"production_orders_100m"</span>
-    iceberg.table.write-props = { write.format.default = <span class="s">"parquet"</span>
+    iceberg.catalog.config = { type      = <span class="s">"hive"</span>
+                               uri       = <span class="s">"thrift://hms:9083"</span>
+                               warehouse = <span class="s">"file:///lake/warehouse"</span> }
+    namespace              = <span class="s">"retail"</span>
+    table                  = <span class="s">"production_orders_100m"</span>
+    iceberg.table.write-props = { write.format.default            = <span class="s">"parquet"</span>
                                   write.parquet.compression-codec = <span class="s">"zstd"</span> }
-    data_save_mode = <span class="s">"APPEND_DATA"</span>   <span class="c">// 재실행하면 중복된다 — 래퍼 스크립트로 차단</span>
+    data_save_mode         = <span class="s">"APPEND_DATA"</span>
 } }</pre>
-    <div class="code-note"><b>주목할 점</b> — sink에 Trino나 Superset 얘기가 전혀 없다. 쓰는 쪽은 <b>읽는 쪽의 존재를 모른다.</b> 카탈로그 주소와 파일 경로만 알면 된다.</div>
+    <div class="code-note" style="margin-top:1.1cqw"><b>주목할 점</b> — sink에 Trino나 Superset 얘기가 전혀 없다. 쓰는 쪽은 <b>읽는 쪽의 존재를 모른다.</b> 카탈로그 주소와 파일 경로만 알면 된다.</div>
   </div>
 </section>
 
-<!-- ==================== 9. 섹션 03 ==================== -->
+<!-- ==================== 9. Iceberg sink 설정 ==================== -->
+<section class="slide" data-eyebrow="02. 로컬 아키텍처" data-notes="핵심은 '주소가 두 개'라는 것. uri는 카탈로그(등록·커밋을 보낼 곳), warehouse는 저장소(파일을 쓸 곳). 03장에서 말할 HMS 역할 분리가 설정 파일에 그대로 드러난다는 점을 짚는다. 질문이 나오면: (1) warehouse는 기본 위치일 뿐이고 실제 위치는 카탈로그에 기록된 값이 이긴다 — 우리 테이블도 이름은 …100m인데 디렉터리는 …100m_append다. 그래서 warehouse만 바꿔 기존 테이블을 옮길 수 없다. (2) schema_save_mode의 &apos;스키마&apos;는 Postgres의 public 같은 네임스페이스가 아니라 컬럼 이름+타입을 말한다. 정확히는 원천 테이블 전체가 아니라 source의 SELECT 결과 기준이고, 타입은 SeaTunnel을 거쳐 매핑된다(bigint→long, varchar→string). CREATE TABLE을 한 번도 안 썼는데 테이블이 생긴 이유가 이 설정이다. (3) 실제 파일에는 plugin_input과 upsert-mode-enabled도 있지만 발표 범위 밖이라 생략했다. (4) APPEND 질문이 나오면: 이 job은 조건 없는 전체 SELECT라 재실행하면 1억 행이 2억 행이 된다. Parquet만 실제 중복이고 JSON·Avro 증가는 버전 이력이다. 그래서 CLAUDE.md에 반복 실행 금지가 적혀 있다.">
+  <div class="eyebrow">02. 로컬 아키텍처</div>
+  <div class="s-title">Iceberg sink 설정</div>
+  <div class="s-sub">SeaTunnel이 Iceberg에 쓰려면 <b>주소를 두 개</b> 알려줘야 한다.</div>
+  <div class="body top">
+    <div class="grid" style="grid-template-columns:1fr 1.15fr;gap:1.5cqw">
+<pre style="font-size:1.02cqw;line-height:1.7"><span class="k">sink</span> { Iceberg {
+    catalog_name = <span class="s">"local_hive"</span>
+
+    iceberg.catalog.config = {
+      type      = <span class="s">"hive"</span>
+      <span class="hl">uri       = <span class="s">"thrift://hms:9083"</span></span>
+      <span class="hl">warehouse = <span class="s">"file:///lake/warehouse"</span></span>
+    }
+
+    namespace = <span class="s">"retail"</span>
+    table     = <span class="s">"production_orders_100m"</span>
+
+    iceberg.table.write-props = {
+      write.format.default            = <span class="s">"parquet"</span>
+      write.parquet.compression-codec = <span class="s">"zstd"</span>
+      write.target-file-size-bytes    = 134217728
+      write.parquet.row-group-size-bytes = 16777216
+    }
+
+    schema_save_mode = <span class="s">"CREATE_SCHEMA_WHEN_NOT_EXIST"</span>
+    data_save_mode   = <span class="s">"APPEND_DATA"</span>
+} }</pre>
+      <div style="display:flex">
+        <table style="height:100%">
+          <thead><tr><th style="width:33%">파라미터</th><th>하는 일</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">type</td><td><b>카탈로그 구현 선택</b> — JDBC · REST · Glue로 교체 가능한 자리</td></tr>
+            <tr style="background:var(--orange-soft)"><td class="mono"><b>uri</b></td><td><b>카탈로그 주소</b> — Hive Metastore Thrift 지점. 테이블 <b>등록·커밋 요청의 수신처</b></td></tr>
+            <tr style="background:var(--orange-soft)"><td class="mono"><b>warehouse</b></td><td><b>저장소 주소</b> — Parquet · JSON · Avro의 <b>실제 기록 경로</b> (기본값)</td></tr>
+            <tr><td class="mono">catalog_name</td><td><b>job 안에서만 쓰는 별명</b> — HMS의 DB 이름과 무관</td></tr>
+            <tr><td class="mono">namespace<br>table</td><td><b>테이블 전체 이름</b> → <span class="mono">retail.production_orders_100m</span></td></tr>
+            <tr><td class="mono">write-props</td><td><b>테이블 속성으로 기록되는 쓰기 규약</b> — 포맷 · 압축 · 파일 크기</td></tr>
+            <tr><td class="mono">schema_save_mode</td><td><b>테이블 부재 시 자동 생성</b> — 원천 DB에서 읽어온 컬럼·타입 기반</td></tr>
+            <tr><td class="mono">data_save_mode</td><td><b>기존 데이터 뒤에 추가</b> — 재실행 시 행 중복</td></tr>
+          </tbody>
+        </table>
+        </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 10. 섹션 03 ==================== -->
 <section class="slide divider" data-notes="각 구성요소의 역할과 경계. 이 과제의 두 축 중 하나다.">
   <div class="dlabel">SECTION 03</div>
   <div class="toc">
@@ -589,60 +654,53 @@ body:hover #help{opacity:.5}
   </div>
 </section>
 
-<!-- ==================== 10. 각자 하는 일과 하지 않는 일 ==================== -->
-<section class="slide" data-eyebrow="03. 구성요소의 역할과 경계" data-notes="★ 이해도를 가장 잘 보여주는 슬라이드. '하지 않는 일' 열을 천천히 읽는다. 특히 Iceberg가 docker ps에 안 나온다는 점은 처음 듣는 사람이 놀라는 지점이다. 하단 배너의 '문제가 생겼을 때 어디를 볼지가 정해진다'가 이 표의 실용적 가치다.">
+<!-- ==================== 11. 구성요소별 책임 범위 ==================== -->
+<section class="slide" data-eyebrow="03. 구성요소의 역할과 경계" data-notes="★ 이해도를 가장 잘 보여주는 슬라이드. '하지 않는 일' 열을 천천히 읽는다. 특히 Iceberg가 docker ps에 안 나온다는 점은 처음 듣는 사람이 놀라는 지점이다. 실용적 가치는 문제가 생겼을 때 어디를 볼지가 정해진다는 것 — 조회가 느리면 HMS가 아니라 Trino와 Parquet, 테이블이 안 보이면 파일이 아니라 카탈로그 커밋. 이건 말로 덧붙인다.">
   <div class="eyebrow">03. 구성요소의 역할과 경계</div>
-  <div class="s-title">각자 <span style="color:var(--blue)">하는 일</span>과 <span style="color:var(--orange)">하지 않는 일</span></div>
-  <div class="s-sub">역할이 겹치지 않게 잘라두는 것이 조립형 구조의 핵심이다.</div>
+  <div class="s-title">구성요소별 책임 범위</div>
   <div class="body top">
-    <table>
+    <table class="mid" style="flex:1;font-size:1.42cqw">
       <thead><tr><th style="width:15%">구성요소</th><th style="width:42%">하는 일</th><th>하지 않는 일</th></tr></thead>
       <tbody>
         <tr>
           <td><b>SeaTunnel</b></td>
-          <td>원본에서 행을 읽어 Parquet으로 쓰고, 카탈로그에 커밋한다</td>
-          <td class="not">계속 떠 있지 않는다 — 적재할 때 실행했다가 끝나면 종료된다. <b>조회할 때는 실행되지 않는다</b></td>
+          <td><b>원본 행 읽기 → Parquet 쓰기 → 카탈로그 커밋</b></td>
+          <td class="not"><b>적재할 때만 실행 후 종료</b> — 조회 경로에는 등장하지 않음</td>
         </tr>
         <tr>
           <td><b>Iceberg</b></td>
-          <td>어떤 파일이 현재 테이블인지 정의한다 (스키마 · 스냅샷 · 파일 목록)</td>
-          <td class="not">서버가 아니다. <b>docker ps에 나오지 않는다</b> — 파일 형식과 라이브러리일 뿐이다</td>
+          <td><b>현재 테이블의 정의</b> — 스키마 · 스냅샷 · 파일 목록</td>
+          <td class="not"><b>서버 아님 · <span class="mono">docker&nbsp;ps</span>에 없음</b> — 파일 포맷과 라이브러리</td>
         </tr>
         <tr>
           <td><b>Hive Metastore</b></td>
-          <td>테이블 이름 → 현재 metadata JSON 위치를 관리한다</td>
-          <td class="not">SQL을 실행하지 않는다 · Parquet을 읽지 않는다 · 폴더를 훑어 자동 등록하지 않는다</td>
+          <td><b>테이블 이름 → 현재 metadata JSON 위치</b> 관리</td>
+          <td class="not"><b>SQL 실행 · Parquet 읽기 · 폴더 스캔 자동 등록</b> — 전부 없음</td>
         </tr>
         <tr>
           <td><b>Trino</b></td>
-          <td>SQL을 받아 계획을 세우고, Parquet을 직접 읽어 계산한다</td>
-          <td class="not">데이터를 보관하지 않는다. 저장소가 아니라 <b>계산만 하는 엔진</b>이다</td>
+          <td><b>SQL 수신 · 실행 계획 수립 · Parquet 직접 읽기와 계산</b></td>
+          <td class="not"><b>데이터 보관 없음</b> — 저장소가 아닌 <b>계산 전용 엔진</b></td>
         </tr>
         <tr>
           <td><b>Superset</b></td>
-          <td>웹 화면 — SQL을 Trino에 전달하고 결과를 표·차트로 보여준다</td>
-          <td class="not">파일에 직접 접근하지 않는다. 조회 데이터의 <b>복사본을 갖지 않는다</b></td>
+          <td><b>웹 화면</b> — Trino로 SQL 전달, 결과를 표 · 차트로 렌더링</td>
+          <td class="not"><b>파일 직접 접근 없음 · 조회 데이터 복사본 없음</b></td>
         </tr>
       </tbody>
     </table>
-    <div class="banner">
-      <span class="ic">★</span>
-      <span>“하지 않는 일”을 아는 것이 실제로 쓸모 있는 이유
-      <small>문제가 생겼을 때 <b>어디를 볼지가 정해진다.</b> 조회가 느리면 HMS가 아니라 Trino와 Parquet을 본다. 테이블이 안 보이면 파일이 아니라 카탈로그 커밋을 본다.</small></span>
-    </div>
-  </div>
+</div>
 </section>
 
-<!-- ==================== 11. 카탈로그가 하는 일은 생각보다 작다 ==================== -->
-<section class="slide" data-eyebrow="03. 구성요소의 역할과 경계" data-notes="앞 장 표에서 한 줄이었던 카탈로그를 조금 더 본다. 하단 띠 '우리는 HMS 서버를 개발하지 않고 공식 Hive 이미지를 설정해 실행한다'가 핵심 — 조립이 기본이라는 메시지와 연결된다. 다음 장(왜 이 조합인가)의 카탈로그 칸으로 이어진다.">
+<!-- ==================== 12. 카탈로그가 하는 일은 생각보다 작다 ==================== -->
+<section class="slide" data-eyebrow="03. 구성요소의 역할과 경계" data-notes="앞 장 표에서 한 줄이었던 카탈로그를 조금 더 본다. 그림에서 대제목·노란 부제·하단 띠를 잘라내고 흐름 도식만 남겼다. 잘라낸 부제 '현재 Hive 카탈로그 구성에서는 필요하지만 모든 Iceberg 구성의 필수는 아니다'도 말로 덧붙인다 — JDBC·REST·Glue 카탈로그 대안이 있다(조사, 미사용). '우리는 HMS 서버를 개발하지 않고 공식 Hive 이미지를 설정해 실행한다'는 말로 덧붙인다 — 조립이 기본이라는 메시지와 연결된다. '동시 변경 지원'은 문서 기준이고 동시 writer를 돌려본 적은 없으니 단정하지 않는다. 다음 장(왜 이 조합인가)의 카탈로그 칸으로 이어진다.">
   <div class="eyebrow">03. 구성요소의 역할과 경계</div>
   <div class="s-title">Hive Metastore의 역할</div>
-  <div class="s-sub">테이블 이름과 현재 metadata 위치를 관리한다. 그 외에는 하지 않는다.</div>
-  <div class="fig"><img src="../docs/assets/lakehouse-flow/05-hms-responsibilities.png" alt="HMS의 이름 관리, 등록 정보 조회와 갱신, 동시 변경 지원 역할"></div>
+  <div class="fig"><img src="../docs/assets/lakehouse-flow/05-hms-responsibilities-crop.png" alt="HMS의 이름 관리, 등록 정보 조회와 갱신, 동시 변경 지원 역할"></div>
   <div class="cap"><span>HMS가 아는 것은 <b>“테이블 이름 → 현재 metadata JSON 위치”</b> 뿐이다. 그 다음부터는 읽는 쪽이 파일을 직접 따라간다(04장). 역할이 이렇게 작게 잘려 있어서 <b>카탈로그를 교체해도 파일은 그대로</b>다.</span></div>
 </section>
 
-<!-- ==================== 12. 왜 이 조합을 골랐나 ==================== -->
+<!-- ==================== 13. 왜 이 조합을 골랐나 ==================== -->
 <section class="slide" data-eyebrow="03. 구성요소의 역할과 경계" data-notes="★ 대안을 알고 골랐다는 걸 보여주는 슬라이드. 특히 HMS가 Iceberg의 필수가 아니라는 점을 분명히 말한다. 질문이 나오기 쉬운 지점이기도 하다.">
   <div class="eyebrow">03. 구성요소의 역할과 경계</div>
   <div class="s-title">구성요소 선택 근거</div>
@@ -682,7 +740,7 @@ body:hover #help{opacity:.5}
   </div>
 </section>
 
-<!-- ==================== 13. 섹션 04 ==================== -->
+<!-- ==================== 14. 섹션 04 ==================== -->
 <section class="slide divider" data-notes="파일 네 개를 실제로 열어보는 섹션. 가장 긴 구간이고 두 축 중 하나다.">
   <div class="dlabel">SECTION 04</div>
   <div class="toc">
@@ -695,16 +753,16 @@ body:hover #help{opacity:.5}
   </div>
 </section>
 
-<!-- ==================== 14. 파일 네 개를 차례로 따라가면 데이터가 나온다 ==================== -->
+<!-- ==================== 15. 파일 네 개를 차례로 따라가면 데이터가 나온다 ==================== -->
 <section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="walkthrough 시작. 1억 행 테이블의 실제 파일을 다섯 장에 걸쳐 연다고 예고한다. 확장자가 핵심 — JSON은 하나뿐이고 중간 둘은 Avro다. 흔한 오해 배너는 가볍게 짚고 넘어간다.">
   <div class="eyebrow">04. Iceberg 파일 관리</div>
   <div class="s-title">Iceberg가 만드는 파일 네 가지</div>
-  <div class="s-sub">지금부터 <b>1억 행을 적재한 <span class="mono">retail.production_orders_100m</span> 의 실제 파일</b>을 한 단계씩 열어본다.</div>
+  <div class="s-sub">지금부터 <b>1억 행을 적재한 <span class="mono">retail.production_orders_100m</span> 의 실제 파일</b>을 한 단계씩 열어본다. 아래는 <b>format v2</b> 기준이다.</div>
   <div class="body">
     <div class="grid g4">
       <div class="card">
         <h4><span class="badge-n" style="background:#8b5cf6">1</span>metadata JSON</h4>
-        <p class="why"><b>지금 이 테이블의 상태</b>를 적어둔 파일. 스키마와 스냅샷 목록이 있다.</p>
+        <p class="why"><b>테이블 상태</b>를 적어둔 파일. 스키마와 스냅샷 목록이 있다. 조회는 <b>카탈로그가 가리키는 한 개</b>에서 시작하고, 폴더에는 <b>과거 버전도 남아 있다</b>.</p>
         <p class="alt">00004-9489b5e8-….metadata.json</p>
       </div>
       <div class="card">
@@ -723,15 +781,10 @@ body:hover #help{opacity:.5}
         <p class="alt">….parquet × 4</p>
       </div>
     </div>
-    <div class="banner o">
-      <span class="ic">!</span>
-      <span>확장자를 보자 — <b>JSON은 맨 위 하나뿐이고, 가운데 둘은 Avro</b>다
-      <small>자료를 찾다 보면 “manifest는 JSON”, “snapshot이 별도 파일”, “metadata.json에 데이터 파일 목록이 있다”는 설명이 자주 보이는데 <b>전부 사실과 다르다.</b> 다음 네 장에서 실제 파일로 확인한다.</small></span>
-    </div>
   </div>
 </section>
 
-<!-- ==================== 15. ① JSON에서 현재 스냅샷을 고른다 ==================== -->
+<!-- ==================== 16. ① JSON에서 현재 스냅샷을 고른다 ==================== -->
 <section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="실제 JSON이다. 병렬도 4로 적재했더니 커밋이 4번 일어났고 그게 스냅샷 4개로 남았다. current-snapshot-id와 같은 값을 배열에서 찾아 manifest-list를 따라간다. 스냅샷이 파일이 아니라는 점, 과거 스냅샷이 남아 시점 조회가 된다는 점을 말한다.">
   <div class="eyebrow">04. Iceberg 파일 관리</div>
   <div class="s-title">① metadata JSON — 현재 스냅샷 선택</div>
@@ -745,7 +798,7 @@ body:hover #help{opacity:.5}
   <div class="body top" style="padding-top:0">
     <div class="grid" style="grid-template-columns:1.32fr 1fr;gap:1.5cqw">
       <div class="excerpt">
-        <div class="hd"><span>실제 파일 발췌 · 스냅샷 4개</span><b>metadata.json</b></div>
+        <div class="hd"><span>주요 필드를 재구성한 예시 · 스냅샷 4개</span><b>metadata.json</b></div>
 <pre><span class="hl"><span class="k">"current-snapshot-id"</span>: 3279400440120366835,</span>
 <span class="k">"snapshots"</span>: [
   { <span class="k">"sequence-number"</span>: 1,  <span class="k">"added-records"</span>: <span class="s">"25000000"</span>,
@@ -765,23 +818,24 @@ body:hover #help{opacity:.5}
       </div>
       <div>
         <div class="card gr" style="padding:1.3cqw 1.5cqw">
-          <h4 style="font-size:1.42cqw">하는 일은 단순하다</h4>
+          <h4 style="font-size:1.42cqw">스냅샷 선택 절차</h4>
           <p class="why"><span class="mono">current-snapshot-id</span> 와 <b>같은 값</b>을 배열에서 찾고, 그 항목의 <span class="mono">manifest-list</span> 경로로 넘어간다. 그게 전부다.</p>
         </div>
         <div class="card" style="padding:1.3cqw 1.5cqw;margin-top:1cqw">
-          <h4 style="font-size:1.42cqw">병렬도 4 → 커밋 4번</h4>
-          <p class="why">2,500만 행씩 네 번에 나눠 커밋됐다. <b>25,000,000 → 50,000,000 → 75,000,000 → 100,000,000</b> 누적이 그대로 기록돼 있다.</p>
+          <h4 style="font-size:1.42cqw">커밋 4회 누적</h4>
+          <p class="why">2,500만 행씩 네 번. <b>25,000,000 → 50,000,000 → 75,000,000 → 100,000,000</b> 누적이 기록돼 있다. <b>병렬도와 커밋 수가 항상 같지는 않다.</b></p>
         </div>
         <div class="card o" style="padding:1.3cqw 1.5cqw;margin-top:1cqw">
-          <h4 style="font-size:1.42cqw">스냅샷은 파일이 아니다</h4>
-          <p class="why"><b>JSON 안의 배열 원소</b>다. 과거 셋이 그대로 남아 있어 <b>포인터만 바꾸면 그 시점으로 돌아간다</b> — 커밋이 “파일 교체”가 아니라 <b>포인터 교체</b>인 이유다.</p>
+          <h4 style="font-size:1.42cqw">JSON 안에 기록된 스냅샷</h4>
+          <p class="why"><b>JSON 안의 배열 원소</b>다. 보존된 과거 스냅샷을 <b>지정해 조회할 수 있다</b> (현재 테이블을 되돌리는 것과는 다른 동작이다).</p>
+          <p class="why" style="margin-top:.5cqw">새 JSON에도 과거 스냅샷이 함께 들어 있다 — 같은 ID가 반복되는 건 정상이고 <b>데이터를 복제한 게 아니다</b>.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ==================== 16. ② manifest list에서 manifest 경로를 ==================== -->
+<!-- ==================== 17. ② manifest list에서 manifest 경로를 ==================== -->
 <section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="Avro라 fastavro로 읽었다. 레코드 4개 = manifest 4개. 25,000,000 × 4 = 100,000,000이 파일을 하나도 열기 전에 나온다는 게 핵심. seq 순서가 뒤섞여 있는 건 병렬 writer라 자연스러운 것.">
   <div class="eyebrow">04. Iceberg 파일 관리</div>
   <div class="s-title">② manifest list — 참조하는 manifest 목록</div>
@@ -795,7 +849,7 @@ body:hover #help{opacity:.5}
   <div class="body top" style="padding-top:0">
     <div class="grid" style="grid-template-columns:1.32fr 1fr;gap:1.5cqw">
       <div class="excerpt">
-        <div class="hd"><span>Avro라서 fastavro로 읽은 결과 · 레코드 4개</span><b>manifest list</b></div>
+        <div class="hd"><span>Avro라서 fastavro로 읽은 결과 · 필드명 일부 축약 · 레코드 4개</span><b>manifest list</b></div>
 <pre><span class="c">[1]</span> <span class="hl"><span class="k">manifest_path</span>   : 7418ba24-…-m0.avro</span>
     <span class="k">added_rows_count</span>: <span class="s">25,000,000</span>   <span class="k">files</span>: 1   <span class="k">seq</span>: 4
 
@@ -812,25 +866,21 @@ body:hover #help{opacity:.5}
       </div>
       <div>
         <div class="card gr" style="padding:1.3cqw 1.5cqw">
-          <h4 style="font-size:1.42cqw">여기서 이미 1억 행이 보인다</h4>
-          <p class="why"><b>25,000,000 × 4 = 100,000,000.</b> Parquet을 하나도 열지 않고 레코드 수만 더해도 전체 행 수가 나온다.</p>
-          <p class="why"><span class="mono">COUNT(*)</span>가 빠른 이유가 이것이다.</p>
+          <h4 style="font-size:1.42cqw">파일을 열기 전의 행 수 집계</h4>
+          <p class="why"><b>25,000,000 × 4 = 100,000,000.</b> Parquet을 열지 않고 레코드 수만 더해도 전체 행 수가 나온다 — <b>삭제가 없는 이번 append 사례</b> 기준이다.</p>
+          <p class="why">조건에 따라 엔진이 메타데이터로 행 수를 계산할 수 있다. <b>실제 적용 여부는 실행 계획으로 확인한다.</b></p>
         </div>
         <div class="card" style="padding:1.3cqw 1.5cqw;margin-top:1cqw">
-          <h4 style="font-size:1.42cqw">커밋마다 manifest 하나</h4>
-          <p class="why">네 번의 커밋이 각각 manifest를 남겼고, <b>현재 스냅샷은 넷 다 참조</b>한다. 새 커밋이 기존 것을 덮어쓰지 않는다.</p>
-          <p class="why"><span class="mono">seq</span> 순서가 뒤섞인 건 <b>병렬로 쓴</b> 결과다.</p>
-        </div>
-        <div class="card o" style="padding:1.3cqw 1.5cqw;margin-top:1cqw">
-          <h4 style="font-size:1.42cqw">이 파일은 Avro다</h4>
-          <p class="why">텍스트 편집기로 열면 깨져 보인다. 파일 머리 4바이트가 <span class="mono">4f 62 6a 01</span>(<span class="mono">Obj\x01</span>)인 <b>Avro 컨테이너</b>다.</p>
+          <h4 style="font-size:1.42cqw">레코드 4개가 쌓인 경위</h4>
+          <p class="why">레코드 하나가 <b>manifest 파일 하나</b>를 가리킨다. 네 번의 커밋이 각각 manifest를 남겼고, <b>현재 스냅샷은 넷을 모두 참조</b>한다 — 새 커밋이 기존 것을 덮어쓰지 않는다.</p>
+          <p class="why" style="margin-top:.5cqw">나열 순서(<span class="mono">seq</span> 4 · 3 · 2 · 1)는 <b>커밋 시간순일 필요가 없다</b>. 목록의 순서에 의미를 두지 않는다.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ==================== 17. ③ manifest에서 Parquet 경로와 통계를 얻 ==================== -->
+<!-- ==================== 18. ③ manifest에서 Parquet 경로와 통계를 얻 ==================== -->
 <section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="★ 이 장이 walkthrough의 핵심. order_id 범위가 파일마다 딱 잘려 있어 WHERE order_id = 7이면 파일 하나만 읽는다. 반대로 status·factory_id는 네 파일이 범위가 똑같아서 거르는 데 전혀 도움이 안 된다 — 어떤 컬럼이냐에 따라 효과가 갈린다는 점이 중요하다.">
   <div class="eyebrow">04. Iceberg 파일 관리</div>
   <div class="s-title">③ manifest — Parquet 경로와 통계</div>
@@ -851,22 +901,24 @@ body:hover #help{opacity:.5}
         <tr><td class="mono">cfb7e80e…</td><td class="mono">…349766-d38698f2….parquet</td><td class="mono">25,000,000</td><td class="mono">82,619,061</td><td class="mono"><b>75,000,001 ~ 100,000,000</b></td></tr>
       </tbody>
     </table>
-    <div class="grid g2" style="margin-top:1.3cqw">
+    <div class="cap" style="margin-top:.8cqw"><span><b>표가 1:1로 보이지만 규칙이 아니다.</b> manifest 하나는 <b>Parquet 여러 개</b>의 경로·행 수·통계를 담을 수 있다 — 이번 실행이 커밋마다 파일 하나씩이라 1:1이 됐을 뿐이다. Parquet이 10만 개여도 manifest는 100개일 수 있다.</span></div>
+    <div class="grid g2" style="margin-top:1.1cqw">
       <div class="card gr" style="padding:1.3cqw 1.5cqw">
-        <h4 style="font-size:1.42cqw">통계가 파일을 걸러낸다</h4>
+        <h4 style="font-size:1.42cqw">범위 통계 기반 파일 제외</h4>
         <p class="why"><span class="mono">WHERE order_id = 7</span> → 범위가 겹치는 파일은 <b>첫 번째 하나뿐</b>이다.</p>
-        <p class="why"><b>나머지 세 파일(약 248MB·7,500만 행)은 열지도 않는다.</b> 1억 행 테이블이지만 실제로 읽는 건 2,500만 행짜리 파일 하나다.</p>
+        <p class="why">나머지 세 파일(약 248MB·7,500만 행)은 <b>범위 통계상 읽기 대상에서 제외할 수 있다</b>.</p>
+        <p class="why" style="margin-top:.5cqw">후보가 2,500만 행짜리라고 그 행을 다 읽는 것도 아니다 — Parquet의 <b>row group·컬럼 선택</b>으로 더 줄인다.</p>
       </div>
       <div class="card o" style="padding:1.3cqw 1.5cqw">
-        <h4 style="font-size:1.42cqw">모든 컬럼이 그런 건 아니다</h4>
+        <h4 style="font-size:1.42cqw">제외에 쓰기 어려운 컬럼</h4>
         <p class="why">같은 manifest에서 <span class="mono">status</span>는 네 파일 모두 <span class="mono">CANCELLED ~ IN_PROGRESS</span>, <span class="mono">factory_id</span>는 모두 <span class="mono">F001 ~ F030</span>이다.</p>
-        <p class="why"><b>→ 이 컬럼들로는 하나도 못 거른다.</b> 통계가 쓸모 있으려면 <b>값이 파일마다 몰려 있어야</b> 한다.</p>
+        <p class="why"><b>→ 이 예시의 min/max로는 후보를 줄이기 어렵다.</b> 통계가 쓸모 있으려면 <b>값이 파일마다 몰려 있어야</b> 한다.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ==================== 18. ④ Parquet에 실제 행이 있다 ==================== -->
+<!-- ==================== 19. ④ Parquet에 실제 행이 있다 ==================== -->
 <section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="드디어 실제 데이터. 25,000,000행 중 5행만 보여준다. 오른쪽 컬럼별 크기가 다음 장 컬럼 프루닝의 근거다. status 15KB vs 전체 16.3MB를 짚어둔다.">
   <div class="eyebrow">04. Iceberg 파일 관리</div>
   <div class="s-title">④ Parquet — 실제 행 데이터</div>
@@ -880,6 +932,7 @@ body:hover #help{opacity:.5}
   <div class="body top" style="padding-top:0">
     <div class="grid" style="grid-template-columns:1.25fr 1fr;gap:1.5cqw">
       <div>
+        <div style="font-size:1.12cqw;color:var(--muted);margin-bottom:.5cqw;font-weight:600">파일의 첫 5행 — 2,500만 행 중 샘플</div>
         <table class="rows">
           <thead><tr><th>order_id</th><th>factory_id</th><th>product_name</th><th>quantity</th><th>order_date</th><th>status</th></tr></thead>
           <tbody>
@@ -890,10 +943,10 @@ body:hover #help{opacity:.5}
             <tr><td>5</td><td>F006</td><td>Chassis Panel</td><td>346</td><td>2026-06-01</td><td>IN_PROGRESS</td></tr>
           </tbody>
         </table>
-        <div class="cap" style="margin-top:.8cqw"><span>앞 장 manifest의 <span class="mono">record_count 25,000,000</span>과 <span class="mono">order_id 1 ~ 25,000,000</span>이 실제 내용과 맞는다. 파일 하나당 <b>row group 6개</b>, zstd 압축.</span></div>
+        <div class="cap" style="margin-top:.8cqw"><span>위 <b>5행은 샘플</b>이다. 전체 행 수는 Parquet footer와 대조했고(네 파일 모두 2,500만 행 · row group 6개), 전체 집계와 범위는 <b>별도 Trino 검증</b>에서 확인했다 (25쪽).</span></div>
       </div>
       <div>
-        <div style="font-size:1.12cqw;color:var(--muted);margin-bottom:.5cqw;font-weight:600">row group 하나(약 16MB)의 컬럼별 압축 크기</div>
+        <div style="font-size:1.12cqw;color:var(--muted);margin-bottom:.5cqw;font-weight:600">첫 row group의 컬럼별 크기 (bytes)</div>
         <table class="rows">
           <thead><tr><th>컬럼</th><th>압축 후</th><th>압축 전</th></tr></thead>
           <tbody>
@@ -903,25 +956,27 @@ body:hover #help{opacity:.5}
             <tr><td>quantity</td><td>5,570,971</td><td>5,569,729</td></tr>
             <tr><td>order_date</td><td>5,570,904</td><td>5,569,226</td></tr>
             <tr style="background:var(--green-soft)"><td><b>status</b></td><td><b>14,901</b></td><td>1,251,582</td></tr>
+            <tr style="background:var(--navy)"><td><b style="color:#fff">합계</b></td><td><b style="color:#fff">16,266,974</b></td><td style="color:#9dc2f0">57,440,669</td></tr>
           </tbody>
         </table>
         <div class="card gr" style="padding:1.1cqw 1.4cqw;margin-top:1cqw">
-          <h4 style="font-size:1.38cqw">컬럼별로 따로 저장된다</h4>
-          <p class="why">값이 몇 종류뿐인 <span class="mono">status</span>는 <b>15KB</b>로 줄고, 전부 다른 <span class="mono">order_id</span>는 5MB다. <b>필요한 컬럼만 읽을 수 있는 이유</b>가 이것이다 — 다음 장.</p>
+          <h4 style="font-size:1.38cqw">컬럼 단위 저장과 선택적 읽기</h4>
+          <p class="why">값이 몇 종류뿐인 <span class="mono">status</span>는 <b>15KB</b>로 줄고, 전부 다른 <span class="mono">order_id</span>는 5MB다. <b>필요한 컬럼만 읽을 수 있는 이유</b>다.</p>
+          <p class="why" style="margin-top:.5cqw">설정의 목표 크기(<span class="mono">row-group-size-bytes</span>)는 압축 전 기준이라 실제 파일 크기와 다르다.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ==================== 19. 구조는 데이터 크기와 무관하다 ==================== -->
+<!-- ==================== 20. 구조는 데이터 크기와 무관하다 ==================== -->
 <section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="앞 다섯 장이 1억 행이었다는 걸 확인하고, 같은 구조가 5행짜리 테이블에서도 똑같다는 걸 보여준다. 단계 수가 데이터 크기와 무관하다는 게 핵심. 파일이 N개로 늘어나도 계층은 깊어지지 않는다.">
   <div class="eyebrow">04. Iceberg 파일 관리</div>
   <div class="s-title">테이블 크기별 구조 비교</div>
   <div class="s-sub">방금 1억 행에서 따라간 네 단계가, 5행짜리 테이블에서도 그대로다.</div>
   <div class="body">
     <table>
-      <thead><tr><th style="width:26%">따라가는 단계</th><th style="width:37%">production_orders_100m (방금 본 것)</th><th>retail.orders (첫 실습, 5행)</th></tr></thead>
+      <thead><tr><th style="width:26%">현재 스냅샷 조회 시 따라가는 파일</th><th style="width:37%">production_orders_100m (방금 본 것)</th><th>retail.orders (첫 실습, 5행)</th></tr></thead>
       <tbody>
         <tr><td><b>① metadata JSON</b></td><td class="mono">1개 · 스냅샷 <b>4</b></td><td class="mono">1개 · 스냅샷 2</td></tr>
         <tr><td><b>② manifest list</b></td><td class="mono">1개 · 레코드 <b>4</b></td><td class="mono">1개 · 레코드 2</td></tr>
@@ -932,12 +987,12 @@ body:hover #help{opacity:.5}
     </table>
     <div class="grid g2">
       <div class="card gr">
-        <h4>단계 수가 늘지 않는다</h4>
-        <p class="why">2만 배 차이가 나지만 <b>따라가는 깊이는 넷으로 같다.</b> manifest가 N개가 돼도 경로는 <b>JSON → manifest list → 여러 manifest → 수많은 Parquet</b>으로 동일하다.</p>
+        <h4>크기와 무관한 탐색 깊이</h4>
+        <p class="why"><b>2천만 배</b> 차이가 나지만 <b>따라가는 깊이는 넷으로 같다.</b> manifest가 N개가 돼도 경로는 <b>JSON → manifest list → 여러 manifest → 수많은 Parquet</b>으로 동일하다.</p>
       </div>
       <div class="card">
-        <h4>커지면 달라지는 것</h4>
-        <p class="why">깊이는 같아도 <b>manifest 수와 파일 수는 늘어난다.</b> 그래서 운영에서는 작은 파일을 합치고(compaction) 오래된 스냅샷을 정리한다.</p>
+        <h4>규모 증가에 따른 변화</h4>
+        <p class="why">깊이는 같아도 <b>manifest 수와 파일 수는 늘어날 수 있다</b> — 파일 크기·쓰기 방식·병합 정책에 따라 달라진다. 그래서 운영에서는 작은 파일을 합치고(compaction) 오래된 스냅샷을 정리한다.</p>
         <p class="why" style="color:#a9540a">계층을 따른다는 것만으로 <b>속도가 보장되지는 않는다.</b></p>
       </div>
     </div>
@@ -945,8 +1000,8 @@ body:hover #help{opacity:.5}
   </div>
 </section>
 
-<!-- ==================== 20. Iceberg 파일 관리의 이점 ==================== -->
-<section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="04장 마무리 ①. 네 가지 메커니즘. 근거/미사용 라벨을 반드시 짚는다 — ①②는 앞에서 실제로 봤고, ③은 파일에서 ID만 확인했으며, ④는 이번 테이블에 파티션이 없어 안 써봤다. 안 써본 기능을 해봤다고 말하지 않는다. 상세는 docs/md/lakehouse-concept.md 4절.">
+<!-- ==================== 21. Iceberg 파일 관리의 이점 ==================== -->
+<section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="04장 마무리 ①. 네 가지 메커니즘. 각 카드의 작은 도식은 '무엇이 바뀌고 무엇이 그대로인가'만 보여준다 — 네 번째는 점선 상자라 가정이라는 뜻이다. 근거/미사용 라벨을 반드시 짚는다 — ①②는 앞에서 실제로 봤고, ③은 파일에서 ID만 확인했으며, ④는 이번 테이블에 파티션이 없어 안 써봤다. 안 써본 기능을 해봤다고 말하지 않는다. 상세는 docs/md/lakehouse-concept.md 4절.">
   <div class="eyebrow">04. Iceberg 파일 관리</div>
   <div class="s-title">Iceberg 파일 관리의 이점</div>
   <div class="s-sub">앞에서 본 메타데이터 구조가 실제로 무엇을 가능하게 하는가.</div>
@@ -955,61 +1010,75 @@ body:hover #help{opacity:.5}
       <div class="card gr">
         <h4><span class="badge-n">1</span>스냅샷 기반 시점 보존과 롤백</h4>
         <p class="why">커밋마다 스냅샷이 남는다. <b>포인터 교체 한 번</b>으로 공개되므로 쓰는 도중 읽어도 이전 상태가 보이고, 과거 시점 조회와 되돌리기가 된다.</p>
-        <p class="alt">✅ 확인 — 스냅샷 4개가 25M → 50M → 75M → 100M으로 누적 (15쪽). 단 <span class="mono">FOR VERSION AS OF</span> 쿼리는 미실행</p>
+        <div class="mini"><span class="mb">S1</span><span class="mb">S2</span><span class="mb">S3</span><span class="mb on">S4 · 현재</span><span class="lb">앞의 셋도 그대로 남는다</span></div>
       </div>
       <div class="card gr">
         <h4><span class="badge-n">2</span>메타데이터 통계 기반 파일 프루닝</h4>
         <p class="why">manifest의 컬럼별 min/max로 <b>파일을 열기 전에</b> 후보를 거른다. 디렉터리를 훑지 않으므로 파일이 늘어도 조회 계획이 선형으로 느려지지 않는다.</p>
-        <p class="alt">✅ 확인 — order_id 범위로 4개 중 1개만 (17쪽), 축소 수치는 23쪽</p>
+        <div class="mini"><span class="mb off">file 1</span><span class="mb on">file 2</span><span class="mb off">file 3</span><span class="mb off">file 4</span><span class="lb">열기 전에 셋을 제외</span></div>
       </div>
       <div class="card">
         <h4><span class="badge-n">3</span>컬럼 ID 기반 스키마 진화</h4>
         <p class="why">컬럼마다 <b>불변 ID</b>가 붙어 추가·삭제·이름 변경·순서 변경이 <b>메타데이터만</b> 바꾼다. RDB에서 순서·타입 변경이 테이블 재작성과 잠금을 부르는 것과 다르다.</p>
+        <div class="mini"><span class="mb">id 3 · product_name</span><span class="ar">→</span><span class="mb on">id 3 · item_name</span><span class="lb">Parquet은 그대로</span></div>
         <p class="alt">◐ 파일에서만 확인 — field ID 1~6. <b>스키마 변경은 해보지 않았다</b></p>
       </div>
       <div class="card">
         <h4><span class="badge-n">4</span>숨은 파티셔닝과 파티션 명세 진화</h4>
         <p class="why">파티션 값을 원본 컬럼에서 <b>변환으로 유도</b>해 사용자가 파티션 컬럼을 몰라도 된다. 명세를 바꿔도 <b>기존 데이터를 재작성하지 않는다</b>.</p>
-        <p class="alt">✕ 미사용 — 이번 테이블은 <span class="mono">partition-specs</span>가 비어 있다</p>
+        <div class="mini mini2"><span class="mb">이미 쓰인 file 1~4</span><span class="ar">→</span><span class="mb on">spec 0 그대로</span><span class="mb gh">기준 변경 후 쓰이는 파일</span><span class="ar">→</span><span class="mb gh">spec 1 · month</span></div>
+        <p class="gain">· 파티셔닝을 위한 <b>파생 컬럼 생성 불필요</b><br>· 과거 데이터를 건드리지 않고 <b>파티션 기준 변경 가능</b><span style="color:#8a99ab"> (변경 이후에 쓰인 파일에만 적용)</span></p>
       </div>
     </div>
     <div class="banner">
       <span class="ic">&#9670;</span>
       <span>네 가지 모두 <b>데이터 파일을 다시 쓰지 않는다</b>는 공통점이 있다
-      <small>스냅샷 · 통계 · 컬럼 ID · 파티션 명세는 전부 <b>메타데이터 쪽</b>에서 처리된다. Parquet은 한 번 쓰면 그대로다 — 그래서 대용량에서도 스키마 변경이 즉시 끝난다.</small></span>
+      <small>스냅샷 · 통계 · 컬럼 ID · 파티션 명세는 전부 <b>메타데이터 쪽</b>에서 처리된다. Parquet은 한 번 쓰면 그대로다. </small></span>
     </div>
   </div>
 </section>
 
-<!-- ==================== 21. 스펙 기반 엔진 중립과 표준화 흐름 ==================== -->
-<section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="04장 마무리 ②. 앞 장이 기술 메커니즘이었다면 여기는 생태계 이유. 실무에서 Iceberg를 고르는 이유로 가장 자주 꼽히는 게 이쪽이라는 점을 말한다. 업계 동향은 공개 자료 조사이고 우리가 검증한 게 아니다 — 이미 1위가 아니라 수렴 중으로 말한다.">
+<!-- ==================== 22. 엔진이 보장하는 것과 사람이 검증할 것 ==================== -->
+<section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="04장 마무리 ③. 앞 여덟 장이 '엔진이 알아서 해준다'로만 읽히면 위험하다. 메타데이터가 정상인 것과 업무적으로 올바른 적재는 다르다는 점이 요점. 오른쪽 예시(9천만 행만 가져와도 정상 커밋된다)를 꼭 말한다. 커밋 단위 원자성과 job 단위 원자성이 다르다는 점도 — 우리 1·2차 실패가 그 사례다.">
   <div class="eyebrow">04. Iceberg 파일 관리</div>
-  <div class="s-title">스펙 기반 엔진 중립과 표준화 흐름</div>
-  <div class="s-sub">앞 장의 기능 대부분은 Delta Lake·Hudi도 제공한다. <b>실무에서 갈리는 지점은 여기다.</b></div>
+  <div class="s-title">엔진이 보장하는 것과 사람이 검증할 것</div>
+  <div class="s-sub">파일 참조와 커밋은 엔진에 맡기되, <b>적재 결과가 요구사항에 맞는지는 데이터 엔지니어가 검증한다.</b></div>
   <div class="body">
-    <div class="grid g2">
-      <div class="card gr">
-        <h4>엔진 중립 — 우리가 확인한 것</h4>
-        <p class="why"><b>“적재를 Spark로 바꾸면 Trino 설정을 고쳐야 하나?”</b> → 아니다. 둘이 공유하는 건 <span class="mono">thrift://hms:9083</span> 과 <span class="mono">/lake</span> <b>두 줄뿐</b>이다.</p>
-        <p class="why" style="margin-top:.7cqw">✅ 같은 <span class="mono">./lake</span> 파일을 <b>SeaTunnel(쓰기) · Trino(조회) · PyIceberg(학습)</b> 세 도구로 다뤘다. 셋은 서로를 모른다.</p>
+    <div class="grid" style="grid-template-columns:1.1fr 1fr;gap:1.5cqw">
+      <div>
+        <table>
+          <thead><tr><th style="width:34%">주체</th><th>맡는 일</th></tr></thead>
+          <tbody>
+            <tr><td><b>Iceberg 라이브러리</b><br><span class="mono" style="font-size:.95cqw">SeaTunnel 내부</span></td><td>파일·메타데이터 작성, 참조 구성, 커밋 처리</td></tr>
+            <tr><td><b>Hive Metastore</b></td><td>테이블 등록정보와 현재 metadata 위치 관리</td></tr>
+            <tr><td><b>Trino</b></td><td>메타데이터를 해석해 파일을 읽고 SQL 처리</td></tr>
+            <tr style="background:var(--orange-soft)"><td><b>데이터 엔지니어</b></td><td>추출 범위 · 변환 · 누락·중복 · 타입·시간대 · 집계 결과 · 재실행 정책</td></tr>
+          </tbody>
+        </table>
+        <div class="cap" style="margin-top:.9cqw"><span><b>HMS는 원본과 적재 결과를 비교하지 않는다.</b> 업무 데이터의 정확성을 보장하는 구성요소는 이 표에 없다.</span></div>
       </div>
-      <div class="card">
-        <h4>그걸 가능하게 하는 것</h4>
-        <p class="why"><b>공개 스펙</b> — 문서만 보고 독립 구현이 가능하다. Trino · Spark · Flink · PyIceberg · DuckDB가 각자 구현했다.</p>
-        <p class="why" style="margin-top:.5cqw"><b>재단 거버넌스</b> — Apache 재단 프로젝트라 특정 회사의 제품 전략에 종속되지 않는다.</p>
-        <p class="why" style="margin-top:.5cqw"><b>카탈로그 표준화</b> — REST Catalog 스펙으로 카탈로그 구현(HMS · Glue · Polaris)까지 교체 가능한 방향으로 간다.</p>
+      <div>
+        <div class="card o" style="padding:1.3cqw 1.5cqw">
+          <h4 style="font-size:1.42cqw">메타데이터가 정상 ≠ 올바른 적재</h4>
+          <p class="why">원본 조회 조건을 잘못 써서 <b>1억 행 중 9천만 행만</b> 가져왔다고 하자. Iceberg는 그 9천만 행을 <b>아무 문제 없이 커밋한다.</b></p>
+          <p class="why" style="margin-top:.5cqw">스냅샷도 manifest도 통계도 전부 정상이다. <b>틀린 건 데이터뿐이고, 그건 엔진이 알 수 없다.</b></p>
+        </div>
+        <div class="card" style="padding:1.3cqw 1.5cqw;margin-top:1.1cqw">
+          <h4 style="font-size:1.42cqw">커밋 단위 ≠ 작업 단위 원자성</h4>
+          <p class="why">이번처럼 <b>여러 번 커밋</b>하는 작업은 중간에 실패하면 <b>앞선 커밋이 이미 공개돼 있다.</b> 전체를 그대로 <span class="mono">APPEND</span>로 재실행하면 중복된다.</p>
+          <p class="why" style="margin-top:.5cqw">그래서 래퍼 스크립트가 테이블·경로·실행 기록을 검사해 재실행을 막는다.</p>
+        </div>
       </div>
     </div>
-    <div class="banner b" style="background:var(--blue-soft);color:var(--navy);border:1px solid var(--blue-line)">
-      <span class="ic" style="color:var(--blue)">&#9670;</span>
-      <span style="color:var(--navy)">업계도 Iceberg로 <b>수렴하는 중</b>이다
-      <small style="color:var(--muted)">2024.06 Databricks가 Iceberg 창시자들의 회사 <b>Tabular 인수</b> &nbsp;·&nbsp; Snowflake가 <b>Polaris 카탈로그</b>를 Apache 재단에 기증 &nbsp;·&nbsp; <b>AWS S3 Tables</b> &nbsp;·&nbsp; 경쟁 포맷 Delta Lake도 <b>UniForm</b>으로 Iceberg 호환 제공. 다만 현재 도입 점유율은 Delta가 다소 앞선다는 조사도 있다(39% vs 31%) — <b>“이미 1위”가 아니라 “수렴 중”</b>이 정확하다.</small></span>
+    <div class="banner">
+      <span class="ic">&#9670;</span>
+      <span>운영에서는 JSON·Avro를 눈으로 보지 않는다 — <b>자동화한다</b>
+      <small>작업 성공·실패와 스냅샷 변화 확인 &nbsp;·&nbsp; 원본 대비 건수·합계·범위 대조 &nbsp;·&nbsp; NULL·중복·누락 검사 &nbsp;·&nbsp; 실패 후 재실행 정책 &nbsp;·&nbsp; 저장소 접근과 파일·메타데이터 보존 관리</small></span>
     </div>
-    <div class="src">업계 동향은 공개 자료 기준이며 이번 실습에서 검증한 내용이 아니다 · 정리: docs/md/lakehouse-concept.md 4·5절</div>
   </div>
 </section>
 
-<!-- ==================== 22. 섹션 05 ==================== -->
+<!-- ==================== 23. 섹션 05 ==================== -->
 <section class="slide divider" data-notes="조회 계층을 얹는 섹션. 04장에서 손으로 따라간 경로를 Trino가 자동으로 한다는 연결이 핵심.">
   <div class="dlabel">SECTION 05</div>
   <div class="toc">
@@ -1022,7 +1091,7 @@ body:hover #help{opacity:.5}
   </div>
 </section>
 
-<!-- ==================== 23. 조회 계층을 붙인다 — 설정으로 연결하고, Trino가 ==================== -->
+<!-- ==================== 24. 조회 계층을 붙인다 — 설정으로 연결하고, Trino가 ==================== -->
 <section class="slide" data-eyebrow="05. Trino · Superset 조회" data-notes="05장 시작. 윗줄은 무엇으로 연결했는지(설정 파일), 아랫줄은 SQL 한 번에 무슨 일이 일어나는지. 오른쪽 아래 파일 체인이 04장에서 손으로 따라간 바로 그 경로라는 점을 짚는다. 그림 우하단 Parquet 칸에 실재 오타가 있다.">
   <div class="eyebrow">05. Trino · Superset 조회</div>
   <div class="s-title">Trino · Superset 연결과 조회 흐름</div>
@@ -1031,7 +1100,7 @@ body:hover #help{opacity:.5}
   <div class="cap"><span>오른쪽 아래 <b>metadata JSON → Manifest List → Manifest → Parquet</b> 체인이 <b>04장에서 손으로 따라간 바로 그 경로</b>다. Trino가 그걸 자동으로 한다. 파일을 읽는 주체는 Superset도 HMS도 아닌 <b>Trino</b>다.</span></div>
 </section>
 
-<!-- ==================== 24. 1억 행 테이블이지만, 실제로 읽는 건 일부다 ==================== -->
+<!-- ==================== 25. 1억 행 테이블이지만, 실제로 읽는 건 일부다 ==================== -->
 <section class="slide" data-eyebrow="05. Trino · Superset 조회" data-notes="앞 그림의 파일 체인이 실제로 얼마나 줄여주는지. 두 수치 모두 우리가 파일을 열어 잰 값이고 쿼리 실행 측정이 아니라는 단서를 꼭 단다.">
   <div class="eyebrow">05. Trino · Superset 조회</div>
   <div class="s-title">조회 시 실제로 읽는 데이터량</div>
@@ -1064,7 +1133,7 @@ body:hover #help{opacity:.5}
   </div>
 </section>
 
-<!-- ==================== 25. 읽는 쪽은 카탈로그 주소와 파일 경로만 알면 된다 ==================== -->
+<!-- ==================== 26. 읽는 쪽은 카탈로그 주소와 파일 경로만 알면 된다 ==================== -->
 <section class="slide" data-eyebrow="05. Trino · Superset 조회" data-notes="local.location=/ 가 질문 나오기 쉬운 지점. 주석을 그대로 읽어주면 바로 이해된다. 읽기 전용을 두 겹으로 건 것도 짚는다.">
   <div class="eyebrow">05. Trino · Superset 조회</div>
   <div class="s-title">Trino Iceberg 커넥터 설정</div>
@@ -1099,7 +1168,7 @@ body:hover #help{opacity:.5}
   </div>
 </section>
 
-<!-- ==================== 26. “적재됐다”와 “값이 맞다”는 다르다 ==================== -->
+<!-- ==================== 27. “적재됐다”와 “값이 맞다”는 다르다 ==================== -->
 <section class="slide" data-eyebrow="05. Trino · Superset 조회" data-notes="'행 단위 전수 비교는 아니다'라는 단서를 반드시 말한다. 메타데이터 COUNT만 보고 끝내지 않았다는 게 포인트.">
   <div class="eyebrow">05. Trino · Superset 조회</div>
   <div class="s-title">원본과의 집계 대조 검증</div>
@@ -1123,7 +1192,7 @@ body:hover #help{opacity:.5}
   </div>
 </section>
 
-<!-- ==================== 27. 섹션 06 ==================== -->
+<!-- ==================== 28. 섹션 06 ==================== -->
 <section class="slide divider" data-notes="발표를 닫는 요약.">
   <div class="dlabel">SECTION 06</div>
   <div class="toc">
@@ -1136,7 +1205,7 @@ body:hover #help{opacity:.5}
   </div>
 </section>
 
-<!-- ==================== 28. 전체 지도 — 환경 준비 · 쓰기 · 읽기 ==================== -->
+<!-- ==================== 29. 전체 지도 — 환경 준비 · 쓰기 · 읽기 ==================== -->
 <section class="slide" data-eyebrow="06. 정리" data-notes="전체 복습용 지도. 02~05장을 한 번에 되짚는다. ①은 최초 1회, ②는 완료, ③만 평소에 쓴다는 생애주기를 손으로 짚는다.">
   <div class="eyebrow">06. 정리</div>
   <div class="s-title">전체 실행 흐름</div>
@@ -1144,7 +1213,7 @@ body:hover #help{opacity:.5}
   <div class="cap"><span>①은 최초 1회, ②는 이미 완료, <b>평소에 쓰는 건 ③뿐</b>이다. 조회할 때 SeaTunnel은 실행되지 않는다 — 쓰기와 읽기는 시간적으로도 완전히 분리돼 있다.</span></div>
 </section>
 
-<!-- ==================== 29. 구축하며 확인한 것 ==================== -->
+<!-- ==================== 30. 구축하며 확인한 것 ==================== -->
 <section class="slide" data-eyebrow="06. 정리" data-notes="핵심 메시지를 다시 말하고 끝낸다. 첫 줄은 5쪽에서 한 말과 똑같이 반복한다 — 의도된 반복이다.">
   <div class="eyebrow">06. 정리</div>
   <div class="s-title">구축하며 확인한 것</div>
@@ -1162,7 +1231,7 @@ body:hover #help{opacity:.5}
   </div>
 </section>
 
-<!-- ==================== 30. 남은 것 — 안 해본 것은 안 했다고 적는다 ==================== -->
+<!-- ==================== 31. 남은 것 — 안 해본 것은 안 했다고 적는다 ==================== -->
 <section class="slide" data-eyebrow="06. 정리" data-notes="한계를 솔직하게. 안 해본 걸 했다고 말하지 않는다. 질문 받고 마무리.">
   <div class="eyebrow">06. 정리</div>
   <div class="s-title">남은 것과 한계</div>
