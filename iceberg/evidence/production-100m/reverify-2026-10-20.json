@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-20",
+  "purpose": "발표 자료 28쪽 수치를 1억 행 기준으로 재확인",
+  "query": "evidence/production-100m/trino-summary.sql (2026-10-08과 동일 쿼리)",
+  "engine": "Trino 483 · iceberg.retail.production_orders_100m",
+  "wall_clock_seconds_including_cli": 4.656,
+  "result": {
+    "vs_trino_summary_2026_10_08": "완전 일치 (11지표 × 5그룹)",
+    "vs_source_summary_postgresql": "완전 일치",
+    "parquet_files_on_disk": 4,
+    "parquet_bytes": 330496199
+  },
+  "note": "원본 PostgreSQL(포트 5440)은 현재 기동되어 있지 않아 원본측 재측정은 불가. 원본 수치는 적재 시점 기록(source-summary.csv)을 사용."
+}

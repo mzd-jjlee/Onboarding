@@ -229,8 +229,13 @@ Iceberg는 **파티션 명세를 바꿔도 기존 데이터를 그대로 둔다.
 | **재단 거버넌스** | Apache 재단 프로젝트라 특정 회사의 제품 전략에 종속되지 않는다 |
 
 > **우리 실습에서 확인한 것** — 같은 `./lake` 파일을 **SeaTunnel(쓰기)**,
-> **Trino(조회)**, **PyIceberg 노트북(학습)** 세 도구로 다뤘다. 셋은 서로를 모르고
+> **Trino(조회)**, **fastavro·pyarrow 노트북(학습)** 세 도구로 다뤘다. 셋은 서로를 모르고
 > 공유하는 것은 카탈로그 주소와 파일 경로뿐이다.
+>
+> 노트북 쪽은 **Iceberg 라이브러리를 전혀 쓰지 않았다** — 공개 스펙대로 JSON·Avro·Parquet을
+> 범용 라이브러리로 직접 파싱했다. PyIceberg도 시도했으나 0.10의 HMS `get_table`이
+> Hive 4 서버와 호환되지 않아 쓰지 못했다(`docs/production-orders-100m.md`).
+> **Spark는 이번 실습에서 사용하지 않았다.**
 
 ### 정리 — 이번 실습에서 확인한 것과 안 써본 것
 
@@ -272,10 +277,11 @@ Iceberg는 **파티션 명세를 바꿔도 기존 데이터를 그대로 둔다.
 
 - 특정 벤더 제품 없이 **오픈소스만으로 로컬에 세울 수 있다**
 - 나중에 클라우드로 옮겨도 **같은 포맷**이 쓰인다 — 배워두면 환경이 바뀌어도 남는다
-- 같은 파일을 Trino·PyIceberg 등 **여러 도구로 읽는 것을 실제로 확인**했다
-  (이건 우리가 검증한 것이다 — `evidence/trino/`, `analysis/read_parquet.ipynb`)
+- 같은 파일을 **Trino**와, Iceberg 라이브러리가 아닌 **fastavro·pyarrow**로 읽는 것을 실제로 확인했다
+  (이건 우리가 검증한 것이다 — `evidence/trino/`, `analysis/read_parquet.ipynb`).
+  **Spark·PyIceberg로는 읽어보지 않았다.**
 
-구성요소 선택의 상세한 근거는 발표 자료 12쪽과
+구성요소별 이점은 발표 자료 14쪽과
 [저장소 선택지 문서](../local-lakehouse-build-options.md)에 있다.
 
 ## 6. 이 프로젝트와의 대응
