@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>로컬 데이터 레이크하우스 환경 구축하기</title>
+<title>Apache Iceberg를 활용한 로컬 데이터 레이크하우스 구축</title>
 <style>
 /* ============================================================
    로컬 데이터 레이크하우스 환경 구축하기 — 발표 슬라이드
@@ -420,14 +420,12 @@ body:hover #help{opacity:.5}
 <div class="stage" id="stage">
 <!-- ==================== 1. 타이틀 ==================== -->
 <section class="slide cover" data-notes="결과를 먼저 보여주고 시작한다. 이 발표의 주제는 '레이크하우스라는 환경을 어떻게 이해하고 조립했는가'이지, 특정 도구 사용법이 아니다.">
-  <div class="kicker">DATA ENGINEERING · ONBOARDING</div>
-  <h1>로컬 데이터 레이크하우스<br>환경 구축하기</h1>
-  <div class="tag">네 가지 역할을 어떻게 고르고, 연결하고, 검증했는가<br>
-  SeaTunnel · Apache Iceberg · Hive Metastore · Trino · Superset</div>
+  <h1>Apache Iceberg를 활용한<br>로컬 데이터 레이크하우스 구축</h1>
+  <div class="tag">데이터 레이크하우스 <b>구성요소의 역할 · 연결 </b><br>
+  SeaTunnel · Iceberg · Hive Metastore · Trino · Superset</div>
   <div class="meta">
-    <span><b>2026-10-12</b></span>
-    <span>저장소 <b>Onboarding/iceberg</b></span>
-    <span>선행 공유 <b>Apache SeaTunnel 실습</b>의 다음 이야기</span>
+    <span><b>2026-10-30</b></span>
+    <span>선행 공유 <b>Apache SeaTunnel 실습</b>의 다음 chapter</span>
   </div>
 </section>
 
@@ -440,7 +438,6 @@ body:hover #help{opacity:.5}
     <div class="toc-row on"><span class="n">03</span><span><span class="t">구성요소의 역할과 경계</span><br><span class="d">각자 하는 일과 하지 않는 일 · 카탈로그의 자리</span></span></div>
     <div class="toc-row on"><span class="n">04</span><span><span class="t">Iceberg가 파일을 관리하는 방법</span><br><span class="d">JSON · Avro · Parquet를 직접 열어본다</span></span></div>
     <div class="toc-row on"><span class="n">05</span><span><span class="t">Trino·Superset으로 조회하기</span><br><span class="d">조회 계층을 붙이고 실제로 읽는다</span></span></div>
-    <div class="toc-row on"><span class="n">06</span><span><span class="t">정리</span><br><span class="d">전체 지도 · 확인한 것 · 남은 것</span></span></div>
   </div>
 </section>
 
@@ -551,7 +548,6 @@ body:hover #help{opacity:.5}
     <div class="toc-row"><span class="n">03</span><span><span class="t">구성요소의 역할과 경계</span></span></div>
     <div class="toc-row"><span class="n">04</span><span><span class="t">Iceberg가 파일을 관리하는 방법</span></span></div>
     <div class="toc-row"><span class="n">05</span><span><span class="t">Trino·Superset으로 조회하기</span></span></div>
-    <div class="toc-row"><span class="n">06</span><span><span class="t">정리</span></span></div>
   </div>
 </section>
 
@@ -658,7 +654,6 @@ body:hover #help{opacity:.5}
     <div class="toc-row on"><span class="n">03</span><span><span class="t">구성요소의 역할과 경계</span><br><span class="d">각자 하는 일과 하지 않는 일 · 카탈로그의 자리</span></span></div>
     <div class="toc-row"><span class="n">04</span><span><span class="t">Iceberg가 파일을 관리하는 방법</span></span></div>
     <div class="toc-row"><span class="n">05</span><span><span class="t">Trino·Superset으로 조회하기</span></span></div>
-    <div class="toc-row"><span class="n">06</span><span><span class="t">정리</span></span></div>
   </div>
 </section>
 
@@ -802,7 +797,6 @@ write.parquet.row-group-size-bytes   16777216</pre>
     <div class="toc-row"><span class="n">03</span><span><span class="t">구성요소의 역할과 경계</span></span></div>
     <div class="toc-row on"><span class="n">04</span><span><span class="t">Iceberg가 파일을 관리하는 방법</span><br><span class="d">JSON · Avro · Parquet를 직접 열어본다</span></span></div>
     <div class="toc-row"><span class="n">05</span><span><span class="t">Trino·Superset으로 조회하기</span></span></div>
-    <div class="toc-row"><span class="n">06</span><span><span class="t">정리</span></span></div>
   </div>
 </section>
 
@@ -972,7 +966,7 @@ write.parquet.row-group-size-bytes   16777216</pre>
 </section>
 
 <!-- ==================== 20. ④ Parquet에 실제 행이 있다 ==================== -->
-<section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="드디어 실제 데이터. 25,000,000행 중 5행만 보여준다. 오른쪽 표의 메시지는 압축률이 아니라 컬럼 단위 저장이다 — SELECT status면 0.09%만 읽는다는 것이 25쪽 컬럼 프루닝의 근거다. 질문이 나오면: 같은 row group의 압축 전 합계는 57,440,669 bytes라 zstd로 약 3.5배 줄었고, 설정의 row-group-size-bytes(16MB)는 압축 전 기준이라 실제 파일 크기와 다르다.">
+<section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="드디어 실제 데이터. 25,000,000행 중 5행만 보여준다. 오른쪽 표의 메시지는 압축률이 아니라 컬럼 단위 저장이다 — SELECT status면 0.09%만 읽는다 — 행 단위로 저장했다면 나머지 다섯 컬럼까지 읽어야 한다는 대비를 짚는다. 질문이 나오면: 같은 row group의 압축 전 합계는 57,440,669 bytes라 zstd로 약 3.5배 줄었고, 설정의 row-group-size-bytes(16MB)는 압축 전 기준이라 실제 파일 크기와 다르다.">
   <div class="eyebrow">04. Iceberg 파일 관리</div>
   <div class="s-title">④ Parquet — 실제 행 데이터</div>
   <div class="chain">
@@ -996,7 +990,7 @@ write.parquet.row-group-size-bytes   16777216</pre>
             <tr><td>5</td><td>F006</td><td>Chassis Panel</td><td>346</td><td>2026-06-01</td><td>IN_PROGRESS</td></tr>
           </tbody>
         </table>
-        <div class="cap" style="margin-top:.8cqw"><span>위 <b>5행은 샘플</b>이다. 전체 행 수는 Parquet footer와 대조했고(네 파일 모두 2,500만 행 · row group 6개), 전체 집계와 범위는 <b>별도 Trino 검증</b>에서 확인했다 (25쪽).</span></div>
+        <div class="cap" style="margin-top:.8cqw"><span>위 <b>5행은 샘플</b>이다. 전체 행 수는 Parquet footer와 대조했고(네 파일 모두 2,500만 행 · row group 6개), 전체 집계와 범위는 <b>별도 Trino 검증</b>에서 확인했다 (27쪽).</span></div>
       </div>
       <div>
         <div style="font-size:1.12cqw;color:var(--muted);margin-bottom:.5cqw;font-weight:600">같은 row group을 <b>컬럼별로 나눠 저장한 크기</b> — 행 단위가 아니다</div>
@@ -1023,7 +1017,7 @@ write.parquet.row-group-size-bytes   16777216</pre>
 </section>
 
 <!-- ==================== 21. Iceberg 파일 관리의 이점 ==================== -->
-<section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="04장 마무리 ①. 네 가지 메커니즘. 각 카드의 작은 도식은 '무엇이 바뀌고 무엇이 그대로인가'만 보여준다 — 네 번째는 점선 상자라 가정이라는 뜻이다. 근거/미사용 라벨을 반드시 짚는다 — ①②는 앞에서 실제로 봤고, ③은 파일에서 ID만 확인했으며, ④는 이번 테이블에 파티션이 없어 안 써봤다. 안 써본 기능을 해봤다고 말하지 않는다. 상세는 docs/md/lakehouse-concept.md 4절.">
+<section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="04장 마무리 (1/2). 네 가지 메커니즘. 각 카드의 작은 도식은 '무엇이 바뀌고 무엇이 그대로인가'만 보여준다 — 네 번째는 점선 상자라 가정이라는 뜻이다. 근거/미사용 라벨을 반드시 짚는다 — ①②는 앞에서 실제로 봤고, ③은 파일에서 ID만 확인했으며, ④는 이번 테이블에 파티션이 없어 안 써봤다. 안 써본 기능을 해봤다고 말하지 않는다. 상세는 docs/md/lakehouse-concept.md 4절.">
   <div class="eyebrow">04. Iceberg 파일 관리</div>
   <div class="s-title">Iceberg 파일 관리의 이점</div>
   <div class="s-sub">앞에서 본 메타데이터 구조가 실제로 무엇을 가능하게 하는가.</div>
@@ -1061,7 +1055,7 @@ write.parquet.row-group-size-bytes   16777216</pre>
 </section>
 
 <!-- ==================== 22. 엔진이 보장하는 것과 사람이 검증할 것 ==================== -->
-<section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="04장 마무리 ③. 앞 여덟 장이 '엔진이 알아서 해준다'로만 읽히면 위험하다. 메타데이터가 정상인 것과 업무적으로 올바른 적재는 다르다는 점이 요점. 오른쪽 예시(9천만 행만 가져와도 정상 커밋된다)를 꼭 말한다. 커밋 단위 원자성과 job 단위 원자성이 다르다는 점도 — 우리 1·2차 실패가 그 사례다.">
+<section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="04장 마무리 (2/2). 앞 여덟 장이 '엔진이 알아서 해준다'로만 읽히면 위험하다. 메타데이터가 정상인 것과 업무적으로 올바른 적재는 다르다는 점이 요점. 오른쪽 예시(9천만 행만 가져와도 정상 커밋된다)를 꼭 말한다. 커밋 단위 원자성과 job 단위 원자성이 다르다는 점도 — 우리 1·2차 실패가 그 사례다.">
   <div class="eyebrow">04. Iceberg 파일 관리</div>
   <div class="s-title">엔진이 보장하는 것과 사람이 검증할 것</div>
   <div class="s-sub">파일 참조와 커밋은 엔진에 맡기되, <b>적재 결과가 요구사항에 맞는지는 데이터 엔지니어가 검증한다.</b></div>
@@ -1109,7 +1103,6 @@ write.parquet.row-group-size-bytes   16777216</pre>
     <div class="toc-row"><span class="n">03</span><span><span class="t">구성요소의 역할과 경계</span></span></div>
     <div class="toc-row"><span class="n">04</span><span><span class="t">Iceberg가 파일을 관리하는 방법</span></span></div>
     <div class="toc-row on"><span class="n">05</span><span><span class="t">Trino·Superset으로 조회하기</span><br><span class="d">조회 계층을 붙이고 실제로 읽는다</span></span></div>
-    <div class="toc-row"><span class="n">06</span><span><span class="t">정리</span></span></div>
   </div>
 </section>
 
@@ -1122,76 +1115,52 @@ write.parquet.row-group-size-bytes   16777216</pre>
   <div class="cap"><span>오른쪽 아래 <b>metadata JSON → Manifest List → Manifest → Parquet</b> 체인이 <b>04장에서 손으로 따라간 바로 그 경로</b>다. Trino가 그걸 자동으로 한다. 파일을 읽는 주체는 Superset도 HMS도 아닌 <b>Trino</b>다.</span></div>
 </section>
 
-<!-- ==================== 25. 1억 행 테이블이지만, 실제로 읽는 건 일부다 ==================== -->
-<section class="slide" data-eyebrow="05. Trino · Superset 조회" data-notes="앞 그림의 파일 체인이 실제로 얼마나 줄여주는지. 두 수치 모두 우리가 파일을 열어 잰 값이고 쿼리 실행 측정이 아니라는 단서를 꼭 단다.">
-  <div class="eyebrow">05. Trino · Superset 조회</div>
-  <div class="s-title">조회 시 실제로 읽는 데이터량</div>
-  <div class="s-sub">앞 그림의 파일 체인을 따라가는 동안 <b>두 번 줄어든다.</b></div>
-  <div class="body">
-    <div class="grid g2">
-      <div class="card gr">
-        <h4><span class="badge-n">1</span>첫 번째 축소 — 파일 거르기</h4>
-        <p class="why"><span class="mono">WHERE order_id = 7</span> 이면 manifest의 범위 통계로 <b>4개 중 1개</b>만 후보가 된다.</p>
-        <div class="stats" style="grid-template-columns:1fr 1fr;margin-top:1cqw">
-          <div class="stat"><div class="v">330<small>MB</small></div><div class="k">테이블 전체</div></div>
-          <div class="stat hero"><div class="v">83<small>MB</small></div><div class="k">실제 후보 파일</div></div>
-        </div>
-      </div>
-      <div class="card gr">
-        <h4><span class="badge-n">2</span>두 번째 축소 — 컬럼만 읽기</h4>
-        <p class="why"><span class="mono">SELECT status</span> 라면 컬럼형 저장이라 그 컬럼만 읽으면 된다.</p>
-        <div class="stats" style="grid-template-columns:1fr 1fr;margin-top:1cqw">
-          <div class="stat"><div class="v">16.3<small>MB</small></div><div class="k">row group 전체</div></div>
-          <div class="stat hero"><div class="v">15<small>KB</small></div><div class="k">status 컬럼만</div></div>
-        </div>
-      </div>
-    </div>
-    <div class="banner">
-      <span class="ic">&#9670;</span>
-      <span>조회 경로에서 <b>데이터를 보관하는 것은 Parquet 하나뿐</b>이다
-      <small>Superset은 화면, Trino는 계산, HMS는 위치 — 셋 다 데이터를 갖지 않는다. <b>단서</b> — 위 수치는 <b>파일을 열어 잰 크기</b>이지 쿼리 실행 시간을 측정한 값이 아니다. 실제로는 메타데이터 읽기·캐시가 더해진다.</small></span>
-    </div>
-    <div class="src">출처 · manifest Avro의 lower/upper bounds · pyarrow ParquetFile.metadata.row_group(0)</div>
-  </div>
-</section>
-
-<!-- ==================== 26. 읽는 쪽은 카탈로그 주소와 파일 경로만 알면 된다 ==================== -->
-<section class="slide" data-eyebrow="05. Trino · Superset 조회" data-notes="local.location=/ 가 질문 나오기 쉬운 지점. 주석을 그대로 읽어주면 바로 이해된다. 읽기 전용을 두 겹으로 건 것도 짚는다.">
+<!-- ==================== 25. Trino Iceberg 커넥터 설정 ==================== -->
+<section class="slide" data-eyebrow="05. Trino · Superset 조회" data-notes="왼쪽 compose의 마운트 한 줄이 오른쪽 파일을 Trino에게 전달한다는 것이 이 장의 구조다. .properties는 Java properties 포맷으로 주석(#)과 키=값만 있는 평평한 목록이며, iceberg.catalog.type의 점은 계층이 아니라 긴 키 이름의 일부다 — Trino·Kafka·Hadoop 같은 JVM 도구가 공통으로 쓰고, 이 프로젝트에서도 SeaTunnel은 HOCON(.conf), compose는 YAML이라 형식이 서로 다르다. Trino는 import하지 않고 /etc/trino/catalog/*.properties를 기동 시 스캔하며, 파일 이름이 곧 SQL의 카탈로그 이름이 된다. 강조한 두 줄은 connector.name(이 줄이 Iceberg 커넥터를 올린다)과 hive.metastore.uri(9쪽 SeaTunnel sink의 uri와 완전히 같은 주소 — 쓰는 쪽과 읽는 쪽이 서로를 모른 채 이 한 줄만 공유한다). 아래 두 줄은 로컬 파일시스템 배선이고 local.location=/ 가 질문 나오기 쉬운 지점 — 주석을 그대로 읽어주면 바로 이해된다. 질문이 나오면: 읽기 전용을 두 겹으로 걸었다(카탈로그 READ_ONLY + 볼륨 :ro). 그리고 로컬 파일시스템은 단일 노드 전용이라 다중 노드면 S3 호환 저장소가 전제인데 그건 설계만 있고 검증은 안 했다.">
   <div class="eyebrow">05. Trino · Superset 조회</div>
   <div class="s-title">Trino Iceberg 커넥터 설정</div>
-  <div class="s-sub">쓰기 경로가 이미 만들어둔 파일을 <b>고치지 않고</b> 읽는 것이 목표였다.</div>
+  <div class="s-sub">compose의 <b>마운트 설정</b>으로 <span class="mono">properties</span> 파일을 <b>Trino 컨테이너에 연동</b></div>
   <div class="body top">
-<pre><span class="c"># config/trino/catalog/iceberg.properties
-# 파일명이 SQL의 catalog 이름이 된다 → iceberg.retail.production_orders_100m</span>
-<span class="k">connector.name</span>=iceberg
-<span class="k">iceberg.catalog.type</span>=hive_metastore
-
-<span class="c"># catalog-db에 직접 접속하지 않는다. HMS API로 현재 JSON 위치만 얻는다.</span>
-<span class="k">hive.metastore.uri</span>=thrift://hms:9083
-
-<span class="c"># 조회 전용 — 적재 쪽이 관리하는 테이블을 Trino가 수정하지 못하게 막는다.</span>
-<span class="k">iceberg.security</span>=READ_ONLY
-
-<span class="hl"><span class="k">fs.local.enabled</span>=true</span>      <span class="c"># Trino 483의 native local filesystem</span>
-<span class="hl"><span class="k">local.location</span>=/</span>          <span class="c"># URI 접두사가 아니라 실제 파일시스템 루트(Path)다.
-                           # file:/lake/...의 path가 lake/...이므로
-                           # 루트 /와 합쳐 /lake/...로 읽힌다.
-                           # /lake로 쓰면 /lake/lake/...가 되어 못 찾는다.</span></pre>
-    <div class="grid g2" style="margin-top:1.3cqw">
-      <div class="card gr" style="padding:1.2cqw 1.5cqw">
-        <h4 style="font-size:1.38cqw">읽기 전용을 두 겹으로</h4>
-        <p class="why">카탈로그는 <span class="mono">READ_ONLY</span>, 볼륨은 <span class="mono">./lake:/lake:ro</span>. 조회 도구가 적재 결과를 건드릴 수 없게 했다.</p>
+    <div class="grid" style="grid-template-columns:1fr 1.12fr;gap:1.5cqw;flex:1;min-height:0">
+      <div class="excerpt">
+        <div class="hd"><span>compose.analytics.yaml</span><b>서비스 선언</b></div>
+<pre style="font-size:1.02cqw;line-height:2.15"><span class="k">services</span>:
+  <span class="k">trino</span>:
+    image: trinodb/trino:483
+    ports:
+      - <span class="s">"127.0.0.1:8081:8080"</span>
+    mem_limit: 2g
+    volumes:
+      <span class="hl">- ./config/trino:/etc/trino:ro</span>   <span class="c">◀ ①</span>
+      - ./lake:/lake:ro
+    depends_on:
+      hms:
+        condition: service_started</pre>
       </div>
-      <div class="card" style="padding:1.2cqw 1.5cqw">
-        <h4 style="font-size:1.38cqw">운영이라면 다르다</h4>
-        <p class="why">로컬 파일시스템은 단일 노드 전용이다. 다중 노드로 가면 S3 호환 객체 저장소가 전제다 — 설계만 있고 <b>검증은 안 했다</b>.</p>
+      <div class="excerpt">
+        <div class="hd"><span>config/trino/<b>catalog/iceberg.properties</b></span><b>◀ ②</b></div>
+<pre style="font-size:1.02cqw;line-height:2.15"><span class="hl"><span class="k">connector.name</span>=iceberg</span>              <span class="c"># 이 줄이 Iceberg 커넥터를 올린다</span>
+<span class="k">iceberg.catalog.type</span>=hive_metastore   <span class="c"># 카탈로그 구현 선택</span>
+<span class="hl"><span class="k">hive.metastore.uri</span>=thrift://hms:9083</span>   <span class="c"># 9쪽 sink의 uri와 같은 주소</span>
+<span class="k">iceberg.security</span>=READ_ONLY            <span class="c"># 조회 전용</span>
+
+<span class="k">fs.local.enabled</span>=true   <span class="c"># 아래 둘은 로컬 파일시스템용 배선</span>
+<span class="k">local.location</span>=/       <span class="c"># URI 접두사가 아니라 파일시스템 루트
+                      # file:/lake/…의 path가 lake/…이므로
+                      # 루트 /와 합쳐 /lake/…로 읽힌다
+                      # /lake로 쓰면 /lake/lake/…가 되어 못 찾는다</span></pre>
       </div>
+    </div>
+    <div class="banner" style="flex:none;background:var(--green-soft);color:var(--navy);border:1px solid var(--green-line)">
+      <span class="ic" style="color:var(--green)">&#9654;</span>
+      <span style="color:var(--navy)">① 마운트 → ② 파일 → ③ <b>Trino가 기동 시 폴더를 스캔</b> → ④ 파일 이름이 SQL의 카탈로그 이름
+      <small style="font-family:var(--mono);font-size:1.02cqw;color:var(--muted)">./config/trino/catalog/iceberg.properties &nbsp;▶&nbsp; /etc/trino/catalog/iceberg.properties &nbsp;▶&nbsp; SELECT * FROM <b>iceberg</b>.retail.production_orders_100m</small></span>
     </div>
   </div>
 </section>
 
-<!-- ==================== 27. Superset SQL Lab 조회 ==================== -->
-<section class="slide" data-eyebrow="05. Trino · Superset 조회" data-notes="24쪽 그림에서 상자로만 있던 Superset의 실제 화면. 짚을 것 세 가지 — (1) 브라우저 주소는 localhost:8088인데 데이터는 ./lake의 Parquet에 있다. Superset은 사본을 갖지 않는다. (2) 테이블 이름 iceberg.retail.production_orders_100m에서 iceberg는 Trino 카탈로그 파일명, retail은 HMS namespace, 뒤는 테이블. 앞 장 설정이 그대로 SQL 한 줄이 된다. (3) 2.346초는 단일 실행 기록이지 성능 측정이 아니다. limit 1000이라 1억 행을 다 읽지도 않았다. 질문이 나오면: 좌측 테이블 목록에 production_orders_100m_attempt1이 같이 보이는데 실패 시도 잔재이고 정리 대상이다.">
+<!-- ==================== 26. Superset SQL Lab 조회 ==================== -->
+<section class="slide" data-eyebrow="05. Trino · Superset 조회" data-notes="24쪽 그림에서 상자로만 있던 Superset의 실제 화면. 짚을 것 세 가지 — (1) 브라우저 주소는 localhost:8088인데 데이터는 ./lake의 Parquet에 있다. Superset은 사본을 갖지 않는다. (2) 테이블 이름 iceberg.retail.production_orders_100m에서 iceberg는 Trino 카탈로그 파일명, retail은 HMS namespace, 뒤는 테이블. 앞 장 설정이 그대로 SQL 한 줄이 된다. (3) 2.346초는 단일 실행 기록이지 성능 측정이 아니다. limit 1000이라 1억 행을 다 읽지도 않았다. 질문이 나오면: (a) 좌측 테이블 목록에 production_orders_100m_attempt1이 같이 보이는데 실패 시도 잔재이고 정리 대상이다. (b) 연결은 어떻게 했나 — 공식 Superset 이미지에 Trino 드라이버가 없어 Dockerfile에서 --python /app/.venv/bin/python으로 Superset의 venv에 trino[sqlalchemy]를 설치하고, bootstrap_superset.py가 REST API로 trino://superset@trino:8080/iceberg를 등록한다. MySQL을 붙일 때와 같은 절차라 발표 본문에서는 뺐다. (c) 주소가 셋으로 갈린다 — 호스트 브라우저는 localhost:8081, Superset 컨테이너는 trino:8080, Trino 자기 자신은 localhost:8080. 같은 iceberg-learning-net 네트워크라 서비스 이름으로 찾는다.">
   <div class="eyebrow">05. Trino · Superset 조회</div>
   <div class="s-title">Superset SQL Lab 조회</div>
   <div class="s-sub">브라우저에서 SQL을 던지면 <b>Trino가 Parquet을 읽어</b> 돌려준다.</div>
@@ -1199,7 +1168,7 @@ write.parquet.row-group-size-bytes   16777216</pre>
   <div class="cap"><span>왼쪽 <b>Database가 Trino</b>다 — Superset은 Iceberg에 직접 붙지 않는다. <b>1,000행 응답 2.346초</b> (단일 실행 기록, 성능 측정값 아님).</span></div>
 </section>
 
-<!-- ==================== 28. “적재됐다”와 “값이 맞다”는 다르다 ==================== -->
+<!-- ==================== 27. “적재됐다”와 “값이 맞다”는 다르다 ==================== -->
 <section class="slide" data-eyebrow="05. Trino · Superset 조회" data-notes="'행 단위 전수 비교는 아니다'라는 단서를 반드시 말한다. 메타데이터 COUNT만 보고 끝내지 않았다는 게 포인트. 표의 모든 수치는 2026-10-20에 같은 쿼리로 다시 재서 적재 시점 기록과 완전히 일치함을 확인했다(reverify-2026-10-20.json). 원본 PostgreSQL(포트 5440)은 현재 기동돼 있지 않아 원본측은 적재 시점 기록을 쓴다. 질문이 나오면: 기존 5행 orders 테이블도 5행/170,000 그대로 보존된 것을 함께 확인했다.">
   <div class="eyebrow">05. Trino · Superset 조회</div>
   <div class="s-title">원본과의 집계 대조 검증</div>
@@ -1227,73 +1196,7 @@ write.parquet.row-group-size-bytes   16777216</pre>
   </div>
 </section>
 
-<!-- ==================== 29. 섹션 06 ==================== -->
-<section class="slide divider" data-notes="발표를 닫는 요약.">
-  <div class="dlabel">SECTION 06</div>
-  <div class="toc">
-    <div class="toc-row"><span class="n">01</span><span><span class="t">레이크하우스란 무엇인가</span></span></div>
-    <div class="toc-row"><span class="n">02</span><span><span class="t">로컬 레이크하우스 아키텍처</span></span></div>
-    <div class="toc-row"><span class="n">03</span><span><span class="t">구성요소의 역할과 경계</span></span></div>
-    <div class="toc-row"><span class="n">04</span><span><span class="t">Iceberg가 파일을 관리하는 방법</span></span></div>
-    <div class="toc-row"><span class="n">05</span><span><span class="t">Trino·Superset으로 조회하기</span></span></div>
-    <div class="toc-row on"><span class="n">06</span><span><span class="t">정리</span><br><span class="d">전체 지도 · 확인한 것 · 남은 것</span></span></div>
-  </div>
-</section>
 
-<!-- ==================== 30. 전체 지도 — 환경 준비 · 쓰기 · 읽기 ==================== -->
-<section class="slide" data-eyebrow="06. 정리" data-notes="전체 복습용 지도. 02~05장을 한 번에 되짚는다. ①은 최초 1회, ②는 완료, ③만 평소에 쓴다는 생애주기를 손으로 짚는다.">
-  <div class="eyebrow">06. 정리</div>
-  <div class="s-title">전체 실행 흐름</div>
-  <div class="fig"><img src="../docs/assets/lakehouse-flow/08-scripts-to-lakehouse.png" alt="환경 준비, 1억 행 적재, SQL 조회의 세 단계와 각 단계에서 사용하는 파일"></div>
-  <div class="cap"><span>①은 최초 1회, ②는 이미 완료, <b>평소에 쓰는 건 ③뿐</b>이다. 조회할 때 SeaTunnel은 실행되지 않는다 — 쓰기와 읽기는 시간적으로도 완전히 분리돼 있다.</span></div>
-</section>
-
-<!-- ==================== 31. 구축하며 확인한 것 ==================== -->
-<section class="slide" data-eyebrow="06. 정리" data-notes="핵심 메시지를 다시 말하고 끝낸다. 첫 줄은 5쪽에서 한 말과 똑같이 반복한다 — 의도된 반복이다.">
-  <div class="eyebrow">06. 정리</div>
-  <div class="s-title">구축하며 확인한 것</div>
-  <div class="body">
-    <ul class="arrow">
-      <li><b>레이크하우스는 제품이 아니라 네 가지 역할의 조합이다.</b> 적재 · 테이블 포맷 · 카탈로그 · 조회.
-        <span class="sub">우리는 SeaTunnel · Iceberg · Hive Metastore · Trino+Superset을 골랐을 뿐이고, 각 칸은 교체할 수 있다.</span></li>
-      <li><b>각 구성요소가 “하지 않는 일”을 아는 것이 더 쓸모 있었다.</b> 역할 경계가 분명해야 문제가 생겼을 때 어디를 볼지 정해진다.</li>
-      <li><b>쓰기 경로와 읽기 경로는 서로를 모른다.</b> 카탈로그와 파일 저장소 두 지점에서만 만난다. 이것이 구성요소를 갈아끼울 수 있는 이유다.</li>
-      <li><b>“파일을 썼다”와 “테이블이 됐다”는 다르다.</b> 카탈로그 커밋이 성공해야 새 상태가 공개된다. 둘을 묶는 트랜잭션은 없다.</li>
-      <li><b>“적재됐다”와 “값이 맞다”도 다르다.</b> 메타데이터 COUNT가 아니라 실제 파일을 스캔해 원본과 대조했다.</li>
-      <li><b>조립의 자유에는 경계를 책임지는 비용이 따른다.</b> 가장 오래 걸린 문제들은 전부 도구 사이의 접점에서 생겼다.</li>
-      <li><b>우리가 쓴 코드는 약 800줄이고 나머지는 조립이다.</b> 카탈로그 서버도 쿼리 엔진도 개발하지 않았다. 고르고 연결하고 검증했다.</li>
-    </ul>
-  </div>
-</section>
-
-<!-- ==================== 32. 남은 것 — 안 해본 것은 안 했다고 적는다 ==================== -->
-<section class="slide" data-eyebrow="06. 정리" data-notes="한계를 솔직하게. 안 해본 걸 했다고 말하지 않는다. 질문 받고 마무리.">
-  <div class="eyebrow">06. 정리</div>
-  <div class="s-title">남은 것과 한계</div>
-  <div class="s-sub">안 해본 것은 안 했다고 적는다.</div>
-  <div class="body">
-    <div class="grid g2">
-      <div class="card o">
-        <h4>지금 구성의 한계</h4>
-        <p class="why"><b>단일 Mac · 로컬 파일시스템 · 단일 노드 Trino.</b> 운영 환경이 아니다.</p>
-        <p class="why"><b>정적 배치 적재만</b> 했다. CDC·스트리밍은 이번 범위 밖이다.</p>
-        <p class="why"><b>추가(append) 전용</b>이라 삭제 파일, 파티션·스키마 진화는 경험하지 않았다.</p>
-        <p class="why">Superset에 1억 행 <b>Dataset·차트는 등록하지 않았다.</b> SQL Lab 조회만 확인했다.</p>
-      </div>
-      <div class="card b">
-        <h4>다음에 해볼 것</h4>
-        <p class="why"><b>S3 호환 객체 저장소로 전환</b> — 설계는 <span class="mono">docs/local-lakehouse-build-options.md</span>에 있고 실행 검증은 아직이다. 기존 <span class="mono">retail</span>은 그대로 두고 새 namespace에 적재한다.</p>
-        <p class="why"><b>카탈로그 교체 실험</b> — REST Catalog로 바꿔도 파일이 그대로인지 확인하면, “교체 가능하다”를 말이 아니라 증거로 보일 수 있다.</p>
-        <p class="why"><b>폐쇄망 이관 절차</b> — 이미지 반입과 사내 레지스트리 검토.</p>
-      </div>
-    </div>
-    <div class="banner">
-      <span class="ic">◆</span>
-      <span>모든 수치와 설정은 저장소에 기록으로 남아 있다
-      <small><span class="mono">evidence/</span> · <span class="mono">docs/</span> · <span class="mono">presentation/local-lakehouse-deck-plan.md</span> — 이 발표의 기획 문서와 출처 목록도 함께 커밋했다.</small></span>
-    </div>
-  </div>
-</section>
 </div><!-- /stage -->
 
 <div id="grid"></div>
@@ -1314,7 +1217,7 @@ write.parquet.row-group-size-bytes   16777216</pre>
     if(s.classList.contains('cover')) return;
     const f = document.createElement('div');
     f.className = 'foot';
-    f.innerHTML = '<span>로컬 데이터 레이크하우스 구축 · 2026-10-12</span>'
+    f.innerHTML = '<span>로컬 데이터 레이크하우스 구축 · 2026-10-30</span>'
                 + '<span class="num">'+(i+1)+' / '+total+'</span>';
     if(s.classList.contains('divider')){
       f.style.color='#6f8aa8'; f.style.borderTopColor='rgba(255,255,255,.18)';
