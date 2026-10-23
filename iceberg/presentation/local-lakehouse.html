@@ -175,6 +175,15 @@ body{
 .mini .lb{font-size:1.0cqw;color:var(--muted);margin-left:.45cqw}
 .card .gain{font-size:1.1cqw;color:#53677d;margin-top:.7cqw;line-height:1.72}
 /* '무엇이 → 어떤 명세로' 두 줄을 세로로 맞춰 보여주는 격자 */
+/* "대표적인 예" 칩 — 우리가 쓴 도구가 아니라는 점이 드러나게 테두리만 */
+/* 명사구 불릿 */
+.blt{list-style:none;margin-top:.9cqw;padding:0}
+.blt li{position:relative;padding-left:1.5cqw;margin-top:.75cqw;font-size:1.22cqw;line-height:1.5;color:var(--ink)}
+.blt li::before{content:"";position:absolute;left:.28cqw;top:.62cqw;width:.42cqw;height:.42cqw;border-radius:50%;background:currentColor;opacity:.5}
+.blt li small{display:block;font-size:1.05cqw;color:var(--muted);margin-top:.22cqw;font-weight:500}
+.egs{margin-top:auto;padding-top:1cqw;font-size:1.02cqw;color:var(--muted);display:flex;align-items:center;gap:.45cqw;flex-wrap:wrap}
+.egs b{font-weight:700;color:var(--muted);margin-right:.3cqw}
+.egs span{font-family:var(--mono);font-size:.98cqw;padding:.24cqw .55cqw;border-radius:.3cqw;border:1px solid var(--line);background:rgba(255,255,255,.65);color:#53677d}
 .mini2{display:grid;grid-template-columns:max-content max-content max-content;
        gap:.4cqw .5cqw;align-items:center;margin:.9cqw 0 .15cqw}
 .card .gain b{color:var(--navy)}
@@ -443,51 +452,34 @@ body:hover #help{opacity:.5}
   </div>
 </section>
 
-<!-- ==================== 3. 데이터 웨어하우스 · 레이크 · 레이크하우스 ==================== -->
-<section class="slide" data-eyebrow="01. 레이크하우스란 무엇인가" data-notes="개념 도입. 표를 세로로 읽으면 레이크하우스가 어느 칸에서 뭘 가져왔는지 보인다 — 저장 방식은 레이크, 관리 기능은 웨어하우스. 아래 한 줄이 이 장의 요약이고, 그 '관리 기능'을 무엇이 제공하는지가 다음 장이다.">
+<!-- ==================== 3. 데이터 레이크하우스의 정의 ==================== -->
+<section class="slide" data-eyebrow="01. 레이크하우스란 무엇인가" data-notes="개념 도입. 웨어하우스와 레이크를 각각 설명하지 않는다 — 아는 내용이고 오늘 주제도 아니다. 왼쪽 두 카드를 읽고 '이 넷을 한 자리에서 쓰려는 것이 레이크하우스'라고 말한 뒤 바로 다음 장으로 넘어간다. 오른쪽 아래 카드가 중요 — 공짜가 아니라 조립을 떠안는 구조이고, 그 조립 대상이 다음 장의 네 가지 역할이다. 칩은 "대표적인 예"일 뿐 우리가 쓴 것이 아니라고 분명히 말한다. 질문이 나오면: 클라우드 웨어하우스(Snowflake·BigQuery)도 물리적으로는 오브젝트 스토리지에 파일로 두지만 포맷이 비공개라 그 엔진으로만 읽힌다 — 차이는 '어디에 두느냐'가 아니라 '누구만 읽을 수 있느냐'다.">
   <div class="eyebrow">01. 레이크하우스란 무엇인가</div>
-  <div class="s-title">데이터 웨어하우스 · 레이크 · 레이크하우스</div>
-  <div class="s-sub">같은 데이터를 어디에 어떻게 두느냐의 차이다.</div>
-  <div class="body">
-    <table>
-      <thead><tr><th style="width:19%">항목</th><th style="width:27%">데이터 웨어하우스</th><th style="width:27%">데이터 레이크</th><th>레이크하우스</th></tr></thead>
-      <tbody>
-        <tr>
-          <td><b>저장 방식</b></td>
-          <td>데이터베이스 안에 넣어 관리한다</td>
-          <td>값싼 저장소에 <b>파일 그대로</b> 쌓는다</td>
-          <td class="ok">값싼 저장소에 <b>파일 그대로</b> 쌓는다</td>
-        </tr>
-        <tr>
-          <td><b>스키마 · 이력</b></td>
-          <td>있다</td>
-          <td class="no">없다</td>
-          <td class="ok">있다</td>
-        </tr>
-        <tr>
-          <td><b>쓰는 중에 읽으면</b></td>
-          <td>이전 상태가 보인다 (안전)</td>
-          <td class="no">쓰다 만 파일이 보인다</td>
-          <td class="ok">이전 상태가 보인다 (안전)</td>
-        </tr>
-        <tr>
-          <td><b>조회 도구</b></td>
-          <td class="no">그 시스템 전용</td>
-          <td>여러 도구로 읽을 수 있다</td>
-          <td class="ok">여러 도구로 읽을 수 있다</td>
-        </tr>
-        <tr>
-          <td><b>주로 겪는 문제</b></td>
-          <td>비용이 크고, 데이터를 꺼내려면 복사해야 한다</td>
-          <td class="no">뭐가 뭔지 모르게 된다</td>
-          <td>구성요소를 직접 조립해야 한다</td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="banner">
-      <span class="ic">◆</span>
-      <span>레이크하우스 = <b>파일은 레이크처럼 두고, 관리 기능은 웨어하우스처럼</b>
-      <small>데이터 레이크는 파일을 싸게 많이 쌓을 수 있었지만 “이 폴더가 무엇인지” 아무도 모르는 상태가 되기 쉬웠다. 레이크하우스는 그 자리에 <b>테이블을 관리하는 계층</b>을 얹은 것이다 — 그 계층이 무엇으로 구성되는지가 다음 장이다.</small></span>
+  <div class="s-title">데이터 레이크하우스의 정의</div>
+  <div class="s-sub">레이크의 <b>저장 방식</b>에 웨어하우스의 <b>관리 기능</b>을 얹은 구조</div>
+  <div class="body top">
+    <div class="grid g2" style="flex:1;min-height:0">
+      <div class="card b" style="display:flex;flex-direction:column">
+        <h4><span class="badge-n" style="background:var(--blue)">＋</span>데이터 레이크에서 가져온 것</h4>
+        <ul class="blt">
+          <li><b>값싼 저장소에 파일 그대로 적재</b><small>전용 시스템에 넣지 않아 용량 확장이 쉽다</small></li>
+          <li><b>공개 포맷 — 여러 도구가 같은 파일을 읽음</b><small>꺼내기 위한 복사가 필요 없다</small></li>
+        </ul>
+        <div class="egs"><b>저장소 예</b><span>Amazon S3</span><span>MinIO</span><span>Google Cloud Storage</span><span>Azure Data Lake</span></div>
+      </div>
+      <div class="card gr" style="display:flex;flex-direction:column">
+        <h4><span class="badge-n" style="background:var(--green)">＋</span>데이터 웨어하우스에서 가져온 것</h4>
+        <ul class="blt">
+          <li><b>스키마와 변경 이력 보존</b><small>어떤 컬럼인지, 언제 무엇이 바뀌었는지 남는다</small></li>
+          <li><b>쓰는 중 조회 시 이전 상태 노출</b><small>쓰다 만 파일이 보이지 않는다</small></li>
+        </ul>
+        <div class="egs"><b>제품 예</b><span>Snowflake</span><span>BigQuery</span><span>Redshift</span><span>Teradata</span></div>
+      </div>
+    </div>
+    <div class="banner g" style="flex:none">
+      <span class="ic">&#9670;</span>
+      <span>파일은 <b>레이크처럼</b> 두고, 그 위에 <b>테이블을 관리하는 계층</b>을 얹는다
+      <small>데이터 레이크는 파일을 싸게 많이 쌓을 수 있었지만 “이 폴더가 무엇인지” 아무도 모르는 상태가 되기 쉬웠다. 레이크하우스는 파일을 옮기지 않고 <b>그 자리에</b> 관리 계층만 추가한 것이다.</small></span>
     </div>
   </div>
 </section>
