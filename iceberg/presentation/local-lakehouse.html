@@ -185,6 +185,9 @@ body{
 .blt li{position:relative;padding-left:1.5cqw;margin-top:.75cqw;font-size:1.22cqw;line-height:1.5;color:var(--ink)}
 .blt li::before{content:"";position:absolute;left:.28cqw;top:.62cqw;width:.42cqw;height:.42cqw;border-radius:50%;background:currentColor;opacity:.5}
 .blt li small{display:block;font-size:1.05cqw;color:var(--muted);margin-top:.22cqw;font-weight:500}
+.blt.big li{font-size:1.72cqw;margin-top:1.9cqw;padding-left:2cqw}
+.blt.big li::before{left:.4cqw;top:.9cqw;width:.56cqw;height:.56cqw}
+.blt.big li small{font-size:1.32cqw;margin-top:.45cqw}
 .egs{margin-top:auto;padding-top:1cqw;font-size:1.02cqw;color:var(--muted);display:flex;align-items:center;gap:.45cqw;flex-wrap:wrap}
 .egs b{font-weight:700;color:var(--muted);margin-right:.3cqw}
 .egs span{font-family:var(--mono);font-size:.98cqw;padding:.24cqw .55cqw;border-radius:.3cqw;border:1px solid var(--line);background:rgba(255,255,255,.65);color:#53677d}
@@ -675,7 +678,7 @@ body:hover #help{opacity:.5}
         </tr>
         <tr>
           <td><span class="tool"><img src="../docs/assets/lakehouse-flow/logos/hive-metastore.png" alt=""><b>Hive Metastore</b></span></td>
-          <td><b>테이블 이름 → 현재 metadata JSON 위치</b> 관리</td>
+          <td><b>“테이블 이름 → 현재 metadata JSON 위치”</b> 등록 · 보관 · 교체</td>
           <td class="not"><b>SQL 실행 · Parquet 읽기 · 폴더 스캔 자동 등록</b> — 전부 없음</td>
         </tr>
         <tr>
@@ -748,11 +751,10 @@ write.parquet.row-group-size-bytes   16777216</pre>
   </div>
 </section>
 
-<!-- ==================== 14. 왜 이 조합을 골랐나 ==================== -->
-<section class="slide" data-eyebrow="03. 구성요소의 역할과 경계" data-notes="★ 기술 선정은 팀 차원의 결정이므로 '내가 골랐다'로 말하지 않는다. 이 장은 그 구성이 실제로 무엇을 덜어줬는지와, 각 칸이 교체 가능하다는 점을 보여준다. 특히 HMS가 Iceberg의 필수가 아니라는 점을 분명히 말한다. 질문이 나오기 쉬운 지점이다.">
+<!-- ==================== 14. 구성요소 선정 근거와 교체 후보 ==================== -->
+<section class="slide" data-eyebrow="03. 구성요소의 역할과 경계" data-notes="4쪽과 같은 네 칸이지만 묻는 질문이 다르다 — 4쪽은 '무엇을 썼나', 이 장은 '왜 그것이고 바꿀 수 있나'다. 들어갈 때 그 차이를 한 줄로 말해주면 반복으로 안 들린다. 기술 선정은 팀 차원의 결정이므로 '내가 골랐다'로 말하지 않는다. 각 카드 아래 교체 후보가 이 장의 절반이다. 특히 HMS가 Iceberg의 필수가 아니라는 점을 분명히 말한다 — 질문이 나오기 쉬운 지점이다. 선정 조건 셋(오픈소스·재단 관리 / 로컬 단일 노드 / 교체 가능)은 슬라이드에서 빼고 말로만 덧붙인다.">
   <div class="eyebrow">03. 구성요소의 역할과 경계</div>
-  <div class="s-title">이 구성에서 얻은 이점</div>
-  <div class="s-sub">각 칸이 덜어준 작업 — 그리고 <b>바꿔 끼울 수 있는 후보</b></div>
+  <div class="s-title">구성요소 선정 근거와 교체 후보</div>
   <div class="body">
     <div class="grid g4">
       <div class="card">
@@ -779,11 +781,6 @@ write.parquet.row-group-size-bytes   16777216</pre>
         <p class="why" style="margin-top:.7cqw">Trino는 Iceberg 커넥터가 성숙하고, Superset은 <b>Trino 드라이버를 공식 지원</b>한다.</p>
         <p class="alt">교체 후보 · Spark SQL · DuckDB / Metabase · Redash</p>
       </div>
-    </div>
-    <div class="banner b" style="background:var(--blue-soft);color:var(--navy);border:1px solid var(--blue-line)">
-      <span class="ic" style="color:var(--blue)">◆</span>
-      <span style="color:var(--navy)">네 칸이 공통으로 만족하는 조건 셋
-      <small style="color:var(--muted)">① 오픈소스이고 재단이 관리한다 (특정 회사가 사라져도 남는다) &nbsp;·&nbsp; ② 로컬 단일 노드에서 뜬다 &nbsp;·&nbsp; ③ <b>나중에 갈아끼울 수 있다</b></small></span>
     </div>
   </div>
 </section>
@@ -818,11 +815,11 @@ write.parquet.row-group-size-bytes   16777216</pre>
         </div>
         <div class="card" style="padding:1.05cqw 1.3cqw;flex:1;display:flex;flex-direction:column;justify-content:center">
           <h4 style="font-size:1.34cqw"><span class="badge-n" style="background:var(--orange)">3</span>manifest</h4>
-          <p class="why" style="margin-top:.4cqw">데이터 파일의 <b>경로와 컬럼별 통계</b>. 파일을 거를 근거가 여기 있다.</p>
+          <p class="why" style="margin-top:.4cqw">parquet 파일의 <b>경로와 컬럼별 통계</b>. 파일을 거를 근거가 여기 있다.</p>
         </div>
         <div class="card" style="padding:1.05cqw 1.3cqw;flex:1;display:flex;flex-direction:column;justify-content:center">
           <h4 style="font-size:1.34cqw"><span class="badge-n" style="background:var(--blue)">4</span>Parquet</h4>
-          <p class="why" style="margin-top:.4cqw"><b>실제 데이터 저장</b>. 여기까지 와야 데이터를 읽는다.</p>
+          <p class="why" style="margin-top:.4cqw"><b>실제 데이터 저장</b>. 메타데이터를 따라 도달한 Parquet 파일에서 실제 레코드를 읽는다.</p>
         </div>
       </div>
       <div class="excerpt" style="background:var(--bg-soft);border-color:var(--line)">
@@ -854,7 +851,7 @@ write.parquet.row-group-size-bytes   16777216</pre>
 </section>
 
 <!-- ==================== 17. ① JSON에서 현재 스냅샷을 고른다 ==================== -->
-<section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="실제 JSON이다. 병렬도 4로 적재했더니 커밋이 4번 일어났고 그게 스냅샷 4개로 남았다. 네 항목 모두 자기 snapshot-id를 가진다 — 맨 위 current-snapshot-id(3279400440120366835)와 같은 값을 배열에서 찾고, 그 항목의 manifest-list로 넘어간다. snapshot-id는 manifest-list 파일 이름(snap-<id>-…)에도 그대로 들어 있어 눈으로 따라갈 수 있다. 과거 스냅샷 셋도 그대로 남아 있어서 지정 조회가 되고, 각 항목의 parent-snapshot-id가 직전 스냅샷을 가리켜 사슬을 이룬다 — 되돌리기는 current-snapshot-id를 과거 값으로 바꾸는 일이다. 스냅샷이 별도 파일이 아니라 이 JSON 안의 배열 원소라는 점을 짚는다.">
+<section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="실제 JSON이다. 커밋마다 스냅샷 항목이 배열에 하나씩 덧붙는다 — 기존 항목은 고치지 않는다. total-records는 그 시점까지의 누적이다. 이번 실행은 병렬도 4에 커밋 4회였지만 둘이 항상 같지는 않다. 네 항목 모두 자기 snapshot-id를 가진다 — 맨 위 current-snapshot-id(3279400440120366835)와 같은 값을 배열에서 찾고, 그 항목의 manifest-list로 넘어간다. snapshot-id는 manifest-list 파일 이름(snap-<id>-…)에도 그대로 들어 있어 눈으로 따라갈 수 있다. 과거 스냅샷 셋도 그대로 남아 있어서 지정 조회가 되고, 각 항목의 parent-snapshot-id가 직전 스냅샷을 가리켜 사슬을 이룬다 — 되돌리기는 current-snapshot-id를 과거 값으로 바꾸는 일이다. 스냅샷이 별도 파일이 아니라 이 JSON 안의 배열 원소라는 점을 짚는다.">
   <div class="eyebrow">04. Iceberg 파일 관리</div>
   <div class="s-title">① metadata JSON — 현재 스냅샷 선택</div>
   <div class="chain">
@@ -890,8 +887,9 @@ write.parquet.row-group-size-bytes   16777216</pre>
           <p class="why"><b>네 항목 모두 자기 <span class="mono">snapshot-id</span>를 가진다.</b> <span class="mono">current-snapshot-id</span>와 <b>같은 값</b>을 배열에서 찾고, 그 항목의 <span class="mono">manifest-list</span> 경로로 넘어간다. </p>
         </div>
         <div class="card" style="padding:1.3cqw 1.5cqw;margin-top:1cqw">
-          <h4 style="font-size:1.42cqw">커밋 4회 누적</h4>
-          <p class="why">2,500만 행씩 네 번. <b>25,000,000 → 50,000,000 → 75,000,000 → 100,000,000</b> 누적이 기록돼 있다. <b>병렬도와 커밋 수가 항상 같지는 않다.</b></p>
+          <h4 style="font-size:1.42cqw">커밋마다 스냅샷이 하나씩 쌓인다</h4>
+          <p class="why">커밋이 일어날 때마다 <b>스냅샷 항목 하나가 배열에 추가</b>된다. 기존 항목은 고치지 않고 <b>덧붙이기만</b> 한다.</p>
+          <p class="why" style="margin-top:.5cqw">각 항목의 <span class="mono">total-records</span>는 <b>그 시점까지의 누적 행 수</b>다. </p>
         </div>
         <div class="card o" style="padding:1.3cqw 1.5cqw;margin-top:1cqw">
           <h4 style="font-size:1.42cqw">JSON 안에 기록된 스냅샷</h4>
@@ -904,7 +902,7 @@ write.parquet.row-group-size-bytes   16777216</pre>
 </section>
 
 <!-- ==================== 18. ② manifest list에서 manifest 경로를 ==================== -->
-<section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="17쪽에서 고른 스냅샷의 manifest-list 파일(snap-3279400440120366835-….avro)을 그대로 연 것이다. Avro라 fastavro로 읽었다. 안에 레코드가 4개 있고 각 레코드의 manifest_path가 …-m0.avro를 가리킨다 — 즉 manifest 파일 4개의 위치가 여기 들어 있다. 각 레코드의 added_files가 1이라 manifest 하나당 Parquet 하나인데, 이번 실행 기준이고 규칙은 아니다(19쪽). 네 manifest 중 셋은 이전 커밋이 만든 것이고 현재 스냅샷이 그대로 재사용한다 — 새 커밋이 기존 것을 덮어쓰지 않는다. 25,000,000 × 4 = 100,000,000이 Parquet을 하나도 열기 전에 나온다는 게 두 번째 포인트. seq 순서가 뒤섞인 건 병렬 writer라 자연스러운 것.">
+<section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="🧭 네 단계 중 두 번째라고 한 번 환기한다. 17쪽에서 고른 스냅샷의 manifest-list 파일(snap-3279400440120366835-….avro)을 그대로 연 것이다. Avro라 fastavro로 읽었다. 안에 레코드가 4개 있고 각 레코드의 manifest_path가 …-m0.avro를 가리킨다 — 즉 manifest 파일 4개의 위치가 여기 들어 있다. 각 레코드의 added_files가 1이라 manifest 하나당 Parquet 하나인데, 이번 실행 기준이고 규칙은 아니다(19쪽). 네 manifest 중 셋은 이전 커밋이 만든 것이고 현재 스냅샷이 그대로 재사용한다 — 새 커밋이 기존 것을 덮어쓰지 않는다. 25,000,000 × 4 = 100,000,000이 Parquet을 하나도 열기 전에 나온다는 게 두 번째 포인트. seq 순서가 뒤섞인 건 병렬 writer라 자연스러운 것.">
   <div class="eyebrow">04. Iceberg 파일 관리</div>
   <div class="s-title">② manifest list — 참조하는 manifest 목록</div>
   <div class="chain">
@@ -1132,7 +1130,7 @@ write.parquet.row-group-size-bytes   16777216</pre>
 </section>
 
 <!-- ==================== 25. Superset SQL Lab 조회 ==================== -->
-<section class="slide" data-eyebrow="05. Trino · Superset 조회" data-notes="23쪽 그림에서 상자로만 있던 Superset의 실제 화면. 짚을 것 세 가지 — (1) 브라우저 주소는 localhost:8088인데 데이터는 ./lake의 Parquet에 있다. Superset은 사본을 갖지 않는다. (2) 테이블 이름 iceberg.retail.production_orders_100m에서 iceberg는 Trino 카탈로그 파일명, retail은 HMS namespace, 뒤는 테이블. 앞 장 설정이 그대로 SQL 한 줄이 된다. (3) 2.346초는 단일 실행 기록이지 성능 측정이 아니다. limit 1000이라 1억 행을 다 읽지도 않았다. 질문이 나오면: (a) 좌측 테이블 목록에 production_orders_100m_attempt1이 같이 보이는데 실패 시도 잔재이고 정리 대상이다. (b) 연결은 어떻게 했나 — 공식 Superset 이미지에 Trino 드라이버가 없어 Dockerfile에서 --python /app/.venv/bin/python으로 Superset의 venv에 trino[sqlalchemy]를 설치하고, bootstrap_superset.py가 REST API로 trino://superset@trino:8080/iceberg를 등록한다. MySQL을 붙일 때와 같은 절차라 발표 본문에서는 뺐다. (c) 주소가 셋으로 갈린다 — 호스트 브라우저는 localhost:8081, Superset 컨테이너는 trino:8080, Trino 자기 자신은 localhost:8080. 같은 iceberg-learning-net 네트워크라 서비스 이름으로 찾는다.">
+<section class="slide" data-eyebrow="05. Trino · Superset 조회" data-notes="🔴 여기서 브라우저로 전환 — 스택이 떠 있으면 화면을 클릭해 localhost:8088을 새 탭으로 연다. 23쪽 그림에서 상자로만 있던 Superset의 실제 화면. 짚을 것 세 가지 — (1) 브라우저 주소는 localhost:8088인데 데이터는 ./lake의 Parquet에 있다. Superset은 사본을 갖지 않는다. (2) 테이블 이름 iceberg.retail.production_orders_100m에서 iceberg는 Trino 카탈로그 파일명, retail은 HMS namespace, 뒤는 테이블. 앞 장 설정이 그대로 SQL 한 줄이 된다. (3) 2.346초는 단일 실행 기록이지 성능 측정이 아니다. limit 1000이라 1억 행을 다 읽지도 않았다. 질문이 나오면: (a) 좌측 테이블 목록에 production_orders_100m_attempt1이 같이 보이는데 실패 시도 잔재이고 정리 대상이다. (b) 연결은 어떻게 했나 — 공식 Superset 이미지에 Trino 드라이버가 없어 Dockerfile에서 --python /app/.venv/bin/python으로 Superset의 venv에 trino[sqlalchemy]를 설치하고, bootstrap_superset.py가 REST API로 trino://superset@trino:8080/iceberg를 등록한다. MySQL을 붙일 때와 같은 절차라 발표 본문에서는 뺐다. (c) 주소가 셋으로 갈린다 — 호스트 브라우저는 localhost:8081, Superset 컨테이너는 trino:8080, Trino 자기 자신은 localhost:8080. 같은 iceberg-learning-net 네트워크라 서비스 이름으로 찾는다.">
   <div class="eyebrow">05. Trino · Superset 조회</div>
   <div class="s-title">Superset SQL Lab 조회</div>
   <div class="s-sub">브라우저에서 SQL을 던지면 <b>Trino가 Parquet을 읽어</b> 돌려준다.</div>
@@ -1164,6 +1162,20 @@ write.parquet.row-group-size-bytes   16777216</pre>
       <span>Iceberg에 <b>정상적으로 적재되었음</b>을 확인
       <small><span class="mono">order_id</span> 합계 · <span class="mono">NULL quantity</span> · 문자열 길이 합계 · 날짜 범위까지 <b>원본 DB와 SeaTunnel·Iceberg 적재 결과가 모두 동일</b>하다.<br>성격이 다른 지표가 전부 일치했다는 점에서, 행의 누락이나 값의 변형 없이 옮겨졌다고 볼 수 있다.</small></span>
     </div>
+  </div>
+</section>
+
+<!-- ==================== 27. 구축을 통해 확인한 것 ==================== -->
+<section class="slide" data-eyebrow="마무리" data-notes="닫는 장. 네 줄이 전부다 — 천천히 한 줄씩 읽고 각 줄에 한 문장만 덧붙인다. 순서는 덱 순서다: 1번은 04장, 2번은 01·02장, 3번은 02장, 4번은 05장. 슬라이드에서 뺀 한계는 말로 덧붙인다 — 삭제·스키마 변경·파티션 진화 미경험, 동시 writer·스냅샷 정리·다중 노드는 문서로만, 로컬 단일 노드라 운영 환경 아님. 마지막에 다음 단계 우선순위 질문을 던지고 닫는다.">
+  <div class="eyebrow">마무리</div>
+  <div class="s-title">구축을 통해 확인한 것</div>
+  <div class="body">
+    <ul class="blt big" style="margin-top:0">
+      <li><b>Iceberg는 서버가 아니라 오픈 테이블 포맷이다</b><small>JSON · Avro 메타데이터가 Parquet을 가리키고, 컬럼 통계로 <b>열기 전에 읽을 파일을 고른다</b></small></li>
+      <li><b>레이크하우스는 제품이 아니라 역할의 조합이다</b><small>적재 · 테이블 포맷 · 카탈로그 · 조회를 컨테이너로 띄워 <b>적재부터 조회까지 직접 연결</b>했다</small></li>
+      <li><b>SeaTunnel은 설정 파일 선언만으로 적재를 끝낸다</b><small>원본 읽기 → Parquet 작성 → <b>HMS 커밋</b>까지. 적재 잡에는 코드를 쓰지 않았다</small></li>
+      <li><b>Superset에는 쿼리 엔진이 없다</b><small>Trino 같은 엔진을 붙여야 Iceberg를 조회할 수 있다</small></li>
+    </ul>
   </div>
 </section>
 
