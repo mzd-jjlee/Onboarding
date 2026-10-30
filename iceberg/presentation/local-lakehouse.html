@@ -481,7 +481,7 @@ body:hover #help{opacity:.5}
         <h4><span class="badge-n" style="background:var(--green)">＋</span>데이터 웨어하우스에서 가져온 것</h4>
         <ul class="blt">
           <li><b>스키마 정의 · 변경 이력(Time Travel) 관리</b><small>어떤 컬럼인지, 언제 무엇이 바뀌었는지 남는다</small></li>
-          <li><b>트랜잭션 — 쓰는 중 조회 시 이전 상태 노출</b><small>쓰다 만 파일이 보이지 않는다</small></li>
+          <li><b>트랜잭션 — 쓰는 도중에 조회해도 중간 상태가 안 보인다</b><small>커밋 전까지는 직전 상태가 그대로 보인다 — 쓰다 만 파일이 섞이지 않는다</small></li>
         </ul>
         <div class="egs"><b>제품 예</b><span>Snowflake</span><span>BigQuery</span><span>Redshift</span><span>Teradata</span></div>
       </div>
