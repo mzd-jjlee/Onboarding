@@ -1033,19 +1033,10 @@ write.parquet.row-group-size-bytes   16777216</pre>
 </section>
 
 <!-- ==================== 21. Iceberg 파일 관리의 이점 ==================== -->
-<section class="slide" id="s21" data-eyebrow="04. Iceberg 파일 관리" data-notes="04장 마무리. 네 가지 메커니즘. 각 카드의 작은 도식은 '무엇이 바뀌고 무엇이 그대로인가'만 보여준다. 네 번째 카드는 SQL 예시를 그대로 읽으면 되고, ◌ 표시가 미사용이라는 뜻이다. 근거/미사용 라벨을 반드시 짚는다 — ①②는 앞에서 실제로 봤고, ③은 파일에서 ID만 확인했으며, ④는 이번 테이블에 파티션이 없어 안 써봤다. 안 써본 기능을 해봤다고 말하지 않는다. 상세는 docs/md/lakehouse-concept.md 4절.">
+<section class="slide" id="s21" data-eyebrow="04. Iceberg 파일 관리" data-notes="04장 마무리. 네 가지 메커니즘. 각 카드의 작은 도식은 '무엇이 바뀌고 무엇이 그대로인가'만 보여준다. 네 번째 카드의 ◌ 표시가 미사용이라는 뜻이다. 숨은 파티셔닝은 슬라이드에서 뺐고 물으면만 답한다. 근거/미사용 라벨을 반드시 짚는다 — ①②는 앞에서 실제로 봤고, ③은 파일에서 ID만 확인했으며, ④는 이번 테이블에 파티션이 없어 안 써봤다. 안 써본 기능을 해봤다고 말하지 않는다. 상세는 docs/md/lakehouse-concept.md 4절.">
   <div class="eyebrow">04. Iceberg 파일 관리</div>
   <div class="s-title">Iceberg 파일 관리의 이점</div>
   <div class="s-sub">앞에서 본 메타데이터 구조가 <b>가능하게 하는 것</b></div>
-  <style>
-  #s21 .body{gap:.9cqw}
-  #s21 .grid{gap:1.05cqw}
-  #s21 .banner{padding:.9cqw 1.7cqw;font-size:1.46cqw}
-  #s21 .banner .ic{font-size:1.7cqw}
-  #s21 .c4 .why{font-size:1.09cqw;line-height:1.5}
-  #s21 .c4 .gain{font-size:1.05cqw;line-height:1.62}
-  #s21 .c4 .pcode{font-size:1.0cqw;padding:.4cqw .65cqw;margin:.45cqw 0 .1cqw}
-  </style>
   <div class="body">
     <div class="grid g2" style="gap:1cqw">
       <div class="card gr" style="padding:1.1cqw 1.3cqw">
@@ -1059,18 +1050,15 @@ write.parquet.row-group-size-bytes   16777216</pre>
         <div class="mini"><span class="mb off">file 1</span><span class="mb on">file 2</span><span class="mb off">file 3</span><span class="mb off">file 4</span><span class="lb">열기 전에 셋을 제외</span></div>
       </div>
       <div class="card" style="padding:1.1cqw 1.3cqw">
-        <h4><span class="badge-n">3</span>컬럼 ID 기반 스키마 진화</h4>
+        <h4><span class="badge-n">3</span>컬럼 ID 기반 스키마 진화<span style="font-weight:500;font-size:.78em;color:#8a99ab;font-family:var(--mono)">schema evolution</span></h4>
         <p class="why">컬럼마다 <b>불변 ID</b>가 붙어 추가·삭제·이름 변경·순서 변경이 <b>메타데이터만</b> 바꾼다. RDB에서 순서·타입 변경이 테이블 재작성과 잠금을 부르는 것과 다르다.</p>
         <div class="mini"><span class="mb">id 3 · product_name</span><span class="ar">→</span><span class="mb on">id 3 · item_name</span><span class="lb">Parquet은 그대로</span></div>
         <p class="alt">◐ 파일에서만 확인 — field ID 1~6. <b>스키마 변경은 해보지 않았다</b></p>
       </div>
-      <div class="card c4" style="padding:1.05cqw 1.3cqw">
-        <h4><span class="badge-n">4</span>숨은 파티셔닝과 파티션 명세 진화</h4>
-        <p class="why"><b>나누는 규칙을 테이블에 등록</b>한다 — 예: <b><span class="mono">order_date</span>를 월별로</b>. 사용자는 <b>원본 컬럼으로 조회</b>하고 엔진이 읽을 파일을 줄인다. 파생 컬럼은 만들지 않는다.</p>
-        <div class="pcode">WHERE order_date = DATE '2026-09-14'</div>
-        <div class="mini" style="margin:.45cqw 0 .15cqw"><span class="mb off">8월 파일들</span><span class="mb on">9월 파일들 · 후보</span><span class="mb off">10월 파일들</span><span class="lb">그 안에서 14일 행을 찾는다</span></div>
-        <p class="why"><span class="mono">order_month</span> 같은 조건을 쓸 필요가 없다 — 그래서 <b>“숨은”</b> 파티셔닝이다.</p>
-        <p class="gain" style="margin-top:.5cqw"><b>규칙을 월별 → 일별로 바꿔도</b> 기존 파일은 월별 그대로, 새 파일만 일별 — <b>조회 SQL은 그대로다.</b></p>
+      <div class="card" style="padding:1.1cqw 1.3cqw">
+        <h4><span class="badge-n">4</span>파티션 명세 진화<span style="font-weight:500;font-size:.78em;color:#8a99ab;font-family:var(--mono)">partition evolution</span></h4>
+        <p class="why"><b>파티션 기준을 나중에 바꿀 수 있다.</b> 바꾼 뒤에 쓰는 파일부터 새 기준이 적용되고 <b>기존 파일은 옛 기준 그대로</b> 남는다. 한 테이블에 두 기준이 섞여도 <b>조회는 같은 SQL 그대로다</b> — 엔진이 파일마다 알아서 고른다. RDB는 기준을 바꾸면 <b>데이터를 전부 다시 써야</b> 한다.</p>
+        <div class="mini"><span class="mb">기존 파일 · 월별</span><span class="ar">→</span><span class="mb on">새 파일 · 일별</span><span class="lb">기존 파일은 재작성하지 않는다</span></div>
         <p class="alt">◌ 설명용 예시 — <b>이번 테이블은 비파티션</b>(<span class="mono">fields: []</span>)이라 미적용</p>
       </div>
     </div>
