@@ -191,6 +191,9 @@ body{
 .egs{margin-top:auto;padding-top:1cqw;font-size:1.02cqw;color:var(--muted);display:flex;align-items:center;gap:.45cqw;flex-wrap:wrap}
 .egs b{font-weight:700;color:var(--muted);margin-right:.3cqw}
 .egs span{font-family:var(--mono);font-size:.98cqw;padding:.24cqw .55cqw;border-radius:.3cqw;border:1px solid var(--line);background:rgba(255,255,255,.65);color:#53677d}
+.pcode{font-family:var(--mono);font-size:1.06cqw;line-height:1.5;color:var(--navy);
+       background:rgba(255,255,255,.72);border:1px solid var(--line);border-left:.22cqw solid var(--navy);
+       border-radius:.3cqw;padding:.45cqw .7cqw;margin:.5cqw 0 .15cqw}
 .mini2{display:grid;grid-template-columns:max-content max-content max-content;
        gap:.4cqw .5cqw;align-items:center;margin:.9cqw 0 .15cqw}
 .card .gain b{color:var(--navy)}
@@ -697,11 +700,11 @@ body:hover #help{opacity:.5}
 </section>
 
 <!-- ==================== 12. 카탈로그가 하는 일은 생각보다 작다 ==================== -->
-<section class="slide" data-eyebrow="03. 구성요소의 역할과 경계" data-notes="앞 장 표에서 한 줄이었던 카탈로그를 조금 더 본다. 그림에서 대제목·노란 부제·하단 띠를 잘라내고 흐름 도식만 남겼다. 잘라낸 부제 '현재 Hive 카탈로그 구성에서는 필요하지만 모든 Iceberg 구성의 필수는 아니다'도 말로 덧붙인다 — JDBC·REST·Glue 카탈로그 대안이 있다(조사, 미사용). '우리는 HMS 서버를 개발하지 않고 공식 Hive 이미지를 설정해 실행한다'는 말로 덧붙인다 — 조립이 기본이라는 메시지와 연결된다. '동시 변경 지원'은 문서 기준이고 동시 writer를 돌려본 적은 없으니 단정하지 않는다. 다음 장(왜 이 조합인가)의 카탈로그 칸으로 이어진다.">
+<section class="slide" data-eyebrow="03. 구성요소의 역할과 경계" data-notes="앞 장 표에서 한 줄이었던 카탈로그를 조금 더 본다. 그림에서 대제목·노란 부제·하단 띠를 잘라내고 흐름 도식만 남겼다. 잘라낸 부제 '현재 Hive 카탈로그 구성에서는 필요하지만 모든 Iceberg 구성의 필수는 아니다'도 말로 덧붙인다 — JDBC·REST·Glue 카탈로그 대안이 있다(조사, 미사용). '우리는 HMS 서버를 개발하지 않고 공식 Hive 이미지를 설정해 실행한다'는 말로 덧붙인다 — 조립이 기본이라는 메시지와 연결된다. 다음 장(왜 이 조합인가)의 카탈로그 칸으로 이어진다.">
   <div class="eyebrow">03. 구성요소의 역할과 경계</div>
   <div class="s-title">Hive Metastore의 역할</div>
   <div class="s-sub">Iceberg 테이블의 <b>이름</b>과 <b>현재 metadata 위치</b>를 기록하는 카탈로그</div>
-  <div class="fig"><img src="../docs/assets/lakehouse-flow/05-hms-responsibilities-crop.png" alt="HMS의 이름 관리, 등록 정보 조회와 갱신, 동시 변경 지원 역할"></div>
+  <div class="fig"><img src="../docs/assets/lakehouse-flow/05-hms-responsibilities-crop-v2.png" alt="HMS의 이름 관리, 등록 정보 조회, 등록 정보 갱신 역할"></div>
   <div class="cap"><span>HMS가 아는 것은 <b>“테이블 이름 → 현재 metadata JSON 위치”</b> 뿐이다. 그 다음부터는 읽는 쪽이 파일을 직접 따라간다(04장). 역할이 이렇게 작게 잘려 있어서 <b>카탈로그를 교체해도 파일은 그대로</b>다.</span></div>
 </section>
 
@@ -755,6 +758,7 @@ write.parquet.row-group-size-bytes   16777216</pre>
 <section class="slide" data-eyebrow="03. 구성요소의 역할과 경계" data-notes="4쪽과 같은 네 칸이지만 묻는 질문이 다르다 — 4쪽은 '무엇을 썼나', 이 장은 '왜 그것이고 바꿀 수 있나'다. 들어갈 때 그 차이를 한 줄로 말해주면 반복으로 안 들린다. 기술 선정은 팀 차원의 결정이므로 '내가 골랐다'로 말하지 않는다. 각 카드 아래 교체 후보가 이 장의 절반이다. 특히 HMS가 Iceberg의 필수가 아니라는 점을 분명히 말한다 — 질문이 나오기 쉬운 지점이다. 선정 조건 셋(오픈소스·재단 관리 / 로컬 단일 노드 / 교체 가능)은 슬라이드에서 빼고 말로만 덧붙인다.">
   <div class="eyebrow">03. 구성요소의 역할과 경계</div>
   <div class="s-title">구성요소 선정 근거와 교체 후보</div>
+  <div class="s-sub">각 기술이 서로를 지원해 <b>추가 구현 없이 연결</b>할 수 있었다</div>
   <div class="body">
     <div class="grid g4">
       <div class="card">
@@ -766,7 +770,7 @@ write.parquet.row-group-size-bytes   16777216</pre>
       <div class="card">
         <h4><span class="badge-n">2</span>테이블 포맷</h4>
         <span class="pick">Iceberg</span>
-        <p class="why" style="margin-top:.7cqw"><b>엔진 중립적</b>이다 — 포맷이 <b>공개 스펙</b>이라 쓴 도구와 읽는 도구가 달라도 된다. SeaTunnel이 쓴 파일을 Trino가 읽었고, 노트북에서는 <b>스펙만 보고</b> fastavro · pyarrow로 따라가 읽었다.</p>
+        <p class="why" style="margin-top:.7cqw"><b>오픈 테이블 포맷</b>이라 <b>쓰는 도구와 읽는 도구가 달라도 된다.</b></p>
         <p class="alt">교체 후보 · Delta Lake · Apache Hudi</p>
       </div>
       <div class="card gr">
@@ -808,10 +812,12 @@ write.parquet.row-group-size-bytes   16777216</pre>
         <div class="card" style="padding:1.05cqw 1.3cqw;flex:1;display:flex;flex-direction:column;justify-content:center">
           <h4 style="font-size:1.34cqw"><span class="badge-n" style="background:#8b5cf6">1</span>metadata JSON</h4>
           <p class="why" style="margin-top:.4cqw"><b>테이블의 현재 상태</b> — 스키마와 스냅샷 목록. 조회는 <b>카탈로그가 가리키는 한 개</b>에서 시작한다.</p>
+          <p class="alt"><b>스냅샷</b> = 커밋 한 번이 만든 <b>그 시점의 테이블 전체 모습</b></p>
         </div>
         <div class="card" style="padding:1.05cqw 1.3cqw;flex:1;display:flex;flex-direction:column;justify-content:center">
           <h4 style="font-size:1.34cqw"><span class="badge-n" style="background:var(--green)">2</span>manifest list</h4>
           <p class="why" style="margin-top:.4cqw">고른 스냅샷이 <b>어떤 manifest들로 이뤄졌는지</b>의 목록.</p>
+          <p class="alt"><b>manifest</b> = 데이터 파일의 목록 · 이건 <b>그 목록들을 모은 목록</b></p>
         </div>
         <div class="card" style="padding:1.05cqw 1.3cqw;flex:1;display:flex;flex-direction:column;justify-content:center">
           <h4 style="font-size:1.34cqw"><span class="badge-n" style="background:var(--orange)">3</span>manifest</h4>
@@ -1027,33 +1033,45 @@ write.parquet.row-group-size-bytes   16777216</pre>
 </section>
 
 <!-- ==================== 21. Iceberg 파일 관리의 이점 ==================== -->
-<section class="slide" data-eyebrow="04. Iceberg 파일 관리" data-notes="04장 마무리. 네 가지 메커니즘. 각 카드의 작은 도식은 '무엇이 바뀌고 무엇이 그대로인가'만 보여준다 — 네 번째는 점선 상자라 가정이라는 뜻이다. 근거/미사용 라벨을 반드시 짚는다 — ①②는 앞에서 실제로 봤고, ③은 파일에서 ID만 확인했으며, ④는 이번 테이블에 파티션이 없어 안 써봤다. 안 써본 기능을 해봤다고 말하지 않는다. 상세는 docs/md/lakehouse-concept.md 4절.">
+<section class="slide" id="s21" data-eyebrow="04. Iceberg 파일 관리" data-notes="04장 마무리. 네 가지 메커니즘. 각 카드의 작은 도식은 '무엇이 바뀌고 무엇이 그대로인가'만 보여준다. 네 번째 카드는 SQL 예시를 그대로 읽으면 되고, ◌ 표시가 미사용이라는 뜻이다. 근거/미사용 라벨을 반드시 짚는다 — ①②는 앞에서 실제로 봤고, ③은 파일에서 ID만 확인했으며, ④는 이번 테이블에 파티션이 없어 안 써봤다. 안 써본 기능을 해봤다고 말하지 않는다. 상세는 docs/md/lakehouse-concept.md 4절.">
   <div class="eyebrow">04. Iceberg 파일 관리</div>
   <div class="s-title">Iceberg 파일 관리의 이점</div>
   <div class="s-sub">앞에서 본 메타데이터 구조가 <b>가능하게 하는 것</b></div>
+  <style>
+  #s21 .body{gap:.9cqw}
+  #s21 .grid{gap:1.05cqw}
+  #s21 .banner{padding:.9cqw 1.7cqw;font-size:1.46cqw}
+  #s21 .banner .ic{font-size:1.7cqw}
+  #s21 .c4 .why{font-size:1.09cqw;line-height:1.5}
+  #s21 .c4 .gain{font-size:1.05cqw;line-height:1.62}
+  #s21 .c4 .pcode{font-size:1.0cqw;padding:.4cqw .65cqw;margin:.45cqw 0 .1cqw}
+  </style>
   <div class="body">
-    <div class="grid g2">
-      <div class="card gr">
+    <div class="grid g2" style="gap:1cqw">
+      <div class="card gr" style="padding:1.1cqw 1.3cqw">
         <h4><span class="badge-n">1</span>스냅샷 기반 시점 보존과 롤백</h4>
-        <p class="why">커밋마다 스냅샷이 남는다. <b>포인터 교체 한 번</b>으로 공개되므로 쓰는 도중 읽어도 이전 상태가 보이고, 과거 시점 조회와 되돌리기가 된다.</p>
+        <p class="why">커밋마다 스냅샷이 남는다. <b>과거 시점 조회와 되돌리기</b>가 가능하다.</p>
         <div class="mini"><span class="mb">S1</span><span class="mb">S2</span><span class="mb">S3</span><span class="mb on">S4 · 현재</span><span class="lb">앞의 셋도 그대로 남는다</span></div>
       </div>
-      <div class="card gr">
+      <div class="card gr" style="padding:1.1cqw 1.3cqw">
         <h4><span class="badge-n">2</span>메타데이터 통계 기반 파일 프루닝</h4>
         <p class="why">manifest의 컬럼별 min/max로 <b>파일을 열기 전에</b> 후보를 거른다. 디렉터리를 훑지 않으므로 파일이 늘어도 조회 계획이 선형으로 느려지지 않는다.</p>
         <div class="mini"><span class="mb off">file 1</span><span class="mb on">file 2</span><span class="mb off">file 3</span><span class="mb off">file 4</span><span class="lb">열기 전에 셋을 제외</span></div>
       </div>
-      <div class="card">
+      <div class="card" style="padding:1.1cqw 1.3cqw">
         <h4><span class="badge-n">3</span>컬럼 ID 기반 스키마 진화</h4>
         <p class="why">컬럼마다 <b>불변 ID</b>가 붙어 추가·삭제·이름 변경·순서 변경이 <b>메타데이터만</b> 바꾼다. RDB에서 순서·타입 변경이 테이블 재작성과 잠금을 부르는 것과 다르다.</p>
         <div class="mini"><span class="mb">id 3 · product_name</span><span class="ar">→</span><span class="mb on">id 3 · item_name</span><span class="lb">Parquet은 그대로</span></div>
         <p class="alt">◐ 파일에서만 확인 — field ID 1~6. <b>스키마 변경은 해보지 않았다</b></p>
       </div>
-      <div class="card">
+      <div class="card c4" style="padding:1.05cqw 1.3cqw">
         <h4><span class="badge-n">4</span>숨은 파티셔닝과 파티션 명세 진화</h4>
-        <p class="why">파티션 값을 원본 컬럼에서 <b>변환으로 유도</b>해 사용자가 파티션 컬럼을 몰라도 된다. 명세를 바꿔도 <b>기존 데이터를 재작성하지 않는다</b>.</p>
-        <div class="mini mini2"><span class="mb">이미 쓰인 file 1~4</span><span class="ar">→</span><span class="mb on">spec 0 그대로</span><span class="mb gh">기준 변경 후 쓰이는 파일</span><span class="ar">→</span><span class="mb gh">spec 1 · month</span></div>
-        <p class="gain">· 파티셔닝을 위한 <b>파생 컬럼 생성 불필요</b><br>· 과거 데이터를 건드리지 않고 <b>파티션 기준 변경 가능</b><span style="color:#8a99ab"> (변경 이후에 쓰인 파일에만 적용)</span></p>
+        <p class="why"><b>나누는 규칙을 테이블에 등록</b>한다 — 예: <b><span class="mono">order_date</span>를 월별로</b>. 사용자는 <b>원본 컬럼으로 조회</b>하고 엔진이 읽을 파일을 줄인다. 파생 컬럼은 만들지 않는다.</p>
+        <div class="pcode">WHERE order_date = DATE '2026-09-14'</div>
+        <div class="mini" style="margin:.45cqw 0 .15cqw"><span class="mb off">8월 파일들</span><span class="mb on">9월 파일들 · 후보</span><span class="mb off">10월 파일들</span><span class="lb">그 안에서 14일 행을 찾는다</span></div>
+        <p class="why"><span class="mono">order_month</span> 같은 조건을 쓸 필요가 없다 — 그래서 <b>“숨은”</b> 파티셔닝이다.</p>
+        <p class="gain" style="margin-top:.5cqw"><b>규칙을 월별 → 일별로 바꿔도</b> 기존 파일은 월별 그대로, 새 파일만 일별 — <b>조회 SQL은 그대로다.</b></p>
+        <p class="alt">◌ 설명용 예시 — <b>이번 테이블은 비파티션</b>(<span class="mono">fields: []</span>)이라 미적용</p>
       </div>
     </div>
     <div class="banner">
@@ -1174,7 +1192,7 @@ write.parquet.row-group-size-bytes   16777216</pre>
       <li><b>Iceberg는 서버가 아니라 오픈 테이블 포맷이다</b><small>JSON · Avro 메타데이터가 Parquet을 가리키고, 컬럼 통계로 <b>열기 전에 읽을 파일을 고른다</b></small></li>
       <li><b>레이크하우스는 제품이 아니라 역할의 조합이다</b><small>적재 · 테이블 포맷 · 카탈로그 · 조회를 컨테이너로 띄워 <b>적재부터 조회까지 직접 연결</b>했다</small></li>
       <li><b>SeaTunnel은 설정 파일 선언만으로 적재를 끝낸다</b><small>원본 읽기 → Parquet 작성 → <b>HMS 커밋</b>까지. 적재 잡에는 코드를 쓰지 않았다</small></li>
-      <li><b>Superset에는 쿼리 엔진이 없다</b><small>Trino 같은 엔진을 붙여야 Iceberg를 조회할 수 있다</small></li>
+      <li><b>Superset은 쿼리를 실행하지 않고 엔진에 위임한다</b><small>Iceberg에는 <b>붙을 SQL 서버가 없어서</b> Trino를 뒀다. 파일을 읽는 건 Trino다</small></li>
     </ul>
   </div>
 </section>

@@ -335,3 +335,7 @@ Iceberg 자체의 구조는 [공식 스펙](https://iceberg.apache.org/spec/)과
 외부 설명 중 사실과 다른 부분을 우리 파일로 대조한 기록은
 [iceberg-json-to-parquet.md](iceberg-json-to-parquet.md)와
 [발표 기획서 7절](../../presentation/local-lakehouse-deck-plan.md)에 있다.
+
+### 발표 화면의 파티셔닝 예시 (2026-10-29)
+
+`presentation/local-lakehouse.html` 21쪽 네 번째 카드는 월별 분류를 가정하고 `WHERE order_date = DATE '2026-09-14'`로 9월 파일을 후보로 선택한 뒤 14일 행을 찾는 과정을 보여준다. 월별→일별 변경 시 기존 파일은 유지되며 새 규칙으로 작성하는 파일에 적용한다. 현재 실습 테이블에는 파티션이 없어 설명용 예시다. HTML을 브라우저로 열어 확인한다.

@@ -127,3 +127,5 @@
 - 2026-10-15: 사용자 제공 로고를 참고해 전체 아키텍처의 Trino·Hive 마스코트를 수정한 `11-local-lakehouse-overview-v2.png` 추가. 기존 이미지·발표 HTML 보존.
 
 - 2026-10-15: 전체 아키텍처 최신 이미지 `11-local-lakehouse-overview-v3.png`: Docker 제목·고래 아이콘, 호스트 브라우저 경계 분리, 전체 제목 제거. 사용자가 지정한 나머지 설명 유지. 발표 HTML 미수정.
+
+- 2026-10-29: 사용자 요청으로 presentation/local-lakehouse.html 21쪽 네 번째 카드에 월별 파티션 규칙, order_date SQL, 9월 후보 파일 선택 및 14일 필터 예시 추가. 월별→일별 명세 변경과 기존 파일 유지, 이번 실습 미적용 명시. 기존 편집 내용과 speaker-notes.md 보존. 브라우저 렌더 검증은 미수행.
