@@ -3,3 +3,9 @@ vendor/
 __pycache__/
 
 .env.superset
+
+# Reproducible API staging; raw evidence is retained separately.
+data/public-api/
+
+# Local execution artifacts; previously tracked evidence remains versioned.
+/evidence/

@@ -129,3 +129,9 @@
 - 2026-10-15: 전체 아키텍처 최신 이미지 `11-local-lakehouse-overview-v3.png`: Docker 제목·고래 아이콘, 호스트 브라우저 경계 분리, 전체 제목 제거. 사용자가 지정한 나머지 설명 유지. 발표 HTML 미수정.
 
 - 2026-10-29: 사용자 요청으로 presentation/local-lakehouse.html 21쪽 네 번째 카드에 월별 파티션 규칙, order_date SQL, 9월 후보 파일 선택 및 14일 필터 예시 추가. 월별→일별 명세 변경과 기존 파일 유지, 이번 실습 미적용 명시. 기존 편집 내용과 speaker-notes.md 보존. 브라우저 렌더 검증은 미수행.
+
+- 2026-11-05: 공개 API 적재 실습 추가. `scripts/public_api_weather.py`가 Open-Meteo ERA5 서울 2025-10-01~07의 168행을 수집하고 SeaTunnel LocalFile → Iceberg로 `public_api.weather_hourly`에 적재한다. `weather_time`은 ISO 8601 +09:00 string이며 Trino에서 `from_iso8601_timestamp()`로 해석한다. API 원본·CSV·로그·검증 보고서는 `evidence/public-api/`. 전체 값 대사, replay skip(동일 snapshot), 기존 28파일 SHA-256 및 orders 5건/170000 보존 확인. 초기 timestamp 시도는 신규 테이블만 복구했고 미참조 파일은 보존. 상세 `docs/public-api-to-iceberg.md`, `tasks/001-public-api-to-iceberg.md`. 원시 job 직접 실행 금지; 부분 중복/정정값은 래퍼가 중단한다. 리니지·mart·스케줄링은 후속 범위.
+
+- 공개 API CSV bind mount는 `compose.yaml`의 `seatunnel.volumes`에서 관리한다. 별도 API Compose 파일 없이 기존 `compose.yaml` + `compose.analytics.yaml` 두 파일로 실행한다.
+
+- `evidence/`의 새 실행 산출물은 `.gitignore`로 제외한다. 원본·로그는 로컬에 보존하고 결과 요약은 tasks/docs에 기록한다. 기존 추적 중인 증거 파일 57개는 노트북 evidence 모드와 문서에서 사용하므로 추적 상태를 유지한다.

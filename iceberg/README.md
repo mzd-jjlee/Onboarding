@@ -63,3 +63,18 @@ Iceberg sink의 파일 생성 과정은 [Parquet·Avro·JSON 생성 단계별 �
 ### 1억 행 테이블의 JSON·Avro·Parquet 직접 확인
 
 [analysis/read_parquet.ipynb](analysis/read_parquet.ipynb)를 프로젝트 `.venv/bin/python` 커널로 위에서부터 실행한다 (`uv sync --dev`). 기본 live 모드는 실행 중인 catalog-db를 SELECT하며, Docker 없이 보려면 `SOURCE_MODE = "evidence"`로 바꾼다. 파일당 5행 샘플과 footer만 확인하므로 1억 행 전체를 메모리에 올리지 않는다. JSON 5개·manifest list 4개·manifest 4개·Parquet 4개의 실제 참조 관계와 네 커밋의 누적 행 수를 표시한다. 이전 5행 노트북은 `analysis/read_parquet.orders-5rows.ipynb`에 보존했다. 실행 검증: `evidence/notebook/production-100m/execution.json`.
+
+## 공개 API → Iceberg 적재
+
+서울의 시간별 과거 날씨(ERA5 재분석)를 Open-Meteo에서 수집해 `iceberg.public_api.weather_hourly`에 적재한다. Python 수집 → JSON/CSV 보존 → SeaTunnel Iceberg sink → Trino 전체 행 대사 흐름이다.
+
+```bash
+python3 scripts/public_api_weather.py
+bash scripts/trino.sh --execute 'SELECT * FROM iceberg.public_api.weather_hourly ORDER BY weather_time LIMIT 10'
+```
+
+2026-11-05 실제 API 데이터 168행 적재·대사 완료. 같은 원본 재실행은 `SKIP_IDENTICAL`이며 행 수와 스냅샷이 유지됐다. 시간은 시간대를 명시한 ISO 8601 문자열로 저장한다. 기존 retail 데이터와 Trino 읽기 전용 설정은 유지했다.
+
+[실행 안내와 집계 SQL](docs/public-api-to-iceberg.md) · [작업 문서](tasks/001-public-api-to-iceberg.md)
+
+상세 검증 결과는 로컬 `evidence/public-api/verification.json`에 저장한다. 새 실행 산출물은 Git에서 제외하며, 검증 요약은 작업 문서에 남긴다.

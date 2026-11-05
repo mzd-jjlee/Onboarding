@@ -74,6 +74,8 @@ services:
       - ./lake:/lake
       # 호스트 작업 설정을 컨테이너 /jobs에서 읽는다.
       - ./jobs:/jobs:ro
+      # 공개 API 수집기가 만든 CSV를 읽는다.
+      - ./data/public-api:/api-data:ro
       - ./scripts:/lab/scripts:ro
       - ./config/jvm_client_options:/opt/seatunnel/config/jvm_client_options:ro
     depends_on:
