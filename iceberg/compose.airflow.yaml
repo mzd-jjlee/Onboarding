@@ -1,0 +1,60 @@
+# 기존 Compose와 함께 사용: bash scripts/up-airflow.sh
+#   docker compose -f compose.yaml -f compose.analytics.yaml -f compose.airflow.yaml ...
+# 공개 API 날씨 적재를 스케줄링하는 Airflow. 기존 서비스 설정은 바꾸지 않는다.
+services:
+  # Airflow의 DAG 실행 이력·상태 저장소. HMS catalog-db, superset-db와 독립된 DB/볼륨이다.
+  airflow-db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - airflow-db:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U airflow -d airflow]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  airflow:
+    image: iceberg-airflow:3.3.1
+    build:
+      context: .
+      dockerfile: config/Dockerfile.airflow
+    # scheduler, dag-processor, api-server(웹 UI), triggerer를 한 컨테이너에서 실행하는 로컬 모드.
+    command: standalone
+    # docker.sock 그룹 권한. up-airflow.sh가 실제 소켓 gid를 넣어준다.
+    group_add:
+      - "${DOCKER_SOCKET_GID:-102}"
+    environment:
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-db:5432/airflow
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__DAGS_FOLDER: ${LAB_ROOT:?run scripts/up-airflow.sh}/dags
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      AIRFLOW__CORE__DEFAULT_TIMEZONE: Asia/Seoul
+      # 127.0.0.1에만 공개하는 로컬 실습용: 로그인 없이 관리자 권한.
+      AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_ALL_ADMINS: "True"
+    # Mac 브라우저 → localhost:8082. 8080은 openmetadata Airflow, 8081은 Trino가 쓴다.
+    ports:
+      - "127.0.0.1:8082:8080"
+    volumes:
+      # 호스트와 같은 절대 경로로 마운트한다. task 안의 `docker compose`가
+      # ./lake 같은 상대 경로를 호스트 경로로 풀어야 SeaTunnel 컨테이너에 올바르게 붙는다.
+      - ${LAB_ROOT:?run scripts/up-airflow.sh}:${LAB_ROOT:?run scripts/up-airflow.sh}
+      # Rancher Desktop VM의 Docker 데몬 소켓. 컨테이너 안에서 형제 컨테이너를 실행한다.
+      - /var/run/docker.sock:/var/run/docker.sock
+      - airflow-logs:/opt/airflow/logs
+    depends_on:
+      airflow-db:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, curl, -fsS, 'http://localhost:8080/api/v2/version']
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
+
+volumes:
+  airflow-db:
+  airflow-logs:

@@ -43,6 +43,7 @@
 | Hive Metastore 4.0.1 (`thrift://hms:9083`) | 동작 확인됨 |
 | Trino 483 | HMS + 기존 file:/lake 경로 조회 검증 완료, localhost:8081 |
 | Superset 6.0.0 | Trino 연결·주문 Dataset·차트·대시보드 등록, localhost:8088 |
+| Airflow 3.3.1 | `public_weather_to_iceberg` DAG 동작 확인됨, localhost:8082 (2026-11-09) |
 | production_orders_100m | 2026-10-08 SeaTunnel 적재 성공: 100,000,000행, Parquet 4개 / 330,496,199 bytes. Trino 실파일 스캔 집계가 원본 PostgreSQL과 일치. 사용자가 Superset SQL Lab 조회 확인. 상세: `docs/production-orders-100m.md`. |
 
 - 설계 문서: `docs/local-lakehouse-superset.md` (전체 구축 순서),
@@ -135,3 +136,5 @@
 - 공개 API CSV bind mount는 `compose.yaml`의 `seatunnel.volumes`에서 관리한다. 별도 API Compose 파일 없이 기존 `compose.yaml` + `compose.analytics.yaml` 두 파일로 실행한다.
 
 - `evidence/`의 새 실행 산출물은 `.gitignore`로 제외한다. 원본·로그는 로컬에 보존하고 결과 요약은 tasks/docs에 기록한다. 기존 추적 중인 증거 파일 57개는 노트북 evidence 모드와 문서에서 사용하므로 추적 상태를 유지한다.
+
+- 2026-11-09: Airflow 스케줄링 추가. `compose.airflow.yaml`(Airflow 3.3.1 standalone + airflow-db, 127.0.0.1:8082), 기동 `bash scripts/up-airflow.sh`. DAG `dags/public_weather_to_iceberg.py`는 매일 09:00 KST, 테이블 마지막 날짜+1일부터 `batch_days`(7)일, `오늘-lag_days`(6)까지 받는다(ERA5 약 5일 지연). 로직은 `src/public_api/weather.py`로 이동, CLI와 공유. Airflow는 docker.sock을 마운트해 `docker compose run seatunnel`을 호출하므로 프로젝트를 호스트와 같은 절대 경로(`LAB_ROOT`)로 마운트한다. 확인: scheduled 1회(10-08~14), manual 2회(10-15~17, 새 데이터 없음 skip) → 408행, 중복 없음, 기존 28파일 SHA-256·orders 5건/170000 보존. DAG 일시정지 해제 상태. Airflow 기동 중에는 CLI 적재 금지(호스트-컨테이너 잠금 공유 미확인). 상세 `docs/airflow-weather-dag.md`, `tasks/002-airflow-weather-schedule.md`.

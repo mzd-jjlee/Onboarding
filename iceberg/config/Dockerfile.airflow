@@ -1,0 +1,8 @@
+# Airflow + docker CLI. DAG task가 기존 래퍼와 같은 방식으로
+# `docker compose run seatunnel`, `docker compose exec trino`를 호출하기 위해 필요하다.
+# docker/compose 바이너리는 정적 빌드라 Alpine 이미지에서 그대로 복사해 쓴다.
+FROM docker:29-cli AS docker-cli
+
+FROM apache/airflow:3.3.1
+COPY --from=docker-cli /usr/local/bin/docker /usr/local/bin/docker
+COPY --from=docker-cli /usr/local/libexec/docker/cli-plugins/docker-compose /usr/local/libexec/docker/cli-plugins/docker-compose

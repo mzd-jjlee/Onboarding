@@ -78,3 +78,14 @@ bash scripts/trino.sh --execute 'SELECT * FROM iceberg.public_api.weather_hourly
 [실행 안내와 집계 SQL](docs/public-api-to-iceberg.md) · [작업 문서](tasks/001-public-api-to-iceberg.md)
 
 상세 검증 결과는 로컬 `evidence/public-api/verification.json`에 저장한다. 새 실행 산출물은 Git에서 제외하며, 검증 요약은 작업 문서에 남긴다.
+
+### Airflow 스케줄링
+
+Airflow DAG `public_weather_to_iceberg`가 매일 09:00(KST)에 테이블의 마지막 날짜 다음 날부터 최대 7일치를 이어 받는다. ERA5는 약 5일 늦게 채워지므로 `오늘 - 6일`까지만 받는다.
+
+```bash
+bash scripts/up-trino.sh
+bash scripts/up-airflow.sh   # http://localhost:8082
+```
+
+2026-11-09 스케줄 실행 1회와 수동 실행 2회를 확인했다(168 → 336 → 408행, 받을 날짜가 없으면 skip). [Airflow 안내](docs/airflow-weather-dag.md) · [작업 문서](tasks/002-airflow-weather-schedule.md)

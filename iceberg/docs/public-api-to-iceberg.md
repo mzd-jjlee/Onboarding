@@ -95,7 +95,9 @@ python3 -m unittest discover -s tests -p 'test_public_api_weather.py' -v
 
 | 경로 | 용도 |
 | --- | --- |
-| `scripts/public_api_weather.py` | API 수집, 검증, 선행 검사, 적재 실행, 대사 |
+| `scripts/public_api_weather.py` | CLI: 아래 모듈의 단계를 순서대로 실행 |
+| `src/public_api/weather.py` | API 수집, 검증, 선행 검사, 적재 실행, 대사 (CLI와 Airflow DAG 공용) |
+| `dags/public_weather_to_iceberg.py` | Airflow 증분 배치 DAG. [Airflow 안내](airflow-weather-dag.md) |
 | `scripts/prepare-public-api-catalog.py` | HMS에 새 namespace만 준비 |
 | `jobs/04_public_weather_to_iceberg.conf` | CSV → Iceberg job |
 | `compose.yaml`의 `seatunnel.volumes` | CSV를 SeaTunnel 컨테이너에 읽기 전용 마운트 |

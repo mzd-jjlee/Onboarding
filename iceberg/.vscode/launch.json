@@ -1,0 +1,31 @@
+{
+  // iceberg/ 폴더를 VS Code로 열었을 때 사용한다 (File > Open Folder > iceberg).
+  // 로직은 src/public_api/weather.py에 있으므로 거기에 중단점을 찍는다.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // 5단계(new_run → collect → precheck → load → verify)를 전부 지나간다.
+      // 이미 적재된 10-01~07을 저장된 응답으로 replay하므로 SKIP_IDENTICAL, Iceberg 쓰기 없음.
+      // Trino 컨테이너가 떠 있어야 한다 (bash scripts/up-trino.sh).
+      "name": "Weather: replay 전체 흐름 (쓰기 없음)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/public_api_weather.py",
+      "args": ["--replay", "evidence/public-api/20261105T072318Z-3887c148/response.json"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      // Docker 없이 normalize / decision / plan_window만 따라갈 때.
+      "name": "Weather: 단위 테스트 (Docker 불필요)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "unittest",
+      "args": ["discover", "-s", "tests", "-p", "test_public_api_weather.py", "-v"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    }
+  ]
+}

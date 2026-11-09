@@ -1,12 +1,12 @@
 import copy
 from datetime import date
-import importlib.util
 from pathlib import Path
+import sys
 import unittest
 
-spec = importlib.util.spec_from_file_location('weather', Path(__file__).resolve().parents[1] / 'scripts/public_api_weather.py')
-w = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(w)
+sys.path.append(str(Path(__file__).resolve().parents[1] / 'src'))
+
+from public_api import weather as w  # noqa: E402
 
 
 class WeatherTests(unittest.TestCase):
@@ -45,6 +45,30 @@ class WeatherTests(unittest.TestCase):
         for existing in (rows[:1], changed, rows + rows[:1]):
             with self.subTest(existing=len(existing)), self.assertRaises(ValueError):
                 w.decision(rows, existing)
+
+
+class PlanWindowTests(unittest.TestCase):
+    today = date(2026, 11, 9)
+
+    def test_continues_after_latest_loaded_day(self):
+        self.assertEqual(w.plan_window(date(2025, 10, 7), self.today, 7, 6, date(2025, 10, 1)),
+                         (date(2025, 10, 8), date(2025, 10, 14)))
+
+    def test_empty_table_starts_at_first_date(self):
+        self.assertEqual(w.plan_window(None, self.today, 3, 6, date(2025, 10, 1)),
+                         (date(2025, 10, 1), date(2025, 10, 3)))
+
+    def test_window_stops_at_era5_lag(self):
+        self.assertEqual(w.plan_window(date(2026, 10, 30), self.today, 7, 6, date(2025, 10, 1)),
+                         (date(2026, 10, 31), date(2026, 11, 3)))
+
+    def test_nothing_new_returns_none(self):
+        self.assertIsNone(w.plan_window(date(2026, 11, 3), self.today, 7, 6, date(2025, 10, 1)))
+
+    def test_batch_days_limit(self):
+        for days in (0, 32):
+            with self.subTest(days=days), self.assertRaises(ValueError):
+                w.plan_window(None, self.today, days, 6, date(2025, 10, 1))
 
 
 if __name__ == '__main__':
