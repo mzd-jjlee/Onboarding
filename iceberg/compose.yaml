@@ -54,11 +54,19 @@ services:
         -Djavax.jdo.option.ConnectionUserName=hive
         -Djavax.jdo.option.ConnectionPassword=hive
         -Dhive.metastore.warehouse.dir=file:///lake/warehouse
+      # MinIO(s3a://) namespace·테이블 위치를 만들기 위한 S3 JAR. 이미지에 있지만 기본 클래스패스 밖이다.
+      HADOOP_CLASSPATH: /opt/hadoop/share/hadoop/tools/lib/hadoop-aws-3.3.6.jar:/opt/hadoop/share/hadoop/tools/lib/aws-java-sdk-bundle-1.12.367.jar
+    # MinIO 접속 키(AWS_ACCESS_KEY_ID 등). 파일이 없으면 S3만 쓸 수 없고 기존 file: 테이블은 그대로 동작한다.
+    env_file:
+      - path: .env.minio
+        required: false
     volumes:
       # 호스트 ./lake를 HMS의 /lake로 연결한다. SeaTunnel도 같은 경로를 사용한다.
       - ./lake:/lake
       # HMS Java 프로세스가 PostgreSQL에 연결할 때 사용하는 JDBC 드라이버.
       - ./vendor/postgresql.jar:/opt/hive/lib/postgres.jar:ro
+      # s3a 접속 설정(endpoint, path-style). docs/minio-s3-lakehouse.md
+      - ./config/hadoop/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml:ro
     depends_on:
       catalog-db:
         condition: service_healthy
@@ -69,6 +77,10 @@ services:
     working_dir: /opt/seatunnel
     # 전달받은 /jobs/*.conf를 Zeta local mode로 실행한다.
     entrypoint: [sh, /lab/scripts/seatunnel-entry.sh]
+    # MinIO 접속 키. 05 job(s3a sink)에서만 사용한다. 파일이 없어도 기존 job은 그대로 동작한다.
+    env_file:
+      - path: .env.minio
+        required: false
     volumes:
       # sink의 file:///lake/warehouse가 실제 호스트 ./lake/warehouse에 대응한다.
       - ./lake:/lake
@@ -76,6 +88,8 @@ services:
       - ./jobs:/jobs:ro
       # 공개 API 수집기가 만든 CSV를 읽는다.
       - ./data/public-api:/api-data:ro
+      # load-weather-to-minio.py가 만든 CSV를 읽는다 (05 job).
+      - ./data/minio-lab:/minio-data:ro
       - ./scripts:/lab/scripts:ro
       - ./config/jvm_client_options:/opt/seatunnel/config/jvm_client_options:ro
     depends_on:

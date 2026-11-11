@@ -44,6 +44,7 @@
 | Trino 483 | HMS + 기존 file:/lake 경로 조회 검증 완료, localhost:8081 |
 | Superset 6.0.0 | Trino 연결·주문 Dataset·차트·대시보드 등록, localhost:8088 |
 | Airflow 3.3.1 | `public_weather_to_iceberg` DAG 동작 확인됨, localhost:8082 (2026-11-09) |
+| MinIO(S3) + Iceberg | 2026-11-11 `public_api_s3.weather_hourly` 576행 적재·재실행 skip 확인, Trino catalog `iceberg_s3`, MinIO 콘솔 localhost:9001. 상세: `docs/minio-s3-lakehouse.md` |
 | production_orders_100m | 2026-10-08 SeaTunnel 적재 성공: 100,000,000행, Parquet 4개 / 330,496,199 bytes. Trino 실파일 스캔 집계가 원본 PostgreSQL과 일치. 사용자가 Superset SQL Lab 조회 확인. 상세: `docs/production-orders-100m.md`. |
 
 - 설계 문서: `docs/local-lakehouse-superset.md` (전체 구축 순서),

@@ -1,0 +1,39 @@
+# 기존 Compose와 함께 사용: docker compose -f compose.yaml -f compose.analytics.yaml -f compose.minio.yaml ...
+# 기동은 scripts/up-minio.sh. 상세: docs/minio-s3-lakehouse.md
+services:
+  # S3 API로 동작하는 로컬 객체 저장소. Iceberg 파일(Parquet/Avro/JSON)을 bucket lakehouse에 저장한다.
+  # 공식 minio/minio 이미지를 받을 수 없어 MinIO 소스를 그대로 빌드한 커뮤니티 이미지를 고정 버전으로 쓴다.
+  minio:
+    image: pgsty/minio:RELEASE.2026-08-04T00-00-00Z
+    command: [server, /data, --console-address, ':9001']
+    env_file:
+      - path: .env.minio
+        required: true
+    # 컨테이너끼리는 http://minio:9000, 호스트 브라우저는 localhost:9001(웹 콘솔).
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+    volumes:
+      # 호스트 폴더가 아닌 Docker 볼륨: 파일은 S3 API(콘솔·Trino·mc)로만 확인한다.
+      - minio-data:/data
+
+  # 일회성 도구: bucket lakehouse를 만든다. 이미 있으면 그대로 둔다.
+  minio-init:
+    image: pgsty/mc:RELEASE.2026-10-26T00-00-00Z
+    profiles: [tools]
+    env_file:
+      - path: .env.minio
+        required: true
+    entrypoint:
+      - sh
+      - -c
+      - >-
+        until mc alias set local http://minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD" >/dev/null;
+        do sleep 1; done;
+        mc mb --ignore-existing local/lakehouse && mc ls local
+    depends_on:
+      minio:
+        condition: service_started
+
+volumes:
+  minio-data:

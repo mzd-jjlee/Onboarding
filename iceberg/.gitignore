@@ -3,9 +3,11 @@ vendor/
 __pycache__/
 
 .env.superset
+.env.minio
 
 # Reproducible API staging; raw evidence is retained separately.
 data/public-api/
+data/minio-lab/
 
 # Local execution artifacts; previously tracked evidence remains versioned.
 /evidence/

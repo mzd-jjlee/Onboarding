@@ -6,6 +6,10 @@ services:
     ports:
       - "127.0.0.1:8081:8080"
     mem_limit: 2g
+    # catalog iceberg_s3의 MinIO 접속 키. 파일이 없으면 기존 catalog iceberg만 동작한다.
+    env_file:
+      - path: .env.minio
+        required: false
     volumes:
       - ./config/trino:/etc/trino:ro
       # metadata/manifest에 기록된 기존 /lake 절대 경로를 그대로 사용한다.

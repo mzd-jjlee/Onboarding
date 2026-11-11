@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- HMS가 s3a:// 위치(namespace·테이블 폴더)를 만들 때 쓰는 MinIO 접속 설정.
+     접속 키는 여기 적지 않는다: 환경변수 AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY(.env.minio)를 기본 자격증명 체인이 읽는다. -->
+<configuration>
+  <property>
+    <!-- 컨테이너 간 통신이므로 서비스 이름. localhost가 아니다. -->
+    <name>fs.s3a.endpoint</name>
+    <value>http://minio:9000</value>
+  </property>
+  <property>
+    <name>fs.s3a.endpoint.region</name>
+    <value>us-east-1</value>
+  </property>
+  <property>
+    <!-- http://minio:9000/lakehouse/... 형태. 로컬 MinIO는 bucket.host 형태를 쓰지 않는다. -->
+    <name>fs.s3a.path.style.access</name>
+    <value>true</value>
+  </property>
+  <property>
+    <name>fs.s3a.connection.ssl.enabled</name>
+    <value>false</value>
+  </property>
+</configuration>
