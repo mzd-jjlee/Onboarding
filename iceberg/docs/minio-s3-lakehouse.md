@@ -136,3 +136,26 @@ bash scripts/trino.sh --execute 'SELECT file_path FROM iceberg_s3.public_api_s3.
 
 - 실행 기록: `evidence/minio/20261111T051028Z-82245d3c/` (report.json, CSV, catalog·SeaTunnel 로그). 새 evidence는 `.gitignore` 대상이다.
 - 실행 시 Airflow는 기동되어 있지 않았다 (원본 append와 겹치지 않음).
+
+## 두 번째 테이블: DB 200만 행, 월별 파티션 (2026-11-12)
+
+날씨 576행(CSV)에 이어, seatunnel 프로젝트의 원본 Postgres(`localhost:5440`, `srcdb.public.production_orders`)에서
+**JDBC로 직접 200만 행**을 읽어 `iceberg_s3.retail_s3.production_orders`에 적재했다. 처음으로 **파티션**(`month(order_date)`)을 적용했다.
+목표·결정·검증 전체는 `tasks/003-production-orders-to-minio.md`.
+
+| 항목 | 날씨 (`public_api_s3`) | 주문 (`retail_s3`) |
+|---|---|---|
+| 원본 | Trino로 읽은 로컬 Iceberg snapshot → CSV | PostgreSQL JDBC 직접 조회 (병렬 2) |
+| 테이블 생성 | SeaTunnel 자동 생성 | `PrepareRetailS3Catalog.java`로 미리 생성 (파티션 지정, PK 표시 없음) |
+| 결과 | 576행, Parquet 1개, snapshot 1개 | 2,000,000행, 파티션 13개, Parquet 26개(8.1MiB), snapshot 2개 |
+| 래퍼 | `load-weather-to-minio.py` | `load-production-orders-to-minio.py` (`SOURCE_USER`/`SOURCE_PASSWORD` 필요) |
+| Superset | SQL Lab에서 직접 쿼리 | 연결 `MinIO Iceberg / Trino` + Dataset + 월별 차트 등록 |
+
+```sql
+-- 파티션 효과 확인: 1월 조건이면 1월 파일 2개(170,494행)만 읽는다
+EXPLAIN ANALYZE SELECT sum(quantity) FROM iceberg_s3.retail_s3.production_orders
+WHERE order_date >= DATE '2026-01-01' AND order_date < DATE '2026-02-01';
+```
+
+성공하면: 실행 계획의 `ScanProject[... constraint on [order_date]]` 아래 `Input: 170494 rows ... Splits: 2`가 보인다.
+bucket `lakehouse`에서는 `warehouse/retail_s3.db/production_orders/data/order_date_month=2026-01/`처럼 월별 폴더가 보인다.

@@ -1,0 +1,7 @@
+{
+  // scripts/*.java는 SeaTunnel 컨테이너 안에서 컴파일된다. 에디터가 import를 찾도록 같은 JAR의 로컬 복사본을 참조한다.
+  // 복사본(vendor/는 git 제외)을 다시 만들려면 tasks/003-production-orders-to-minio.md 참고.
+  "java.project.referencedLibraries": [
+    "vendor/java-classpath/*.jar"
+  ]
+}
