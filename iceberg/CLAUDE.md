@@ -1,142 +1,120 @@
-# iceberg — 로컬 데이터 레이크하우스 구축
+# iceberg — 로컬 데이터 레이크하우스
 
-`~/projects/Onboarding/iceberg/` 에서 작업할 때 적용되는 규칙.
-상위 규칙(`~/projects/.claude/CLAUDE.md`, `Onboarding/CLAUDE.md`)도 함께 적용된다.
+원본(PostgreSQL·공개 API) → **SeaTunnel** → **Iceberg** 테이블(HMS 카탈로그, 파일은 `./lake` 또는 **MinIO**) → **Trino** → **Superset**. 날씨 적재는 **Airflow**가 매일 실행한다.
+상위 규칙(`~/projects/.claude/CLAUDE.md`, `Onboarding/CLAUDE.md`)도 함께 적용된다. Codex는 `AGENTS.md`를 통해 이 파일을 읽는다.
 
 ## 설명 방식 (가장 중요)
 
-**작업자는 레이크하우스 구축이 처음이다.** 따라서 결과물만 내놓지 말고 아래를 지킨다.
+**작업자는 레이크하우스 구축이 처음이다.** 결과물만 내놓지 말고 아래를 지킨다.
 
-1. **용어를 풀어서 쓴다.** "카탈로그", "매니페스트", "스냅샷", "커밋" 같은 말을 처음 쓸 때는 그게
-   이 구조에서 뭘 가리키는지 한 줄로 설명한다. 이미 설명한 용어를 매번 다시 설명할 필요는 없다.
-2. **왜 필요한지를 먼저 쓴다.** "Trino를 추가한다"가 아니라 "Superset은 SQL을 실행해 줄 엔진에
-   붙는 BI 도구이고 Iceberg는 SQL 서버가 없으므로, 중간에 Trino가 필요하다" 식으로 쓴다.
-3. **명령어는 복사해서 바로 실행 가능한 형태로 준다.** 어느 디렉터리에서 실행하는지, 호스트인지
-   컨테이너 안인지 명시한다.
-4. **검증 방법을 같이 준다.** 각 단계마다 "성공했으면 이게 보인다"를 적는다. 기대값(행 수, 합계,
-   출력 형태)을 쓴다.
-5. **확인한 것과 추측을 구분한다.** 실제로 실행해서 확인한 결과와, 공식 문서만 보고 설계한 것을
-   문장에서 구분한다. 검증하지 않은 설정을 "이렇게 하면 된다"로 쓰지 않는다.
-6. **막히는 지점을 미리 알려준다.** 처음 하는 사람이 밟을 함정(포트 충돌, 컨테이너 안에서의
-   `localhost`, 드라이버 설치 위치 등)은 해당 단계에서 바로 언급한다.
+1. **용어를 풀어서 쓴다.** "카탈로그", "매니페스트", "스냅샷", "커밋" 같은 말을 처음 쓸 때 이 구조에서 뭘 가리키는지 한 줄로 설명한다. 이미 설명한 용어는 반복하지 않는다.
+2. **왜 필요한지를 먼저 쓴다.** "Trino를 추가한다"가 아니라 "Superset은 SQL 엔진에 붙는 BI 도구이고 Iceberg는 SQL 서버가 없으므로 Trino가 필요하다" 식으로 쓴다.
+3. **명령어는 복사해서 바로 실행 가능한 형태로 준다.** 실행 디렉터리와 호스트/컨테이너 여부를 명시한다.
+4. **검증 방법을 같이 준다.** 단계마다 "성공하면 이게 보인다"와 기대값(행 수, 합계, 출력 형태)을 쓴다.
+5. **확인한 것과 추측을 구분한다.** 실행해서 확인한 결과와 문서만 보고 설계한 것을 문장에서 구분한다.
+6. **막히는 지점을 미리 알려준다.** 포트 충돌, 컨테이너 안의 `localhost` 같은 함정은 해당 단계에서 언급한다.
 
-## 구축 목표 (4단계)
+## 절대 하지 말 것
 
-1. **적재**: SeaTunnel로 원본 데이터를 로컬 환경에 옮긴다. sink는 `Iceberg`를 쓴다
-   (`LocalFile` sink로 Parquet만 쓰는 방식이 아니다 — Iceberg sink가 파일 작성과 테이블 커밋을 함께 한다).
-2. **테이블 포맷**: Apache Iceberg로 오픈 테이블 포맷을 구성한다.
-3. **메타데이터**: Hive Metastore(HMS)로 카탈로그(namespace·테이블·현재 metadata 위치)를 관리한다.
-4. **조회**: **Apache Superset** 웹 UI에서 Iceberg 테이블을 조회한다.
-   Superset은 Iceberg에 직접 붙지 못하므로 **Trino**를 쿼리 엔진으로 둔다.
+- **`docker compose down -v` 금지.** MinIO 데이터, HMS 등록 정보(`catalog-db`), Superset 설정이 볼륨째 삭제된다.
+- **원시 SeaTunnel job(`jobs/*.conf`)을 직접 반복 실행하지 않는다.** `APPEND_DATA`는 중복을 막지 않는다. 항상 아래 "적재 래퍼"로 실행한다.
+- **기존 `./lake` 파일과 기존 namespace는 수정하지 않는다.** 저장소를 바꿀 때도 새 namespace(`retail_s3` 등)에 새로 적재한다.
+- **Iceberg metadata JSON·manifest 안의 경로를 문자열 치환하지 않고, HMS 내부 DB(`catalog-db`)를 직접 수정하지 않는다.** 조회만 한다.
+- **Trino catalog의 `READ_ONLY`를 풀지 않는다.** 쓰기는 SeaTunnel(과 테이블 생성용 Java 코드)만 한다.
+- **Airflow가 떠 있을 때 날씨 CLI 적재(`scripts/public_api_weather.py`)를 실행하지 않는다.** 호스트-컨테이너 잠금 공유가 확인되지 않았다.
+- **매일 09:00(KST, Airflow 날씨 DAG) 근처에 HMS·Trino를 재시작하지 않는다.**
+- **자격증명을 문서·job 파일에 적지 않는다.** 환경변수나 자리표시자로 둔다.
+- `Onboarding/openmetadata/docker-compose.yml`(공식 배포본)은 수정하지 않는다. 이 폴더의 `compose*.yaml`은 직접 작성한 것이라 수정해도 된다.
 
-```
-원본 PG ──SeaTunnel──▶ Iceberg 파일(./lake) + HMS 커밋
-브라우저 ──▶ Superset ──SQL──▶ Trino ──▶ HMS(위치 확인) + ./lake(파일 읽기)
-```
+## Compose 구성과 기동·종료
 
-## 현재 상태
+호스트, `Onboarding/iceberg/`에서 실행한다. Compose 프로젝트 이름(`iceberg-learning`)이 `compose.yaml`에 있으므로 **`compose.yaml`은 항상 포함**한다 (빠지면 빈 볼륨이 새로 생긴다).
 
-| 구성요소 | 상태 |
+| 파일 | 서비스 |
 |---|---|
-| SeaTunnel 2.3.13 → Iceberg sink | 동작 확인됨 (배치 2회, 5건 / 합계 170000) |
-| Iceberg 1.6.1, format v2, `retail.orders` | 생성됨 |
-| Hive Metastore 4.0.1 (`thrift://hms:9083`) | 동작 확인됨 |
-| Trino 483 | HMS + 기존 file:/lake 경로 조회 검증 완료, localhost:8081 |
-| Superset 6.0.0 | Trino 연결·주문 Dataset·차트·대시보드 등록, localhost:8088 |
-| Airflow 3.3.1 | `public_weather_to_iceberg` DAG 동작 확인됨, localhost:8082 (2026-11-09) |
-| MinIO(S3) + Iceberg | 2026-11-11 `public_api_s3.weather_hourly` 576행 적재·재실행 skip 확인, Trino catalog `iceberg_s3`, MinIO 콘솔 localhost:9001. 상세: `docs/minio-s3-lakehouse.md` |
-| MinIO 200만 행 (월별 파티션) | 2026-11-12 seatunnel 원본 PG(5440) `production_orders` → `iceberg_s3.retail_s3.production_orders` 2,000,000행, `month(order_date)` 13파티션, 원본 집계·pruning·재실행 skip 확인. Superset 연결 `MinIO Iceberg / Trino`·Dataset·차트 등록. 상세: `tasks/003-production-orders-to-minio.md` |
-| production_orders_100m | 2026-10-08 SeaTunnel 적재 성공: 100,000,000행, Parquet 4개 / 330,496,199 bytes. Trino 실파일 스캔 집계가 원본 PostgreSQL과 일치. 사용자가 Superset SQL Lab 조회 확인. 상세: `docs/production-orders-100m.md`. |
+| `compose.yaml` | `catalog-db`, `hms`, `source-db`(orders 5행), 작업용 `seatunnel`·`catalog-tools`(profile `tools`) |
+| `compose.analytics.yaml` | `trino`, `superset`, `superset-db`, `superset-init` |
+| `compose.minio.yaml` | `minio`, `minio-init`(bucket 생성) |
+| `compose.airflow.yaml` | `airflow`, `airflow-db` |
+| `compose.bulk.yaml` | 대용량 JDBC 적재용 SeaTunnel 메모리(Xmx 3GiB)·원본 계정 환경변수 오버레이 |
 
-- 설계 문서: `docs/local-lakehouse-superset.md` (전체 구축 순서),
-  `docs/local-lakehouse-build-options.md` (저장소 선택지),
-  `docs/md/local-lakehouse-flow.md` (그림 3장으로 보는 환경 배치 · 적재 · 조회 흐름)
-- 실행 증거: `evidence/` — 원본 데이터, SeaTunnel 적재 로그와 HMS 기록을 유지한다. Trino 조회 결과는 `evidence/trino/`에 있다. Superset 조회 기록은 `evidence/superset/`에 있다. 1억 행 검증 및 실패 시도 기록은 `evidence/production-100m/`에 있다.
+```bash
+# 조회 환경 (HMS + Trino + MinIO + Superset)
+docker compose -f compose.yaml -f compose.analytics.yaml -f compose.minio.yaml up -d --wait catalog-db hms trino minio superset
 
-## 아키텍처 경계
+# 스크립트로 단계별 기동
+bash scripts/up-trino.sh      # catalog-db, HMS, Trino
+bash scripts/up-minio.sh      # .env.minio 생성(최초 1회), MinIO, bucket, HMS·Trino 재생성
+bash scripts/up-superset.sh   # 이미지 빌드·초기화·기동·기본 등록
+bash scripts/up-airflow.sh    # Airflow (Trino가 떠 있어야 함)
 
-- 기존 보조 조회·검증 코드와 그 산출물은 사용자 요청으로 삭제했다.
-  `catalog-tools`는 HMS namespace 초기화만 수행한다. 새 조회·검증은 Trino로 구현했다 (`scripts/trino.sh`, `scripts/verify_trino.py`).
-- **기존 `retail.orders` 테이블과 `./lake` 파일은 보존한다.** 저장소를 S3 호환으로 바꾸는 경우에도
-  기존 namespace를 수정하지 말고 새 namespace(`retail_s3` 등)에 새로 적재한다.
-- **Iceberg metadata JSON / manifest 안의 절대 URI를 문자열 치환으로 고치지 않는다.**
-  `warehouse` 설정만 바꿔도 기존 테이블은 이동하지 않는다.
-- **원시 SeaTunnel job을 반복 실행하지 않는다.** `data_save_mode = "APPEND_DATA"`는 행 중복을 막지 않는다.
-  기존 배치 래퍼와 중복 검사 도구는 삭제했다. 재적재 전에 Trino 기반 선행 상태 검사를 구현한다.
-- 서비스 간 통신은 `iceberg-learning-net` 네트워크의 **서비스 이름**으로 한다
-  (Superset 컨테이너에서 `localhost:8080`은 Trino가 아니다).
+# 종료 (-v 금지). Airflow를 띄웠다면 -f compose.airflow.yaml도 추가
+docker compose -f compose.yaml -f compose.analytics.yaml -f compose.minio.yaml down
+```
 
-## 호스트 포트
+조회: `bash scripts/trino.sh --execute "SELECT count(*) FROM iceberg_s3.retail_s3.production_orders"`
 
-현재 `catalog-db`는 DBeaver 확인용으로 `127.0.0.1:15432:5432`를 공개한다. Trino는 `127.0.0.1:8081:8080`을 공개한다. 새로 공개할 때는 아래 충돌을 피한다.
+## 포트와 자격증명 위치
 
-| 포트 | 이미 쓰는 곳 |
-|---|---|
-| 5432 | `Onboarding/openmetadata` 소스 Postgres |
-| 8080 | `Onboarding/openmetadata` Airflow UI |
-| 8585 | `Onboarding/openmetadata` OpenMetadata UI |
+| 호스트 포트 | 서비스 | 접속 정보 위치 |
+|---|---|---|
+| 15432 | `catalog-db` (HMS 내부 DB, DBeaver 조회용) | `compose.yaml` (`hive` / DB `metastore`) |
+| 8081 | Trino | 사용자 `analyst`, 비밀번호 없음 |
+| 8088 | Superset | `.env.superset` (`python3 scripts/show-superset-login.py`) |
+| 8082 | Airflow | 로그인 없음 (127.0.0.1 전용) |
+| 9000 / 9001 | MinIO API / 웹 콘솔 | `.env.minio` (`scripts/prepare_minio_env.py`가 생성, git 제외) |
+| 5440 | 원본 PostgreSQL `srcdb` (**`Onboarding/seatunnel` 프로젝트**) | `seatunnel/docker-compose.sourcedb.yml`. 적재 시 `SOURCE_USER`/`SOURCE_PASSWORD` 환경변수로 전달 |
 
-→ **Trino는 컨테이너 8080을 호스트 8081로 매핑했다.** Superset은 8088을 쓴다.
-컨테이너 내부 포트는 그대로 둬도 된다 (충돌은 호스트 포트에서만 난다).
+다른 프로젝트가 쓰는 포트: 5432(openmetadata 원본 PG), 8080(openmetadata Airflow), 8585(OpenMetadata UI), 3306(seatunnel MySQL). 새 포트는 이와 겹치지 않게 `127.0.0.1`에만 공개한다.
 
-## 작업 규칙
+## 테이블과 적재 방법 (현재 상태)
 
-- `compose.yaml`은 이 프로젝트가 직접 작성한 파일이라 수정해도 된다
-  (openmetadata의 `docker-compose.yml`과 다르다 — 그쪽은 공식 배포본이라 수정 금지).
-- Trino/Superset은 기존 서비스를 건드리지 않도록 **별도 파일**(`compose.analytics.yaml` 등)로 추가하고
-  `iceberg-learning-net`에 붙이는 방식을 우선 검토한다.
-- 자격증명은 문서·job 파일에 하드코딩하지 않고 환경변수나 자리표시자로 둔다.
-- 새 단계를 구현하면 `evidence/`에 버전·설정·출력을 남긴다.
+| 테이블 (Trino) | 파일 위치 | 내용 | 적재 래퍼 | 상세 |
+|---|---|---|---|---|
+| `iceberg.retail.orders` | `./lake` | 5행, amount 합계 170000. 보존 기준값 | (초기 실습, 재적재 없음) | `docs/local-lakehouse-superset.md` |
+| `iceberg.retail.production_orders_100m` | `./lake` | 1억 행, Parquet 4개 | `scripts/load-production-100m.py` → `verify-production-100m.py` | `docs/production-orders-100m.md` |
+| `iceberg.public_api.weather_hourly` | `./lake` | 서울 시간별 날씨. Airflow DAG `public_weather_to_iceberg`가 매일 09:00 증분 (2026-11-11 576행) | `scripts/public_api_weather.py`, `dags/public_weather_to_iceberg.py` | `tasks/001`, `tasks/002`, `docs/airflow-weather-dag.md` |
+| `iceberg_s3.public_api_s3.weather_hourly` | MinIO | 위 테이블의 2026-11-11 snapshot 복사본 576행. **일회성**: 원본이 늘어난 뒤 재실행하면 "원본과 다름"으로 중단 | `scripts/load-weather-to-minio.py` | `docs/minio-s3-lakehouse.md` |
+| `iceberg_s3.retail_s3.production_orders` | MinIO | `srcdb.production_orders` 200만 행, `month(order_date)` 13파티션 | `scripts/load-production-orders-to-minio.py` | `tasks/003` |
 
-## 다른 에이전트와 함께 작업할 때
+- Trino catalog: `iceberg`(로컬 `./lake`), `iceberg_s3`(MinIO). 같은 HMS를 보지만 **파일 위치가 맞는 catalog로만 읽힌다** (`iceberg_s3.retail.orders`는 목록에만 보이고 조회는 실패).
+- Superset 연결: `Local Iceberg / Trino`(기본 catalog `iceberg`), `MinIO Iceberg / Trino`(기본 catalog `iceberg_s3`). SQL Lab 표시 한도 5만 행, 조회·CSV 20만 행(`config/superset/superset_config.py`).
+  2026-11-12 확인 시 `production_orders_100m` Dataset은 Superset에 없다 (SQL Lab 쿼리는 가능).
 
-이 폴더는 Claude와 Codex를 번갈아 쓴다. 기초 구축은 Codex, 세부 질의는 Claude 쪽으로 나뉜다.
+## 작업 방식
 
-- **두 에이전트가 각자의 대화 기록만 보고 서로를 모른다.** 작업 시작 시 `git status`와
-  `git log -1 --stat`으로 현재 상태를 먼저 확인한다. 기억에 있는 파일 목록을 믿지 않는다.
-- 같은 파일을 동시에 수정하지 않는다. 턴이 바뀌는 지점에서 커밋해 두면 상대가 변경 내역을 읽을 수 있다.
+- 새 작업은 `tasks/NNN-*.md`(목표·결정·완료 조건·범위 밖·실행 기록)로 시작하고, 사용자 검토 후 구현한다.
+- 새 실행 결과는 `evidence/<작업>/<run_id>/`에 남긴다. 새 산출물은 `.gitignore` 대상이고, 결과 요약은 tasks/docs에 쓴다. 기존 추적 중인 evidence 파일 57개는 노트북·문서가 쓰므로 추적을 유지한다.
+- 새 서비스는 기존 서비스를 건드리지 않게 별도 compose 파일로 추가하고 `iceberg-learning-net`에 붙인다.
+- 변경 후 실행 방법은 docs, 현재 상태는 이 파일의 "테이블과 적재 방법" 표에 반영한다. 날짜별 작업 기록은 이 파일이 아니라 tasks/git에 남긴다.
+
+## 처음 밟기 쉬운 함정
+
+- 컨테이너끼리는 **서비스 이름**으로 통신한다(`hms:9083`, `trino:8080`, `minio:9000`). 컨테이너 안의 `localhost`는 자기 자신이다.
+- 다른 compose 프로젝트(원본 PG 5440)는 컨테이너에서 `host.docker.internal:5440`으로 접속한다.
+- Iceberg 테이블 위치는 sink의 `warehouse`가 아니라 **HMS namespace의 location**을 따른다. MinIO용 namespace는 `s3a://` location을 지정해 먼저 만든다.
+- PyIceberg 0.10은 HMS 4와 테이블 조회가 호환되지 않는다(`Invalid method name: get_table`). 테이블 생성·검사는 SeaTunnel 이미지의 Java Iceberg 클라이언트(`scripts/Prepare*Catalog.java`)로 한다. 그 이미지의 Java는 8이다.
+- 원본 PK가 있는 JDBC 적재는 Iceberg identifier로 복사되어 Delta writer가 메모리를 크게 쓴다. append 적재는 PK 메타데이터를 떼고 식별자 없는 테이블을 미리 만든다 (`docs/production-orders-100m.md`).
+- Docker 런타임은 Rancher Desktop이다 (회사 Mac에서 Docker Desktop은 Zscaler와 충돌).
+
+## Codex와 함께 작업할 때
+
+이 폴더는 Claude와 Codex를 번갈아 쓴다. 두 에이전트는 서로의 대화 기록을 모른다.
+
+- 작업 시작 시 `git status`와 `git log -1 --stat`으로 현재 상태를 먼저 확인한다. 기억에 있는 파일 목록을 믿지 않는다.
+- 같은 파일을 동시에 수정하지 않는다. 턴이 바뀌는 지점에서 커밋해 상대가 변경 내역을 읽게 한다.
 - Docker 스택을 올리고 내리는 작업은 한쪽에서만 한다.
 
-## Trino 실행과 검증
+## 더 볼 문서
 
-- 기동: `bash scripts/up-trino.sh` (기존 DB/HMS와 Trino만 기동, 재적재 없음).
-- 조회: `bash scripts/trino.sh --execute "SELECT * FROM iceberg.retail.orders"`.
-- 검증: `python3 scripts/verify_trino.py` (기존 5건 데이터 기준).
-- 반드시 두 Compose 파일을 함께 사용한다: `-f compose.yaml -f compose.analytics.yaml`.
-- `fs.local.enabled=true`, `local.location=/`: 기존 file:/lake 절대 URI를 유지한다. 설정 상세는 `docs/trino-local-query.md` 참고.
-- 공유 lake는 읽기 전용, Iceberg catalog는 READ_ONLY. Superset도 연결 완료했다.
-
-## Superset 실행
-
-- `bash scripts/up-superset.sh`: 이미지 빌드, DB 초기화, 기동, REST API 등록.
-- `python3 scripts/show-superset-login.py`: 로컬 관리자 로그인 정보 확인.
-- 대시보드: http://localhost:8088/superset/dashboard/local-iceberg/
-- `.env.superset` 및 `superset-db` 볼륨 보존. 자세한 설명은 `docs/superset-local-ui.md`.
-
-- 파일별 사용 시점과 스크립트 호출 관계: `docs/md/project-files-guide.md` (그림 + 전체 파일 표). 문서 작업 중 적재 재실행 없음.
-- HMS 입문용 대화형 안내: `docs/web/hms-guide.html`. 로컬 HTML이며 버튼은 설명만 변경하고 서비스를 호출하지 않는다.
-- `analysis/read_parquet.ipynb`: 실제 catalog-db SELECT에서 시작하는 JSON → snapshot → Avro manifest list → manifest → Parquet 읽기 학습. live/evidence 모드, 원본 노트북 별도 보존. 전체 셀 실행 완료 (현재 5행/170000, 과거 3행/69000, lake 파일 9개 불변). 기록: `evidence/notebook/read-parquet-execution.json`. fastavro 및 노트북 실행용 dev 의존성을 pyproject/uv.lock에 추가했다.
-- JSON → Avro → Parquet 그림 및 외부 설명 검토: `docs/md/iceberg-json-to-parquet.md`, 이미지 `docs/assets/lakehouse-flow/07-json-to-parquet.png`. 실제 manifest 2개/Parquet 2개 참조 확인.
-- 2026-10-12: 사용자 승인으로 `.DS_Store`, `docs/.DS_Store`, `docs/assets/.DS_Store`만 삭제. evidence·노트북 백업·서비스·데이터 보존. `docs/md/project-files-guide.md`에 코드 검토 순서, 환경 준비·1억 행 실행·HMS 등록·조회 상세 및 누락된 대용량 작업 파일을 보완했다. 내장 imagegen 그림 `docs/assets/lakehouse-flow/08-scripts-to-lakehouse.png` 추가. 이번 작업은 문서 정리이며 서비스 기동·적재·검증 쿼리는 재실행하지 않았다.
-
-- `docs/web/iceberg-write-guide.html`: append 적재의 Parquet → manifest → manifest list → JSON → HMS 커밋 및 Trino 조회를 설명하는 독립 HTML. 소량 orders의 실제 파일 탐색과 1억 행/컬럼 선택 설명을 포함하며, 가상 예시와 검증 기록을 구분한다.
-
-- 2026-10-14: Trino·Superset 연결 설정과 SQL 조회 흐름 그림 `docs/assets/lakehouse-flow/10-trino-superset-iceberg-connection.png` 추가. 설명·생성 프롬프트는 `docs/md/trino-superset-connection-image.md`. 기존 설정 확인 및 이미지 생성만 수행했고 서비스/데이터 재실행 없음.
-
-- 2026-10-15: `analysis/read_parquet.ipynb`를 production_orders_100m 기준으로 전환. 기존 사용자 셀을 포함한 5행 버전은 `analysis/read_parquet.orders-5rows.ipynb`에 보존. live 전체 셀(nbclient)·evidence 모드 실행 성공, 17개 대상 파일 SHA-256 불변. 4개 Parquet footer 합계 1억 행, 파일당 5행 샘플. JSON 5개=빈 테이블+4커밋, manifest list 4개와 재사용 manifest 4개 확인. 기록 `evidence/notebook/production-100m/`. 전체 행 스캔·재적재 없음, 추가 필수 작업 없음.
-
-- 2026-10-15: 재구성된 presentation 자료를 읽고 전체 목표 아키텍처 이미지 `docs/assets/lakehouse-flow/11-local-lakehouse-overview.png` 생성. 설명·프롬프트는 `docs/md/local-lakehouse-overview-image.md`. 발표 HTML/기획 MD는 변경하지 않음. 적재·조회 흐름과 두 DB 구분, 브라우저는 호스트임을 표시. 서비스 실행 없음.
-
-- 2026-10-15: 사용자 제공 로고를 참고해 전체 아키텍처의 Trino·Hive 마스코트를 수정한 `11-local-lakehouse-overview-v2.png` 추가. 기존 이미지·발표 HTML 보존.
-
-- 2026-10-15: 전체 아키텍처 최신 이미지 `11-local-lakehouse-overview-v3.png`: Docker 제목·고래 아이콘, 호스트 브라우저 경계 분리, 전체 제목 제거. 사용자가 지정한 나머지 설명 유지. 발표 HTML 미수정.
-
-- 2026-10-29: 사용자 요청으로 presentation/local-lakehouse.html 21쪽 네 번째 카드에 월별 파티션 규칙, order_date SQL, 9월 후보 파일 선택 및 14일 필터 예시 추가. 월별→일별 명세 변경과 기존 파일 유지, 이번 실습 미적용 명시. 기존 편집 내용과 speaker-notes.md 보존. 브라우저 렌더 검증은 미수행.
-
-- 2026-11-05: 공개 API 적재 실습 추가. `scripts/public_api_weather.py`가 Open-Meteo ERA5 서울 2025-10-01~07의 168행을 수집하고 SeaTunnel LocalFile → Iceberg로 `public_api.weather_hourly`에 적재한다. `weather_time`은 ISO 8601 +09:00 string이며 Trino에서 `from_iso8601_timestamp()`로 해석한다. API 원본·CSV·로그·검증 보고서는 `evidence/public-api/`. 전체 값 대사, replay skip(동일 snapshot), 기존 28파일 SHA-256 및 orders 5건/170000 보존 확인. 초기 timestamp 시도는 신규 테이블만 복구했고 미참조 파일은 보존. 상세 `docs/public-api-to-iceberg.md`, `tasks/001-public-api-to-iceberg.md`. 원시 job 직접 실행 금지; 부분 중복/정정값은 래퍼가 중단한다. 리니지·mart·스케줄링은 후속 범위.
-
-- 공개 API CSV bind mount는 `compose.yaml`의 `seatunnel.volumes`에서 관리한다. 별도 API Compose 파일 없이 기존 `compose.yaml` + `compose.analytics.yaml` 두 파일로 실행한다.
-
-- `evidence/`의 새 실행 산출물은 `.gitignore`로 제외한다. 원본·로그는 로컬에 보존하고 결과 요약은 tasks/docs에 기록한다. 기존 추적 중인 증거 파일 57개는 노트북 evidence 모드와 문서에서 사용하므로 추적 상태를 유지한다.
-
-- 2026-11-09: Airflow 스케줄링 추가. `compose.airflow.yaml`(Airflow 3.3.1 standalone + airflow-db, 127.0.0.1:8082), 기동 `bash scripts/up-airflow.sh`. DAG `dags/public_weather_to_iceberg.py`는 매일 09:00 KST, 테이블 마지막 날짜+1일부터 `batch_days`(7)일, `오늘-lag_days`(6)까지 받는다(ERA5 약 5일 지연). 로직은 `src/public_api/weather.py`로 이동, CLI와 공유. Airflow는 docker.sock을 마운트해 `docker compose run seatunnel`을 호출하므로 프로젝트를 호스트와 같은 절대 경로(`LAB_ROOT`)로 마운트한다. 확인: scheduled 1회(10-08~14), manual 2회(10-15~17, 새 데이터 없음 skip) → 408행, 중복 없음, 기존 28파일 SHA-256·orders 5건/170000 보존. DAG 일시정지 해제 상태. Airflow 기동 중에는 CLI 적재 금지(호스트-컨테이너 잠금 공유 미확인). 상세 `docs/airflow-weather-dag.md`, `tasks/002-airflow-weather-schedule.md`.
+| 문서 | 내용 |
+|---|---|
+| `docs/local-lakehouse-superset.md` | 전체 구축 순서 |
+| `docs/md/project-files-guide.md` | 파일별 사용 시점과 스크립트 호출 관계 |
+| `docs/md/local-lakehouse-flow.md`, `docs/md/lakehouse-concept.md` | 그림으로 보는 배치·적재·조회 흐름, 개념 |
+| `docs/trino-local-query.md` | Trino의 `file:/lake` 조회 설정 |
+| `docs/minio-s3-lakehouse.md` | MinIO 구성, 컴포넌트별 S3 설정 |
+| `docs/superset-local-ui.md` | Superset 구성 |
+| `docs/web/*.html` | HMS·Iceberg 쓰기·날씨 DAG 대화형 안내 (서비스 호출 없음) |
+| `analysis/read_parquet.ipynb` | JSON → snapshot → manifest → Parquet 읽기 실습 노트북 |
+| `docs/changelog.md` | 2026-11-16 이전 날짜별 작업 기록 |
