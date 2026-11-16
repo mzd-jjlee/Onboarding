@@ -8,7 +8,7 @@
 | 폴더 | 주제 | 구성 | 발표 자료 | 세부 규칙 |
 |---|---|---|---|---|
 | `openmetadata/` | 데이터 카탈로그 로컬 시연 | OpenMetadata 공식 배포(서버·MySQL·Elasticsearch·수집용 Airflow) + 카탈로그 대상 원본 Postgres 2개 | `docs/openmetadata-onboarding-slides.pptx`, 대본 `docs/openmetadata-presentation-script.md` | `openmetadata/CLAUDE.md` |
-| `seatunnel/` | ETL/ELT 도구 Apache SeaTunnel 실습 | 원본 Postgres·MySQL + SeaTunnel(배치 JDBC, 힙/OOM, 병렬 분할, CDC, 클러스터). NiFi 비교 | `docs/slides/seatunnel-practice-share.pptx` | CLAUDE.md 없음. 문서 안내 `seatunnel/docs/README.md` |
+| `seatunnel/` | ETL/ELT 도구 Apache SeaTunnel 실습 | 원본 Postgres·MySQL + SeaTunnel(배치 JDBC, 힙/OOM, 병렬 분할, CDC, 클러스터). NiFi 비교 | `docs/slides/seatunnel-practice-share.pptx` | `seatunnel/CLAUDE.md` |
 | `iceberg/` | 로컬 데이터 레이크하우스 구축 | PostgreSQL → SeaTunnel → Iceberg(Hive Metastore 카탈로그) → Trino → Superset, Airflow 스케줄링. 저장소는 처음 `./lake` 로컬 폴더, **새 데이터는 MinIO(S3 호환)** | `presentation/local-lakehouse.html`, `presentation/speaker-notes.md`, `presentation/local-lakehouse-deck-plan.md` | `iceberg/CLAUDE.md` |
 
 루트의 나머지는 초기 학습 자료다.

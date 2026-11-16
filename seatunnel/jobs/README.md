@@ -50,6 +50,6 @@ Zeta Engine과 JVM은 같은 계층이 아니다. Zeta는 JVM 위에서 실행�
 - `docs/archive/cdc-10m-insert-update-verification.md`: 이전 CDC 검증 기록
 - `tests/manual/cdc_10m_events.sql`: 검증용 INSERT/UPDATE/DELETE SQL
 - `jobs/sink-examples/`: 실행 검증하지 않은 외부 저장소 템플릿
-- `docs/demo-cleanup-manifest.json`: 삭제·이동 목록
+- `docs/archive/demo-cleanup-manifest.json`: 삭제·이동 목록
 
 기존 docs와 analysis/read_parquet.ipynb는 실험 이력이다. 삭제된 옛 경로를 참조하는 셀/설명이 있을 수 있으므로 현재 시연 기준은 이 문서를 사용한다.

@@ -73,9 +73,9 @@ docker compose -f compose.yaml -f compose.analytics.yaml -f compose.minio.yaml d
 |---|---|---|---|---|
 | `iceberg.retail.orders` | `./lake` | 5행, amount 합계 170000. 보존 기준값 | (초기 실습, 재적재 없음) | `docs/local-lakehouse-superset.md` |
 | `iceberg.retail.production_orders_100m` | `./lake` | 1억 행, Parquet 4개 | `scripts/load-production-100m.py` → `verify-production-100m.py` | `docs/production-orders-100m.md` |
-| `iceberg.public_api.weather_hourly` | `./lake` | 서울 시간별 날씨. Airflow DAG `public_weather_to_iceberg`가 매일 09:00 증분 (2026-11-11 576행) | `scripts/public_api_weather.py`, `dags/public_weather_to_iceberg.py` | `tasks/001`, `tasks/002`, `docs/airflow-weather-dag.md` |
+| `iceberg.public_api.weather_hourly` | `./lake` | 서울 시간별 날씨. Airflow DAG `public_weather_to_iceberg`가 매일 09:00 증분 (2026-11-11 576행) | `scripts/public_api_weather.py`, `dags/public_weather_to_iceberg.py` | `tasks/001-public-api-to-iceberg.md`, `tasks/002-airflow-weather-schedule.md`, `docs/airflow-weather-dag.md` |
 | `iceberg_s3.public_api_s3.weather_hourly` | MinIO | 위 테이블의 2026-11-11 snapshot 복사본 576행. **일회성**: 원본이 늘어난 뒤 재실행하면 "원본과 다름"으로 중단 | `scripts/load-weather-to-minio.py` | `docs/minio-s3-lakehouse.md` |
-| `iceberg_s3.retail_s3.production_orders` | MinIO | `srcdb.production_orders` 200만 행, `month(order_date)` 13파티션 | `scripts/load-production-orders-to-minio.py` | `tasks/003` |
+| `iceberg_s3.retail_s3.production_orders` | MinIO | `srcdb.production_orders` 200만 행, `month(order_date)` 13파티션 | `scripts/load-production-orders-to-minio.py` | `tasks/003-production-orders-to-minio.md` |
 
 - Trino catalog: `iceberg`(로컬 `./lake`), `iceberg_s3`(MinIO). 같은 HMS를 보지만 **파일 위치가 맞는 catalog로만 읽힌다** (`iceberg_s3.retail.orders`는 목록에만 보이고 조회는 실패).
 - Superset 연결: `Local Iceberg / Trino`(기본 catalog `iceberg`), `MinIO Iceberg / Trino`(기본 catalog `iceberg_s3`). SQL Lab 표시 한도 5만 행, 조회·CSV 20만 행(`config/superset/superset_config.py`).

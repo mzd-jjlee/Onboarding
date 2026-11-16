@@ -1,6 +1,7 @@
 # 로컬 데이터 레이크하우스
 
-목표 구조는 **SeaTunnel Iceberg sink → Iceberg + Hive Metastore → Trino → Apache Superset 웹 조회**다.
+구조는 **원본(PostgreSQL·공개 API) → SeaTunnel Iceberg sink → Iceberg + Hive Metastore → Trino → Apache Superset 웹 조회**이고, 날씨 적재는 **Airflow**가 매일 실행한다.
+파일 저장소는 처음에는 로컬 폴더 `./lake`였고, 이후 S3 호환 저장소 **MinIO**를 추가해 새 데이터는 MinIO에 적재한다. 기존 `./lake` 테이블은 그대로 둔다.
 
 **먼저 [로컬 데이터 레이크하우스 구축 안내서](docs/local-lakehouse-superset.md)를 읽는다.** 구성요소 역할, 쓰기·조회 흐름, 로컬 저장소 호환성, Superset 연결, 검증 SQL과 구축 완료 기준을 정리했다.
 
@@ -14,6 +15,40 @@
 |---|---|
 | [새 구축 안내서](docs/local-lakehouse-superset.md) | 현재 목표의 전체 구조와 구현 순서 |
 | [구축 선택지](docs/local-lakehouse-build-options.md) | 기존 공유 디스크 재사용과 로컬 S3 대안의 설정 |
+| [MinIO(S3) 레이크하우스](docs/minio-s3-lakehouse.md) | MinIO 추가 구성, 컴포넌트별 S3 설정, 날씨·주문 테이블 적재 |
+| [작업 문서 `tasks/`](tasks/) | 작업별 목표·결정·완료 조건·실행 기록 (001 공개 API, 002 Airflow, 003 MinIO 200만 행) |
+| [작업 기록](docs/changelog.md) | 2026-11-16 이전 날짜별 작업 기록 |
+
+## 현재 테이블
+
+| 테이블 (Trino) | 파일 위치 | 내용 |
+|---|---|---|
+| `iceberg.retail.orders` | `./lake` | 초기 실습 5행 (amount 합계 170000) |
+| `iceberg.retail.production_orders_100m` | `./lake` | PostgreSQL 1억 행 |
+| `iceberg.public_api.weather_hourly` | `./lake` | 서울 시간별 날씨, Airflow가 매일 증분 적재 |
+| `iceberg_s3.public_api_s3.weather_hourly` | MinIO | 위 날씨 테이블의 2026-11-11 복사본 576행 |
+| `iceberg_s3.retail_s3.production_orders` | MinIO | PostgreSQL 200만 행, `order_date` 월별 파티션 13개 |
+
+`iceberg`와 `iceberg_s3`는 같은 Hive Metastore를 보는 Trino catalog이고, 각각 `./lake`와 MinIO의 파일을 읽는다.
+
+## 전체 기동·종료
+
+호스트, 이 폴더에서 실행한다. `compose.yaml`은 항상 포함한다 (프로젝트 이름이 여기에 있어서, 빠지면 빈 볼륨이 새로 생긴다).
+
+```sh
+# HMS + Trino + MinIO + Superset
+docker compose -f compose.yaml -f compose.analytics.yaml -f compose.minio.yaml up -d --wait catalog-db hms trino minio superset
+
+# 종료. -v(볼륨 삭제)는 붙이지 않는다
+docker compose -f compose.yaml -f compose.analytics.yaml -f compose.minio.yaml down
+```
+
+| 화면 | 주소 | 로그인 |
+|---|---|---|
+| Superset | http://localhost:8088 | `python3 scripts/show-superset-login.py` |
+| MinIO 콘솔 | http://localhost:9001 | `.env.minio`의 `MINIO_ROOT_USER` / `MINIO_ROOT_PASSWORD` |
+| Trino (DBeaver 등) | `localhost:8081` | 사용자 `analyst`, 비밀번호 없음 |
+| Airflow | http://localhost:8082 | 로그인 없음 (`bash scripts/up-airflow.sh`로 기동) |
 
 ## Trino 조회
 
@@ -29,15 +64,20 @@ DBeaver: Trino 연결, `localhost:8081`, catalog `iceberg`, schema `retail`, 사
 
 SeaTunnel 2.3.13 Iceberg sink, Hive Metastore 4.0.1, PostgreSQL 16, 공유 `/lake` 및 HMS 초기화 도구가 구현되어 있다. 2026-10-02 기록에서 첫 배치 3건, 추가 적재 후 5건·합계 170,000, 과거 스냅샷 및 카탈로그 재시작 보존을 확인했다.
 
-**Trino 483 및 Superset 6.0.0 연결 완료.** 기존 `retail.orders` 조회 외에, 2026-10-08 원본 PostgreSQL `production_orders_100m` 1억 행을 SeaTunnel으로 Iceberg에 적재했다. Trino가 Parquet 4개(약 330.5 MB)를 스캔해 원본 집계와 대조했고 결과가 일치했다. 사용자가 Superset SQL Lab에서도 이 테이블 조회를 확인했다. 설정·검증·SQL은 [1억 행 적재 안내서](docs/production-orders-100m.md), 실행 산출물은 `evidence/production-100m/`에 있다.
+**Trino 483 및 Superset 6.0.0 연결 완료.** 기존 `retail.orders` 조회 외에, 2026-10-08 원본 PostgreSQL `production_orders_100m` 1억 행을 SeaTunnel으로 Iceberg에 적재했다. Trino가 Parquet 4개(약 330.5 MB)를 스캔해 원본 집계와 대조했고 결과가 일치했다. 설정·검증·SQL은 [1억 행 적재 안내서](docs/production-orders-100m.md), 실행 산출물은 `evidence/production-100m/`에 있다.
+(2026-11-12 확인 시 이 테이블의 Superset Dataset은 등록되어 있지 않다. SQL Lab에서 직접 쿼리하면 조회된다.)
 
-기존 보조 조회·배치 검증 도구와 관련 산출물은 제거했다. Iceberg 실제 데이터와 원본·SeaTunnel·HMS 기록은 유지한다. 초기 구축 절차와 중복 적재 주의사항은 [구축 안내서](docs/local-lakehouse-superset.md#6-구현-순서)를 참고한다.
+**MinIO(S3 호환 저장소) 추가.** 2026-11-11 날씨 576행, 2026-11-12 PostgreSQL `production_orders` 200만 행(월별 파티션)을 MinIO 위 Iceberg 테이블로 적재하고 원본과 대조했다. 아래 "MinIO 적재" 참고.
+
+적재는 항상 래퍼 스크립트로 실행한다. 래퍼가 적재 전에 테이블 상태를 확인해 같은 데이터면 건너뛰고(`SKIP_IDENTICAL`), 다르면 중복 적재 없이 멈춘다. 원시 SeaTunnel job(`jobs/*.conf`)을 직접 반복 실행하면 행이 중복된다.
 
 에이전트 작업 규칙은 [AGENTS.md](AGENTS.md)와 [CLAUDE.md](CLAUDE.md)를 참조한다.
 
 ## Superset 웹 조회
 
 [주문 대시보드 열기](http://localhost:8088/superset/dashboard/local-iceberg/) · [접속 및 구성 안내](docs/superset-local-ui.md)
+
+Superset 연결은 두 개다: `Local Iceberg / Trino`(catalog `iceberg`, `./lake`)와 `MinIO Iceberg / Trino`(catalog `iceberg_s3`). SQL Lab은 화면에 최대 5만 행, 조회·CSV 다운로드는 20만 행까지다(`config/superset/superset_config.py`). 더 큰 결과는 집계하거나 `scripts/trino.sh`로 추출한다.
 
 ```sh
 # 로그인 정보 확인
@@ -89,3 +129,22 @@ bash scripts/up-airflow.sh   # http://localhost:8082
 ```
 
 2026-11-09 스케줄 실행 1회와 수동 실행 2회를 확인했다(168 → 336 → 408행, 받을 날짜가 없으면 skip). [Airflow 안내](docs/airflow-weather-dag.md) · [작업 문서](tasks/002-airflow-weather-schedule.md)
+
+## MinIO 적재
+
+MinIO는 S3와 같은 API로 동작하는 저장소 서버다. Iceberg 파일(Parquet·Avro·metadata JSON)을 로컬 폴더 대신 bucket `lakehouse`에 저장한다. Hive Metastore는 그대로 카탈로그이고, 테이블 주소가 `s3a://...`로 바뀔 뿐이다.
+
+```bash
+bash scripts/up-trino.sh
+bash scripts/up-minio.sh                     # 최초 1회 .env.minio(접속 키) 생성, MinIO·bucket, HMS·Trino 재생성
+
+# 날씨 576행 (한 번만 복사, 재실행 시 같으면 skip)
+python3 scripts/load-weather-to-minio.py
+
+# PostgreSQL 200만 행 (원본: Onboarding/seatunnel의 Postgres, localhost:5440)
+export SOURCE_USER='<원본 DB 사용자>' SOURCE_PASSWORD='<원본 DB 비밀번호>'
+python3 scripts/load-production-orders-to-minio.py
+```
+
+200만 행 적재는 원본과 집계(행 수, 합계, 월별·상태별 건수)를 대조하고, 한 달 조건 조회가 그 달 파일만 읽는지(파티션 효과)까지 확인한다.
+[MinIO 구성·실행 안내](docs/minio-s3-lakehouse.md) · [200만 행 작업 문서](tasks/003-production-orders-to-minio.md)

@@ -6,8 +6,10 @@
 # (wal_level=logical, binlog_format=ROW 등) — 배치 실습만 할 거면 몰라도 되는 옵션이지만 미리 켜둬도
 # 배치 성능에 영향 없다.
 #
-# 최초 기동 시 sourcedb-init/*/01_init.sql이 실행되면서 customers(5만 행) + sales(200만 행)를
+# 최초 기동 시 sourcedb-init/*/01_init.sql이 실행되면서 factories(30행) + production_orders(200만 행)를
 # 생성한다 — 첫 기동은 데이터 생성 때문에 수 분 걸릴 수 있다 (healthcheck retries를 넉넉히 잡아둠).
+# 이후 실습에서 Postgres에 production_orders_10m/100m/200m, cdc_demo_orders 등을 추가했다 (볼륨 postgres-data에 있음).
+# 이 Postgres(localhost:5440)는 Onboarding/iceberg의 대용량 적재 원본으로도 쓴다.
 services:
   postgres:
     image: postgres:16
