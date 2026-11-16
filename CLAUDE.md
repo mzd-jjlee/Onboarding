@@ -1,32 +1,44 @@
-# cluade-test
+# Onboarding — 메가존 온보딩 기술 실습 모음
 
-이 저장소는 두 개의 별개 프로젝트를 담고 있다.
+팀 기술 소개 발표를 위해 공부하고 **로컬 Docker로 직접 구축해 본** 프로젝트 모음이다.
+각 폴더는 독립된 프로젝트(별도 compose 프로젝트·별도 Docker 네트워크)이며, 세부 규칙은 각 폴더의 CLAUDE.md를 따른다.
 
-## 현재 주력: openmetadata/ — OpenMetadata 로컬 연동 시연
+## 프로젝트
 
-Docker로 OpenMetadata 공식 스택 + 소스 Postgres를 띄워서 데이터 카탈로그 자동 수집(ingestion)을 시연하는 프로젝트.
-**현재 대부분의 작업이 여기서 이루어진다** (docker-compose 설정, Airflow DAG, 문서 정비).
+| 폴더 | 주제 | 구성 | 발표 자료 | 세부 규칙 |
+|---|---|---|---|---|
+| `openmetadata/` | 데이터 카탈로그 로컬 시연 | OpenMetadata 공식 배포(서버·MySQL·Elasticsearch·수집용 Airflow) + 카탈로그 대상 원본 Postgres 2개 | `docs/openmetadata-onboarding-slides.pptx`, 대본 `docs/openmetadata-presentation-script.md` | `openmetadata/CLAUDE.md` |
+| `seatunnel/` | ETL/ELT 도구 Apache SeaTunnel 실습 | 원본 Postgres·MySQL + SeaTunnel(배치 JDBC, 힙/OOM, 병렬 분할, CDC, 클러스터). NiFi 비교 | `docs/slides/seatunnel-practice-share.pptx` | CLAUDE.md 없음. 문서 안내 `seatunnel/docs/README.md` |
+| `iceberg/` | 로컬 데이터 레이크하우스 구축 | PostgreSQL → SeaTunnel → Iceberg(Hive Metastore 카탈로그) → Trino → Superset, Airflow 스케줄링. 저장소는 처음 `./lake` 로컬 폴더, **새 데이터는 MinIO(S3 호환)** | `presentation/local-lakehouse.html`, `presentation/speaker-notes.md`, `presentation/local-lakehouse-deck-plan.md` | `iceberg/CLAUDE.md` |
 
-자세한 설계/근거는 [openmetadata/docs/openmetadata-demo-design.md](openmetadata/docs/openmetadata-demo-design.md) 참고.
+루트의 나머지는 초기 학습 자료다.
+- `etl.py` + `data/*.csv`: 표준 라이브러리만 쓰는 ETL 토이(CSV → SQLite `data/sales.db`). `data/*.csv`는 openmetadata 원본 DB 시드로 재사용된다. "표준 라이브러리만" 제약은 `etl.py`에만 해당한다.
+- `docker-basics-guide.yaml`: Docker/Compose 읽기 안내서. 실행용 compose 파일이 아니다.
+- `docs/`: `etl.py` 관련 문서.
 
-- 기동: `cd openmetadata && ./scripts/up.sh` / 종료: `./scripts/down.sh [--volumes]`
-- 구성:
-  - `docker-compose.yml` — OpenMetadata 공식 배포본 **그대로** (직접 수정 금지, 버전 올릴 땐 새 GitHub Release로 재다운로드)
-  - `docker-compose.dags.yml` — 커스텀 DAG(`dags/`)를 ingestion(Airflow) 컨테이너에 얹는 오버레이. **반드시 `docker-compose.yml`과 같이 `-f` 두 개로** 올려야 커스텀 DAG가 보인다 (하나만 올리면 재생성 시 DAG가 안 보임 — 파일이 지워지는 건 아니고, 두 파일을 같이 다시 올리면 복구됨)
-  - `docker-compose.sourcedb.yml` — 카탈로그 대상 소스 Postgres (`retaildb`, 호스트 포트 5432)
-  - `dags/customer_sales_summary_join.py` — customers+sales 조인 데모 DAG. **Airflow DAG를 새로 만들거나 수정할 때는 `~/projects/.claude/rules/dag-style.md`의 공통 규칙(TaskFlow API, task는 얇게/로직은 모듈로, flow는 맨 마지막에 `>>`)도 함께 적용된다.**
-  - `sourcedb-init/generate_seed_sql.py` — `data/*.csv` → seed SQL 재생성 (`etl.py`와 동일한 정제 규칙 적용)
-- 접속 정보:
-  - OpenMetadata UI: `localhost:8585` (`admin@open-metadata.org` / `admin`)
-  - Airflow UI: `localhost:8080` (`admin` / `admin`)
-  - 소스 Postgres: `localhost:5432` (`retaildb` / `demo` / `demo`)
-- OpenMetadata 컨테이너에서 소스 Postgres에 접속할 때는 컨테이너명이 아니라 `host.docker.internal` 사용 (서로 다른 compose 프로젝트 = 다른 docker network라서 호스트를 경유해야 함). 이 구성은 Docker Desktop(Mac) 전용이며 리눅스 네이티브 환경에서는 별도 네트워크 설정이 필요함.
+## 프로젝트 사이의 연결
 
-## 과거 예제: etl.py — 표준 라이브러리 기반 ETL 토이 프로젝트
+- **seatunnel 원본 Postgres(`localhost:5440`, DB `srcdb`)는 iceberg의 대용량 원본으로도 쓴다** (`production_orders_100m`, `production_orders` 200만 행). seatunnel 폴더에서 `docker compose -f docker-compose.sourcedb.yml up -d postgres`로 띄운다.
+- 다른 compose 프로젝트의 서비스는 서비스 이름으로 찾을 수 없다. 컨테이너에서 **`host.docker.internal:<호스트 포트>`**로 접속한다 (Rancher Desktop에서 동작 확인).
 
-`data/sales_raw.csv`를 읽어 정제한 뒤 `data/sales.db`(SQLite)에 적재. 외부 의존성 없이 `csv`/`sqlite3`/`pathlib`만 사용.
-지금은 주력 작업이 아니지만 코드/데이터는 저장소에 남아 있고, `openmetadata/` 데모의 시드 데이터로 재사용된다.
+## 호스트 포트 지도
 
-- 실행: `python etl.py` (매번 `sales` 테이블을 DROP 후 재생성 — 멱등적 재실행 가능)
-- 주의: `transform()`은 `order_id` 중복 행과 `customer`/`quantity`가 빈 값인 행을 **에러 없이 조용히 걸러낸다**. `quantity`/`unit_price`는 각각 `int()`/`float()`로 강제 변환하므로 숫자가 아닌 값이 있으면 예외가 발생한다.
-- "표준 라이브러리만 사용" 제약은 **이 `etl.py`에만 해당**하며, `openmetadata/` 쪽 스크립트(Docker, psycopg2 등 외부 의존성 사용)에는 적용되지 않는다.
+| 포트 | 프로젝트 | 서비스 |
+|---|---|---|
+| 5432 / 5433 | openmetadata | 원본 Postgres `retaildb` / `manufacturingdb` |
+| 3306 | openmetadata **와** seatunnel | OpenMetadata MySQL / seatunnel 원본 MySQL — **같은 포트라 동시에 띄울 수 없다** |
+| 8080 | openmetadata | 수집용 Airflow UI |
+| 8585 / 8586 | openmetadata | OpenMetadata UI / 관리 포트 |
+| 9200 / 9300 | openmetadata | Elasticsearch |
+| 5440 | seatunnel | 원본 Postgres `srcdb` |
+| 15432 | iceberg | `catalog-db` (HMS 내부 DB) |
+| 8081 / 8082 / 8088 | iceberg | Trino / Airflow / Superset |
+| 9000 / 9001 | iceberg | MinIO API / 콘솔 |
+
+새 포트를 공개할 때는 이 표와 겹치지 않게 하고, 추가하면 이 표도 갱신한다.
+
+## 공통 운영 주의
+
+- **`openmetadata/docker-compose.yml`은 `restart: always`**라 `stop`으로 멈춰도 Docker(Rancher Desktop)가 다시 켜지면 같이 뜬다. 안 쓸 때는 `down`으로 내린다.
+- `docker compose down -v`(볼륨 삭제)는 사용자가 명시적으로 요청할 때만 한다. 각 프로젝트의 DB·카탈로그·적재 데이터가 볼륨에 있다.
+- 발표 파일(`.pptx`)은 사용자가 PowerPoint에서 편집 중일 수 있다. 열려 있는지 확인 없이 덮어쓰지 않는다.

@@ -24,4 +24,15 @@
 - `docs/openmetadata-presentation-script.md` — 발표 대본(큐카드)
 - `docs/memo.md` — 세션 간 작업 인계 노트 (최신 상태만 유지, 로그 아님)
 
-그 외 구성(docker-compose 파일, DAG, 접속 정보 등)은 상위 `../CLAUDE.md`에 정리되어 있다.
+## 실행과 구성
+
+자세한 설계·근거는 `docs/openmetadata-demo-design.md`. 포트 전체 지도는 상위 `../CLAUDE.md`.
+
+- 기동: `./scripts/up.sh` (seed SQL 재생성 → 원본 Postgres → 공식 스택) / 종료: `./scripts/down.sh` (`--volumes`는 데이터 삭제이므로 사용자가 요청할 때만)
+- `docker-compose.yml` — OpenMetadata 공식 배포본 **그대로** (직접 수정 금지, 버전 올릴 땐 새 GitHub Release로 재다운로드). `restart: always`라 안 쓸 때는 `down`으로 내린다.
+- `docker-compose.dags.yml` — 커스텀 DAG(`dags/`)를 수집용 Airflow 컨테이너에 얹는 오버레이. **반드시 `docker-compose.yml`과 같이 `-f` 두 개로** 올린다 (하나만 올리면 재생성 시 DAG가 안 보인다. 파일이 지워지는 건 아니고 두 파일로 다시 올리면 복구된다).
+- `docker-compose.sourcedb.yml` — 카탈로그 대상 원본 Postgres 2개: `retaildb`(5432), `manufacturingdb`(5433, `sourcedb-init2/`)
+- `dags/customer_sales_summary_join.py` — customers+sales 조인 데모 DAG. DAG를 만들거나 고칠 때는 `~/projects/.claude/rules/dag-style.md`를 따른다.
+- `sourcedb-init/generate_seed_sql.py` — 루트 `data/*.csv` → seed SQL 재생성 (`etl.py`와 같은 정제 규칙)
+- 접속: OpenMetadata UI `localhost:8585` (`admin@open-metadata.org` / `admin`), Airflow UI `localhost:8080` (`admin` / `admin`), 원본 Postgres `localhost:5432` (`retaildb` / `demo` / `demo`)
+- OpenMetadata 컨테이너에서 원본 Postgres에 접속할 때는 컨테이너명이 아니라 `host.docker.internal`을 쓴다 (다른 compose 프로젝트 = 다른 Docker 네트워크). Rancher Desktop에서도 동작한다. 리눅스 네이티브 환경은 별도 네트워크 설정이 필요하다.
